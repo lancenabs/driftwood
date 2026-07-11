@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Montserrat", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  
+  --color-primary: #58CC02;
+  --color-primary-dark: #46A302;
+  --color-secondary: #1CB0F6;
+  --color-secondary-container: #CE9FFC;
+  --color-on-secondary-container: #1899D6;
+  --color-tertiary: #FF9600;
+  --color-tertiary-container: #FFE16D;
+  --color-tertiary-fixed: #FFE16D;
+  --color-tertiary-fixed-dim: #E9C400;
+  --color-background: #F1F5F9;
+  --color-on-background: #4B4B4B;
+  --color-on-surface: #4B4B4B;
+  --color-surface-container: #F1F5F9;
+  --color-surface-container-low: #F8FAFC;
+  --color-surface-container-lowest: #ffffff;
+  --color-outline-variant: #E5E5E5;
+}
+
+.theme-calm {
+  --color-primary: #3c7750 !important; /* Low-contrast soothing forest green */
+  --color-primary-dark: #2b5639 !important;
+  --color-secondary: #4a758c !important; /* Low-contrast soft slate blue */
+  --color-secondary-container: #b3a5c7 !important; /* Low-contrast soft lavender */
+  --color-on-secondary-container: #335263 !important;
+  --color-tertiary: #b06e30 !important; /* Soft warm amber */
+  --color-tertiary-container: #ecd8b5 !important;
+  --color-tertiary-fixed: #ecd8b5 !important;
+  --color-tertiary-fixed-dim: #c5975e !important;
+  --color-background: #FAF6F0 !important; /* Warm sepia evening paper background */
+  --color-on-background: #4A453F !important; /* Low-contrast soft warm coffee/charcoal text */
+  --color-on-surface: #4A453F !important;
+  --color-surface-container: #F0EAE1 !important; /* Cozy sepia container borders & panels */
+  --color-surface-container-low: #FAF6F0 !important;
+  --color-surface-container-lowest: #FFFFFF !important;
+  --color-outline-variant: #E0D7C9 !important;
+}
+
+.shadow-3d-primary {
+  box-shadow: 0 4px 0 var(--color-primary-dark);
+}
+
+.shadow-3d-secondary {
+  box-shadow: 0 4px 0 var(--color-on-secondary-container);
+}
+
+.shadow-3d-neutral {
+  box-shadow: 0 4px 0 var(--color-outline-variant);
+}
+
+.btn-3d-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border-bottom: 4px solid var(--color-primary-dark);
+  transition: all 0.1s ease;
+}
+.btn-3d-primary:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.btn-3d-secondary {
+  background-color: var(--color-secondary);
+  color: white;
+  border-bottom: 4px solid var(--color-on-secondary-container);
+  transition: all 0.1s ease;
+}
+.btn-3d-secondary:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Hide scrollbar for custom lists */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

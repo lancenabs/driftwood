@@ -1,0 +1,6 @@
+{
+  "name": "FamilyFrame",
+  "description": "An evidence-based couples & family therapy app that blends clinical programs with an AI-driven simulation game.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
