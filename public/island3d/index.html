@@ -641,6 +641,55 @@ addEventListener('keydown', e => { if (e.code === 'Space') wantJump = true; });
 jumpBtn.style.display = 'block';
 jumpBtn.addEventListener('pointerdown', () => { wantJump = true; });
 
+// ── THE SHELL RUN — the Mario layer: hop, climb, collect ─────────────────────
+// Golden shells scattered by the same deterministic seed (one treasure map
+// per family). Most ride the beach; the high ones float where only a hop
+// from a built tower reaches — collecting is the reason to build. Found
+// shells persist (driftwood_shells_v1). Pure play: shells feed nothing,
+// unlock nothing, judge nobody. The counter is just a wooohooo.
+const SHELLS = [];
+{
+  const shellGeo = new THREE.IcosahedronGeometry(0.32, 0);
+  const shellMat = new THREE.MeshLambertMaterial({ color: 0xFFD34D, emissive: 0x8A6A10 });
+  let collected = {};
+  try { collected = JSON.parse(localStorage.getItem('driftwood_shells_v1') || '{}'); } catch { /* fresh hunt */ }
+  const spots = [{ x: 2, z: 90, h: 0 }];                          // the starter, on the walk to the fire
+  for (const s of scatterOn(29, h => h > 0.6 && h < 8)) spots.push({ x: s.x, z: s.z, h: 0 });
+  for (const s of scatterOn(10, h => h > 0.6 && h < 10)) spots.push({ x: s.x, z: s.z, h: 2.4 + rand() * 2.2 }); // the high ones — build to them
+  spots.forEach((s, i) => {
+    if (collected[i]) return;
+    const m = new THREE.Mesh(shellGeo, shellMat);
+    m.position.set(s.x, groundY(s.x, s.z) + 0.5 + s.h, s.z);
+    m.userData = { id: i, baseY: m.position.y };
+    scene.add(m);
+    SHELLS.push(m);
+  });
+  var shellCount = Object.keys(collected).length;
+  var SHELL_TOTAL = spots.length;
+}
+const shellChip = document.createElement('div');
+shellChip.id = 'shells';
+shellChip.style.cssText = 'position:fixed;top:30px;right:10px;z-index:40;background:rgba(255,255,255,0.92);border-radius:999px;padding:8px 14px;font-size:11px;font-weight:800;color:#B8860B;box-shadow:0 2px 8px rgba(0,0,0,0.12)';
+shellChip.textContent = `🐚 ${shellCount}/${SHELL_TOTAL}`;
+document.body.appendChild(shellChip);
+function collectShells() {
+  for (let i = SHELLS.length - 1; i >= 0; i--) {
+    const s = SHELLS[i];
+    const dx = s.position.x - player.position.x, dz = s.position.z - player.position.z;
+    const dy = s.userData.baseY - (player.position.y + 0.8);
+    if (dx * dx + dz * dz < 1.7 && Math.abs(dy) < 1.4) {
+      scene.remove(s); SHELLS.splice(i, 1);
+      shellCount++;
+      shellChip.textContent = `🐚 ${shellCount}/${SHELL_TOTAL}`;
+      try {
+        const c = JSON.parse(localStorage.getItem('driftwood_shells_v1') || '{}');
+        c[s.userData.id] = 1;
+        localStorage.setItem('driftwood_shells_v1', JSON.stringify(c));
+      } catch { /* the wooohooo already happened */ }
+    }
+  }
+}
+
 // ── THE JUMBLE — billboards of the real portraits on driftwood stands ────────
 // Spread across the big island — finding them all is the first hike. Skip
 // stays near camp; the Collier lives up in the northwest spine, by his forge.
@@ -905,6 +954,10 @@ renderer.setAnimationLoop(() => {
     o.rig.userData.baseY = groundY(o.rig.position.x, o.rig.position.z);
     animateWalk(o.rig, Math.min(d, 1), dt, t);
   }
+
+  // shells spin, bob, and get scooped
+  for (const s of SHELLS) { s.rotation.y += dt * 2.2; s.position.y = s.userData.baseY + Math.sin(t * 2.4 + s.userData.id) * 0.12; }
+  collectShells();
 
   // robots breathe; near one → it speaks (throttled)
   for (const r of robots) {
