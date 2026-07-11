@@ -14,6 +14,8 @@ import SandDrawings from './SandDrawings';
 import TwoHuts from './TwoHuts';
 import RitualDesigner from './RitualDesigner';
 import NamingTheUndertow from './NamingTheUndertow';
+import GameShell from './GameShell';
+import PerspectiveSwap from '../PerspectiveSwap';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -74,6 +76,16 @@ const GAMES: GameDef[] = [
   { id: 'naming_the_undertow', name: 'Naming the Undertow', emoji: '🌀', tier: 'deep water',
     blurb: 'Map the cycle that grabs you both, then name it — the cycle is the enemy, never each other.',
     render: (onClose) => <NamingTheUndertow onClose={onClose} /> },
+  // #16 — the crown mechanic was already built as a shore tool; the campfire
+  // simply gives it a seat (same component, same consent spine, zero forks)
+  { id: 'perspective_swap', name: 'Walk a Day in Their Boots', emoji: '🔁', tier: 'deep water',
+    blurb: 'The Perspective Swap — one written day as each other. Invited, bounded, debriefed.',
+    render: (onClose) => (
+      <GameShell emoji="🔁" title="Walk a Day in Their Boots" subtitle="the perspective swap · invited · bounded · debriefed"
+        onClose={onClose} bg="linear-gradient(#1E2A44, #33415E)">
+        <div className="px-5 py-6 max-w-md mx-auto w-full"><PerspectiveSwap /></div>
+      </GameShell>
+    ) },
   // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: Ritual Designer,
   //   the Ridgepole Vote, Naming the Undertow, … each a file + a line here.
 ];
