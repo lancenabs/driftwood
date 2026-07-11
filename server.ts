@@ -29,6 +29,20 @@ const ai = new GoogleGenAI({
   }
 });
 
+
+// ── The vendored library's narrator endpoints ────────────────────────────────
+// The island tools ask /api/lance/respond + /api/intern/respond for adaptive
+// lines. On this shore those voices are the Jumble; until a key ceremony
+// happens they answer honestly keyless: { success:false, error:'no_api_key' }
+// — the exact signal the vendored hook reads to fall back to its static
+// content (and stop asking). No 404 noise, no fake lines.
+app.post("/api/lance/respond", (_req, res) => {
+  res.json({ success: false, error: "no_api_key" });
+});
+app.post("/api/intern/respond", (_req, res) => {
+  res.json({ success: false, error: "no_api_key" });
+});
+
 // Create our secure clinical AI coach API route
 app.post("/api/coach-chat", async (req, res) => {
   try {

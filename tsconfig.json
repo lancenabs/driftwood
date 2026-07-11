@@ -18,6 +18,12 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "firebase/firestore": [
+        "./src/lance/lib/firestore-stub.ts"
+      ],
+      "firebase/auth": [
+        "./src/lance/lib/fireauth-stub.ts"
       ]
     },
     "allowImportingTsExtensions": true,
