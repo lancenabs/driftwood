@@ -298,17 +298,29 @@ instancedScatter(new THREE.CylinderGeometry(0.3, 0.4, 4.6, 7), mat(0xC9B08C), sc
   d.rotation.set(0, rand() * Math.PI, Math.PI / 2);
 });
 // the camp: fire + tent + rowboat
+// THE FIRE THE FAMILY BUILT — every conjoint act this week (fire_quiz_played:
+// every campfire game round) laid a real log. The island reads the week and
+// burns accordingly: more logs in the teepee, a taller flame, a wider glow.
+// This is the reconnection loop made visible — Saturday's island shows the
+// warmth the family earned Monday through Friday.
+let warmth = 0;
+try {
+  const evs = JSON.parse(localStorage.getItem('driftwood_events_v1') || '[]');
+  warmth = Math.min(evs.filter(e => e && e.action === 'fire_quiz_played').length, 24);
+} catch { /* a cold start is still a start */ }
 const fire = new THREE.Group();
-for (let i = 0; i < 4; i++) {
+const logCount = 4 + Math.floor(warmth / 2);           // 4 sticks cold → 16 at full warmth
+for (let i = 0; i < logCount; i++) {
   const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 1.2, 5), mat(0x8a6a48));
-  stick.rotation.z = 0.5; stick.rotation.y = (i / 4) * Math.PI * 2;
+  stick.rotation.z = 0.5 + (i % 3) * 0.06; stick.rotation.y = (i / logCount) * Math.PI * 2;
   stick.position.y = 0.3;
   fire.add(stick);
 }
+const flameScale = 1 + warmth * 0.055;                 // the week grows the flame
 const flame = new THREE.Mesh(new THREE.ConeGeometry(0.34, 1.1, 7), new THREE.MeshBasicMaterial({ color: 0xFFA64D }));
 flame.position.y = 0.9;
 fire.add(flame);
-const fireLight = new THREE.PointLight(0xFFA64D, 1.1, 12);
+const fireLight = new THREE.PointLight(0xFFA64D, 1.1 + warmth * 0.05, 12 + warmth * 0.8);
 fireLight.position.y = 1.4;
 fire.add(fireLight);
 // THE CAMP — on the south shore, where the family washed in
@@ -318,6 +330,42 @@ scene.add(fire);
 const tent = new THREE.Mesh(new THREE.ConeGeometry(1.6, 2.1, 4), mat(0xC96F4A));
 tent.position.set(6, groundY(6, 96) + 1.05, 96); tent.rotation.y = Math.PI / 4;
 scene.add(tent);
+// THE FORGE PATH — Lance's stone-path texture laid as a terrain-hugging
+// ribbon from the camp to the Collier's forge in the northwest spine. The
+// island's first trail: follow the stones, meet the mender. One draw call.
+{
+  const way = [
+    new THREE.Vector3(-2, 0, 88), new THREE.Vector3(-10, 0, 70), new THREE.Vector3(-14, 0, 46),
+    new THREE.Vector3(-10, 0, 20), new THREE.Vector3(-16, 0, -6), new THREE.Vector3(-26, 0, -28),
+    new THREE.Vector3(-38, 0, -48),
+  ];
+  for (const w of way) w.y = groundY(w.x, w.z);
+  const curve = new THREE.CatmullRomCurve3(way);
+  const SEG = 90, HALF_W = 1.1;
+  const pos = [], uv = [], idx = [];
+  for (let i = 0; i <= SEG; i++) {
+    const u = i / SEG;
+    const p = curve.getPointAt(u);
+    const tan = curve.getTangentAt(u);
+    const nx = -tan.z, nz = tan.x;                      // XZ normal to the trail
+    const inv = 1 / (Math.hypot(nx, nz) || 1);
+    const lx = p.x + nx * inv * HALF_W, lz = p.z + nz * inv * HALF_W;
+    const rx = p.x - nx * inv * HALF_W, rz = p.z - nz * inv * HALF_W;
+    pos.push(lx, groundY(lx, lz) + 0.06, lz, rx, groundY(rx, rz) + 0.06, rz);
+    uv.push(0, u * 26, 1, u * 26);
+    if (i < SEG) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  }
+  const pathGeo = new THREE.BufferGeometry();
+  pathGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  pathGeo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  pathGeo.setIndex(idx);
+  pathGeo.computeVertexNormals();
+  const pathTex = texLoader.load('/island3d/tex/path-stone.jpg');
+  pathTex.wrapS = pathTex.wrapT = THREE.RepeatWrapping;
+  // DoubleSide: the ribbon's winding follows the curve direction — don't let
+  // backface culling hide the trail from above
+  scene.add(new THREE.Mesh(pathGeo, new THREE.MeshLambertMaterial({ map: pathTex, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1 })));
+}
 const boat = new THREE.Group();
 const hull = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.1, 4.6, 8, 1, false, 0, Math.PI), mat(0x8a5a22));
 hull.rotation.z = Math.PI / 2; hull.rotation.x = Math.PI;
@@ -564,8 +612,10 @@ stickEl.addEventListener('pointerup', stickEnd); stickEl.addEventListener('point
 const keys = {};
 addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
-// drag to orbit (outside the stick)
-let camYaw = 0, camPitch = 0.34, dragging = false, px = 0, py = 0;
+// drag to orbit (outside the stick) · open with #aerial for the surveyor's view
+const AERIAL = location.hash === '#aerial';
+const CAM_D = AERIAL ? 52 : 9.0;
+let camYaw = 0, camPitch = AERIAL ? 1.08 : 0.34, dragging = false, px = 0, py = 0;
 renderer.domElement.addEventListener('pointerdown', e => { dragging = true; px = e.clientX; py = e.clientY; });
 addEventListener('pointerup', () => dragging = false);
 addEventListener('pointermove', e => {
@@ -738,9 +788,9 @@ renderer.setAnimationLoop(() => {
   // clouds drift slowly across the horizon
   for (const c of clouds) { c.position.x += dt * 0.6; if (c.position.x > 150) c.position.x = -150; }
 
-  // fire flicker
-  flame.scale.setScalar(1 + Math.sin(t * 8) * 0.1);
-  fireLight.intensity = 1.0 + Math.sin(t * 7.3) * 0.15;
+  // fire flicker (around the warmth the week earned)
+  flame.scale.setScalar(flameScale * (1 + Math.sin(t * 8) * 0.1));
+  fireLight.intensity = (1.0 + warmth * 0.05) + Math.sin(t * 7.3) * 0.15;
 
   // gather round: near the fire → the games prompt rises
   const wasNear = nearFire;
@@ -748,10 +798,10 @@ renderer.setAnimationLoop(() => {
   if (nearFire !== wasNear) gatherEl.style.display = nearFire ? 'block' : 'none';
 
   // third-person camera: behind + above, orbit by drag
-  const cx = player.position.x + Math.sin(camYaw) * 9.0 * Math.cos(camPitch);
-  const cz = player.position.z + Math.cos(camYaw) * 9.0 * Math.cos(camPitch);
+  const cx = player.position.x + Math.sin(camYaw) * CAM_D * Math.cos(camPitch);
+  const cz = player.position.z + Math.cos(camYaw) * CAM_D * Math.cos(camPitch);
   // ride the hills with the player (never sink the camera into a slope)
-  const cy = Math.max(player.position.y + 2.4 + Math.sin(camPitch) * 9.0, groundY(cx, cz) + 1.2);
+  const cy = Math.max(player.position.y + 2.4 + Math.sin(camPitch) * CAM_D, groundY(cx, cz) + 1.2);
   camera.position.lerp(new THREE.Vector3(cx, cy, cz), Math.min(1, dt * 7));
   camera.lookAt(player.position.x, player.position.y + 1.2, player.position.z);
 
