@@ -547,7 +547,7 @@ ${completedChallenges.length > 0 ? `<h2>Completed Challenges</h2>
         </button>
         <div>
           <div className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#3ECFCF' }}>Clinical Analytics</div>
-          <h2 className="text-sm font-black leading-none" style={{ color: '#E8F5F1' }}>Your Insights Hub</h2>
+          <h2 className="text-sm font-black leading-none" style={{ color: '#E8F5F1' }}>What the water remembers</h2>
         </div>
         {hasAnyDataAtAll && (
         <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full"
