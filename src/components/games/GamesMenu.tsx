@@ -7,6 +7,8 @@ import BidAndTurn from './BidAndTurn';
 import WeatherReport from './WeatherReport';
 import RepairRope from './RepairRope';
 import StoryCircle from './StoryCircle';
+import ChoreSwap from './ChoreSwap';
+import MemoryMatch from './MemoryMatch';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -46,6 +48,12 @@ const GAMES: GameDef[] = [
   { id: 'story_circle', name: 'The Story Circle', emoji: '📖', tier: 'family',
     blurb: 'The fire deals a prompt; each voice adds a chapter. The island remembers.',
     render: (onClose) => <StoryCircle onClose={onClose} /> },
+  { id: 'chore_swap', name: 'The Chore Swap', emoji: '🧤', tier: 'kindling',
+    blurb: "Trade one invisible task this week — your lantern only lights for THEIR load.",
+    render: (onClose) => <ChoreSwap onClose={onClose} /> },
+  { id: 'memory_match', name: 'Memory Match', emoji: '🐚', tier: 'family',
+    blurb: 'Flip the shells together — every pair is a family memory to retell out loud.',
+    render: (onClose) => <MemoryMatch onClose={onClose} /> },
   // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: Ritual Designer,
   //   the Ridgepole Vote, Naming the Undertow, … each a file + a line here.
 ];
