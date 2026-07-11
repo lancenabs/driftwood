@@ -27,6 +27,23 @@ const COVER = [
 ];
 const CAMPFIRE = { x: 0.5, y: 0.5 };
 
+// ── THE JUMBLE, AT HOME ON THE ISLAND ────────────────────────────────────────
+// The wood robots the sea brought in — the heart of the story — live here,
+// each at their post, wearing their real Foundry portraits. Walk close and
+// they speak a line (scripted, honest robots; the keyed brain comes later).
+const JUMBLE: { id: string; name: string; x: number; y: number; r: number; lines: string[]; wander?: number }[] = [
+  { id: 'skip', name: 'Skip', x: 0.55, y: 0.58, r: 0.09, wander: 0.06,
+    lines: ['A stick! For you! Or— for me? For US.', 'I found this same stick nine times. Every time is the best time.', 'Race you to the rocks! I will lose on purpose. Maybe.'] },
+  { id: 'hollow', name: 'Hollow', x: 0.205, y: 0.53, r: 0.08,
+    lines: ['…it is safe in the shell. But it is warmer at the fire.', 'You may sit near. You do not have to say anything.', '…I come out slower than I go in. That is allowed.'] },
+  { id: 'echo2', name: 'Echo-2', x: 0.44, y: 0.33, r: 0.08,
+    lines: ['You said— you SAID— something kind. I am keeping it.', 'I repeat things slightly wrong. Say the important ones twice.', 'The waves say the same thing all night. I check anyway.'] },
+  { id: 'bailer', name: 'Bailer', x: 0.80, y: 0.60, r: 0.08,
+    lines: ['The boat is dry! I am keeping it that way. You never know.', 'I bailed all night. The boat was fine. I feel better though.', 'Worry is water. I have a bucket. We will be fine.'] },
+  { id: 'collier', name: 'the Collier', x: 0.68, y: 0.76, r: 0.09,
+    lines: ['Sit, sit. The forge remembers every mended thing.', 'Broken is not the end of the story. It is the middle.', 'The seam shows, little one. That is how you know it held.'] },
+];
+
 function nearCover(x: number, y: number) {
   return COVER.some(c => (x - c.x) ** 2 + (y - c.y) ** 2 < c.r ** 2);
 }
@@ -36,6 +53,8 @@ export default function IslandSeek({ onClose }: { onClose: () => void }) {
   const [, force] = useState(0);
   const [mode, setMode] = useState<'walking' | 'hiding'>('walking');
   const [found, setFound] = useState<string | null>(null); // a "found you!" toast
+  const [speaking, setSpeaking] = useState<{ id: string; name: string; line: string } | null>(null);
+  const lastLine = useRef<Record<string, number>>({});
   const pos = useRef({ x: 0.5 + (Math.random() - 0.5) * 0.2, y: 0.62 + (Math.random() - 0.5) * 0.1 });
   const facing = useRef<'left' | 'right'>('right');
   const stick = useRef<{ active: boolean; dx: number; dy: number }>({ active: false, dx: 0, dy: 0 });
@@ -126,8 +145,8 @@ export default function IslandSeek({ onClose }: { onClose: () => void }) {
       <div className="flex items-center gap-2 px-3 py-2 bg-black/20 backdrop-blur-sm">
         <span className="text-sm">🏃</span>
         <div className="flex-1">
-          <p className="text-[11px] font-black text-white">Island Seek · camp {g.code}</p>
-          <p className="text-[8px] text-white/80">walk with the stick (or WASD) · duck near {COVER.map(c => c.label).join(' ')} to hide · nothing is scored</p>
+          <p className="text-[11px] font-black text-white">{g.code ? `Island Seek · camp ${g.code}` : 'The Island · a walk among the Jumble'}</p>
+          <p className="text-[8px] text-white/80">walk with the stick (or WASD) · visit the robots · duck near {COVER.map(c => c.label).join(' ')} to hide · nothing is scored</p>
         </div>
         <button onClick={() => setMode(m => m === 'hiding' ? 'walking' : 'hiding')}
           className={`text-[10px] font-black uppercase rounded-full px-3 py-1.5 ${mode === 'hiding' ? 'bg-emerald-500 text-white' : 'bg-white/85 text-slate-700'}`}>
@@ -146,6 +165,42 @@ export default function IslandSeek({ onClose }: { onClose: () => void }) {
         ))}
         {/* the campfire — home base, always */}
         <div className="absolute text-2xl animate-pulse" style={{ left: `${CAMPFIRE.x * 100}%`, top: `${CAMPFIRE.y * 100}%`, transform: 'translate(-50%, -60%)', filter: 'drop-shadow(0 0 10px rgba(255,166,77,0.9))' }}>🔥</div>
+
+        {/* THE JUMBLE — the wood robots at their posts; tap or walk close and
+            they speak. Skip drifts a little (he cannot stand still). */}
+        {JUMBLE.map(r => {
+          const t = performance.now() / 1000;
+          const wx = r.x + (r.wander ? Math.sin(t * 0.5 + r.x * 20) * r.wander : 0);
+          const wy = r.y + (r.wander ? Math.cos(t * 0.34 + r.y * 20) * r.wander * 0.5 : 0);
+          const speak = () => {
+            const n = (lastLine.current[r.id] ?? -1) + 1;
+            lastLine.current[r.id] = n;
+            setSpeaking({ id: r.id, name: r.name, line: r.lines[n % r.lines.length] });
+            setTimeout(() => setSpeaking(s => (s?.id === r.id ? null : s)), 4500);
+          };
+          // walk-close greeting (once per approach)
+          const near = (pos.current.x - wx) ** 2 + (pos.current.y - wy) ** 2 < 0.008;
+          if (near && speaking?.id !== r.id && (lastLine.current[`near-${r.id}`] ?? 0) < performance.now() - 15000) {
+            lastLine.current[`near-${r.id}`] = performance.now();
+            speak();
+          }
+          return (
+            <button key={r.id} onClick={speak} data-testid={`jumble-${r.id}`}
+              className="absolute flex flex-col items-center cursor-pointer"
+              style={{ left: `${wx * 100}%`, top: `${wy * 100}%`, transform: 'translate(-50%, -80%)' }}>
+              <img src={`/robots/${r.id}.webp`} alt={r.name}
+                className="rounded-2xl object-cover border-2 border-white/60 shadow-lg"
+                style={{ width: r.id === 'collier' ? 58 : 46, height: r.id === 'collier' ? 58 : 46, filter: 'drop-shadow(0 4px 4px rgba(0,0,0,0.3))' }}
+                onError={e => { (e.target as HTMLImageElement).outerHTML = '<span class="text-3xl">🤖</span>'; }} />
+              <span className="text-[8px] font-black text-white bg-black/35 rounded-full px-1.5 mt-0.5">{r.name}</span>
+              {speaking?.id === r.id && (
+                <span className="absolute bottom-full mb-1 w-44 bg-white rounded-2xl px-3 py-2 text-[10px] font-bold text-slate-700 shadow-lg border border-amber-200 text-center leading-snug">
+                  {speaking.line}
+                </span>
+              )}
+            </button>
+          );
+        })}
 
         {/* the others — each family member's live avatar */}
         {others.map(p => {
@@ -172,8 +227,10 @@ export default function IslandSeek({ onClose }: { onClose: () => void }) {
           <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-white rounded-2xl px-5 py-2.5 text-sm font-black text-amber-600 shadow-lg animate-bounce">{found}</div>
         )}
         {others.length === 0 && (
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/30 rounded-2xl px-4 py-2 text-[10px] font-bold text-white">
-            the island is yours alone so far — family joins from the camp bar with code {g.code}
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/30 rounded-2xl px-4 py-2 text-[10px] font-bold text-white text-center max-w-[85%]">
+            {g.code
+              ? `the island is yours so far — family joins from the camp bar with code ${g.code}`
+              : 'a solo walk — the Jumble keeps you company. Light the fire at camp to bring the family here live.'}
           </div>
         )}
 

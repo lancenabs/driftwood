@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { readNeeds, planksEarned, embersHeld, lanternLit, appendEvent } from '../lib/world';
 import { THE_SEVEN, readCrew, aiCastaways, activeCastaway, setActiveCastaway } from '../lib/castaways';
+import IslandSeek from './IslandSeek';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE SHORE — the living scene at the top of the Driftwood tab.
@@ -27,6 +28,7 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
   // When the Foundry's painting loads, the CSS-painted layers stand down —
   // one scene, never two fighting. Missing art = the painted layers hold.
   const [artLoaded, setArtLoaded] = useState(false);
+  const [walking, setWalking] = useState(false);   // 🏝 the one-click island door
   useEffect(() => {
     const bump = () => force(x => x + 1);
     window.addEventListener('driftwood:world-event', bump);
@@ -110,6 +112,15 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
           <span className="text-[7px] font-black uppercase tracking-wider text-white bg-black/30 rounded-full px-1.5 mt-0.5">the Jumble</span>
         </button>
 
+        {/* 🏝 THE ISLAND DOOR — one click, you're standing on it. Solo works
+            (the Jumble keeps you company); gathering brings the family live. */}
+        <button onClick={() => setWalking(true)} data-testid="walk-island"
+          className="absolute top-3 left-3 flex items-center gap-1.5 bg-white/90 hover:bg-white rounded-full pl-2 pr-3 py-1.5 shadow-md cursor-pointer transition-transform hover:scale-105"
+          title="Walk the island — your avatar, third person, the Jumble at their posts">
+          <span className="text-sm">🏝</span>
+          <span className="text-[10px] font-black uppercase tracking-wide text-slate-700">Walk the island</span>
+        </button>
+
         {/* THE LANTERN DOCK — one per castaway; lit = real work this week */}
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 translate-x-10 flex items-end gap-1.5">
           {THE_SEVEN.map(slot => {
@@ -155,6 +166,9 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
           </p>
         )}
       </div>
+
+      {/* the island itself, one click deep */}
+      {walking && <IslandSeek onClose={() => setWalking(false)} />}
     </div>
   );
 }
