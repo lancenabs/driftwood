@@ -47,5 +47,14 @@ joins the **Avatar picker** automatically (👨 Dad · 👩 Mom · 🧒×3 · �
 Buddy-bot), grounded by its foot bone, driven by the walk system. Missing =
 simply absent — nothing breaks while the family is being cast.
 
+## 🆕 FAMILY #2 (2026-07-11 late — the diversity line begins)
+Four A-pose sheets cast from Lance's african_american_family.jpg, staged at
+`~/Downloads/driftwood-family2-sheets/` (dad2 · mom2 · boy2-older · boy2-younger).
+Same cast recipe; land as `family2-<id>.glb` (FAMILY_SLOTS entries added at
+wiring). AND: the dad of family #1 now has a 3-VIEW TURNAROUND uploaded +
+confirmed at Higgsfield — cast HIM via multi_image_to_3d (38cr, rigged +
+Casual_Walk id 30) for the best geometry; the single-image path is the
+fallback for the rest until they get turnarounds.
+
 *Then tell Claude "the family is in" — a verification walk + commit follows,
 and the Seven's slot-claiming maps each family member to their real mesh.*
