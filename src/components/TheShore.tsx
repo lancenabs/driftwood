@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { readNeeds, planksEarned, embersHeld, lanternLit, appendEvent } from '../lib/world';
 import { THE_SEVEN, readCrew, aiCastaways, activeCastaway, setActiveCastaway } from '../lib/castaways';
-import FireQuiz from './FireQuiz';
+import GamesMenu from './games/GamesMenu';
 // (the 2D seek map remains the Gathering bar's game; the shore door now opens
 // the REAL island — public/island3d/, third person, the Horizon-mobile shape)
 
@@ -150,13 +150,13 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         <span className="text-[10px] font-bold opacity-90 normal-case">· walk it in 3D, meet the wood robots</span>
       </button>
 
-      {/* 🔥 THE FIRE QUIZ — build a shared fire by learning each other. Pass the
-          phone; every log warms the whole family's camp. */}
+      {/* 🏕️ CAMPFIRE GAMES — the reconnection mini-games. Build a shared fire by
+          learning each other; every game warms the whole family's camp. */}
       <button onClick={() => setFiring(true)} data-testid="fire-quiz"
         className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-sm cursor-pointer hover:brightness-105 active:brightness-95 transition-all border-t-2 border-outline-variant">
-        <span className="text-lg">🔥</span>
-        <span className="uppercase tracking-wide">The Fire Quiz</span>
-        <span className="text-[10px] font-bold opacity-90 normal-case">· learn each other, lay a log, warm the family</span>
+        <span className="text-lg">🏕️</span>
+        <span className="uppercase tracking-wide">Campfire Games</span>
+        <span className="text-[10px] font-bold opacity-90 normal-case">· learn each other, warm the family, together</span>
       </button>
 
       {/* ── THE FIVE NEEDS ── */}
@@ -189,8 +189,8 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         )}
       </div>
 
-      {/* the Fire Quiz — pass-the-phone, feeds the shared camp fire */}
-      {firing && <FireQuiz onClose={() => setFiring(false)} />}
+      {/* the campfire games menu — Fire Quiz, Two Truths, and the growing rest */}
+      {firing && <GamesMenu onClose={() => setFiring(false)} />}
 
       {/* the island itself, one click deep — 3D, third person, same origin so
           your castaway, your fit, and the live camp all carry over */}
