@@ -95,7 +95,7 @@ export default function BidAndTurn({ onClose }: { onClose: () => void }) {
             That's {caught} moments you'd have met a real bid instead of missing it. {missed > 0 && `${missed} drifted past — that's okay, they always do; the muscle is in the noticing.`} Play it a few times this week, and it starts happening on its own with the people you love.
           </p>
           <button onClick={() => { setCaught(0); setMissed(0); setEmbers([]); setTimeLeft(45); setPhase('play'); }} className="bg-white/15 border-2 border-white/25 text-white font-black rounded-xl py-2.5 text-sm">Again</button>
-          <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-2.5 text-sm">Back to the shore</button>
+          <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-2.5 text-sm">Back to the campfire</button>
         </div>
       )}
     </GameShell>

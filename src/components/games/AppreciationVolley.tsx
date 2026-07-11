@@ -87,7 +87,7 @@ export default function AppreciationVolley({ onClose }: { onClose: () => void })
             <div className="text-5xl">🏐🔥</div>
             <p className="text-white text-lg font-black">A {rally}-volley rally.</p>
             <p className="text-white/80 text-sm">You kept {rally} specific appreciations aloft and laid {logs} {logs === 1 ? 'log' : 'logs'}. That's the turning-toward muscle — small, specific, daily. It's the whole science.</p>
-            <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-3 text-sm">Back to the shore</button>
+            <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-3 text-sm">Back to the campfire</button>
           </div>
         )}
       </div>

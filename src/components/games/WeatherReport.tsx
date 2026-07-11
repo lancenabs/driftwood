@@ -77,7 +77,7 @@ export default function WeatherReport({ onClose }: { onClose: () => void }) {
               <p>{gA === wA ? `✓ ${bName} read ${a}'s sky right.` : `${bName} guessed ${w(gA)?.label.toLowerCase()} — it was ${w(wA)?.label.toLowerCase()}. Worth asking about.`}</p>
             </div>
             <p className="text-[11px] text-white/70 italic">Now you both know the real forecast. Sail accordingly — offer an umbrella, not an argument.</p>
-            <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-3 text-sm">Back to the shore</button>
+            <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-3 text-sm">Back to the campfire</button>
           </div>
         )}
       </div>

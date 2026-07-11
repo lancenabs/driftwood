@@ -182,7 +182,7 @@ export default function FireQuiz({ onClose }: { onClose: () => void }) {
               You laid {logs} {logs === 1 ? 'log' : 'logs'} tonight — every one a thing you learned about each other. It's warming the whole crew now; anyone who opens the shore will see it lit.
             </p>
             <p className="text-[11px] text-amber-100/80 italic">TOGETHER rose. That's not a score — it's the temperature of the camp.</p>
-            <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-3 text-sm">Back to the shore</button>
+            <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-3 text-sm">Back to the campfire</button>
           </div>
         )}
       </div>

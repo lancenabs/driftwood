@@ -5,6 +5,8 @@ import AppreciationVolley from './AppreciationVolley';
 import LoveLanguageSort from './LoveLanguageSort';
 import BidAndTurn from './BidAndTurn';
 import WeatherReport from './WeatherReport';
+import RepairRope from './RepairRope';
+import StoryCircle from './StoryCircle';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -38,8 +40,14 @@ const GAMES: GameDef[] = [
   { id: 'weather_report', name: 'Weather Report', emoji: '🌦', tier: 'kindling',
     blurb: "Name your inner weather, guess each other's — ask before assuming.",
     render: (onClose) => <WeatherReport onClose={onClose} /> },
-  // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: the Repair Rope,
-  //   Ritual Designer, Naming the Undertow, … each a file + a line here.
+  { id: 'repair_rope', name: 'The Repair Rope', emoji: '🪢', tier: 'steady flame',
+    blurb: 'Braid the exact phrases that reach each other mid-storm — kept forever.',
+    render: (onClose) => <RepairRope onClose={onClose} /> },
+  { id: 'story_circle', name: 'The Story Circle', emoji: '📖', tier: 'family',
+    blurb: 'The fire deals a prompt; each voice adds a chapter. The island remembers.',
+    render: (onClose) => <StoryCircle onClose={onClose} /> },
+  // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: Ritual Designer,
+  //   the Ridgepole Vote, Naming the Undertow, … each a file + a line here.
 ];
 
 export default function GamesMenu({ onClose }: { onClose: () => void }) {

@@ -124,7 +124,7 @@ export default function TwoTruthsTide({ onClose }: { onClose: () => void }) {
             <div className="text-5xl">🏮</div>
             <p className="text-white text-lg font-black">The dock is lit.</p>
             <p className="text-white/80 text-sm">{lanterns} lanterns — every one a true thing you learned about each other's week. The crew's warmer for it.</p>
-            <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-3 text-sm">Back to the shore</button>
+            <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-3 text-sm">Back to the campfire</button>
           </div>
         )}
       </div>

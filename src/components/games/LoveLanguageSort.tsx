@@ -95,7 +95,7 @@ export default function LoveLanguageSort({ onClose }: { onClose: () => void }) {
                 ? 'You share a language — speak it often and loud.'
                 : `You speak different languages — and now you know the words. This week, try loving ${bName} in ${lang(topB)?.label.toLowerCase()}, and ${a} in ${lang(topA)?.label.toLowerCase()}.`}
             </p>
-            <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-3 text-sm">Back to the shore</button>
+            <button onClick={onClose} className="bg-amber-500 text-white font-black rounded-xl py-3 text-sm">Back to the campfire</button>
           </div>
         )}
       </div>
