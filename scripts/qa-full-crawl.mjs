@@ -29,7 +29,7 @@ await page.waitForTimeout(1600);
 // ── The four rooms ───────────────────────────────────────────────────────────
 for (const room of ['Check-in', 'Library', 'Insights', 'Driftwood']) {
   current = `room:${room}`;
-  await page.locator('nav').getByText(room, { exact: true }).click()
+  await page.locator('nav:visible').getByText(room, { exact: true }).click()
     .catch(() => findings.push({ where: current, kind: 'nav-fail', msg: 'room not clickable' }));
   await page.waitForTimeout(900);
 }
@@ -37,7 +37,7 @@ for (const room of ['Check-in', 'Library', 'Insights', 'Driftwood']) {
 // ── The crisis strip rides every room ────────────────────────────────────────
 current = 'law:strip';
 for (const room of ['Check-in', 'Library', 'Insights', 'Driftwood']) {
-  await page.locator('nav').getByText(room, { exact: true }).click().catch(() => {});
+  await page.locator('nav:visible').getByText(room, { exact: true }).click().catch(() => {});
   await page.waitForTimeout(500);
   const lit = await page.getByText('National Domestic Violence Hotline').first().isVisible().catch(() => false);
   if (!lit) findings.push({ where: `strip:${room}`, kind: 'DV-LINE-DOWN', msg: 'the bright line is not visible on this room' });
@@ -56,8 +56,8 @@ for (const id of [...DECK, ...ISLAND_SAMPLE]) {
 
 // ── The Milestone Log + the swap card render ─────────────────────────────────
 current = 'room:milestones';
-await page.locator('nav').getByText('Driftwood', { exact: true }).click().catch(() => {});
-await page.locator('nav').getByText('Driftwood', { exact: true }).click().catch(() => {});
+await page.locator('nav:visible').getByText('Driftwood', { exact: true }).click().catch(() => {});
+await page.locator('nav:visible').getByText('Driftwood', { exact: true }).click().catch(() => {});
 await page.waitForTimeout(700);
 if (!(await page.getByText('The Milestone Log').first().isVisible().catch(() => false)))
   findings.push({ where: current, kind: 'log-fail', msg: 'milestone log missing from the shore' });
