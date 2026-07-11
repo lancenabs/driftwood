@@ -18,7 +18,7 @@ export interface SimulationBeat {
 }
 
 export interface Character {
-  id: 'sam' | 'alex';
+  id: string;                 // staged-pattern id (robots stage patterns, never people)
   name: string;
   archetype: string;
   archetypeColor: string;

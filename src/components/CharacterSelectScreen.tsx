@@ -46,7 +46,7 @@ export default function CharacterSelectScreen({ onBack, onSelectCharacter }: Cha
 
       {/* Character Selector Section */}
       <div className="flex flex-col gap-4 mt-2">
-        <h3 className="font-display font-black text-xs text-on-surface-variant uppercase tracking-widest px-2">Choose Your Partner Archetype</h3>
+        <h3 className="font-display font-black text-xs text-on-surface-variant uppercase tracking-widest px-2">Choose the pattern the robot will stage</h3>
         
         <div className="flex flex-col gap-4">
           {CHARACTERS.map((char) => (

@@ -2,14 +2,14 @@ import { Character, MicroLesson, AgentSpec } from '../types';
 
 export const CHARACTERS: Character[] = [
   {
-    id: 'sam',
-    name: 'Sam',
-    archetype: 'Resistant Partner',
+    id: 'skip_stages_the_chase',
+    name: 'Skip stages: The Chase',
+    archetype: 'a pattern, played by a robot',
     archetypeColor: 'text-rose-600 border-rose-200 bg-rose-50',
     archetypeBg: 'bg-rose-500/10 border-rose-500/20 text-rose-700',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    avatarUrl: '/robots/skip.webp',
     description: 'Likely to feel managed or nagged, quickly getting defensive. Requires a gentle, softened start-up and validation of their fatigue.',
-    longDescription: 'Sam represents the classic pursuer-distancer dynamic where requests for chore completion are interpreted as micro-management or parental nagging. Sam responds best to authentic vulnerability and explicit reassurance of their autonomy.',
+    longDescription: 'Skip stages the classic pursuer pattern — a robot playing a PATTERN on neutral ground, never an imitation of anyone in your family. The pattern where requests for chore completion are interpreted as micro-management or parental nagging. the staged partner responds best to authentic vulnerability and explicit reassurance of their autonomy.',
     difficulty: 3,
     scenario: 'The Dirty Dish Dilemma',
     challengeBeats: [
@@ -24,7 +24,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 5,
             empathyScore: 25,
             safetyScore: 30,
-            feedback: "Sam rolls their eyes, crosses their arms, and pulls their phone back out. Defenses are fully up.",
+            feedback: "Skip (in character) rolls his eye-lamps, crosses their arms, and pulls their phone back out. Defenses are fully up.",
             coachNudge: "This is a direct Criticism. Stating what your partner is doing wrong triggers immediate defensiveness. Try starting with 'I feel...' instead."
           },
           {
@@ -33,7 +33,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 15,
             empathyScore: 95,
             safetyScore: 100,
-            feedback: "Sam softens slightly, puts down their phone, and listens. They feel your vulnerability rather than a direct attack.",
+            feedback: "Skip (in character) softens, gears slowing, puts down their phone, and listens. They feel your vulnerability rather than a direct attack.",
             coachNudge: "Excellent! You started with your feeling ('I feel overwhelmed') and stated a positive need ('I would love some support') without placing blame."
           }
         ]
@@ -49,7 +49,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 5,
             empathyScore: 35,
             safetyScore: 40,
-            feedback: "Sam sighs deeply. 'See? This is exactly what I mean. You always escalate everything into a huge fight.'",
+            feedback: "the staged partner sighs deeply. 'See? This is exactly what I mean. You always escalate everything into a huge fight.'",
             coachNudge: "This is Defensiveness. Returning an attack with a counter-attack keeps the conflict going. Try validating their need for autonomy first."
           },
           {
@@ -58,7 +58,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 15,
             empathyScore: 90,
             safetyScore: 95,
-            feedback: "Sam nods reluctantly. 'Yeah, I guess that makes sense. I just hate feeling like I'm on a deadline the second I walk through the door.'",
+            feedback: "the staged partner nods reluctantly. 'Yeah, I guess that makes sense. I just hate feeling like I'm on a deadline the second I walk through the door.'",
             coachNudge: "Beautiful validation! You validated their perspective ('I know you are tired and want downtime') and re-stated your own need gently."
           }
         ]
@@ -74,7 +74,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 5,
             empathyScore: 30,
             safetyScore: 35,
-            feedback: "Sam looks disappointed. They do the dishes, but a cold, silent distance remains between you.",
+            feedback: "the staged partner looks disappointed. They do the dishes, but a cold, silent distance remains between you.",
             coachNudge: "This is Stonewalling. It cuts off Sam's attempt at repair and compromise. Accept their offer with warm appreciation."
           },
           {
@@ -83,7 +83,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 15,
             empathyScore: 100,
             safetyScore: 100,
-            feedback: "Sam smiles and stands up. 'Deal. Let's get it done.' You feel a warm surge of relationship safety.",
+            feedback: "the staged partner smiles and stands up. 'Deal. Let's get it done.' You feel a warm surge of relationship safety.",
             coachNudge: "Perfect! You accepted influence, validated their compromise, and expressed appreciation. This builds lasting emotional connection."
           }
         ]
@@ -91,14 +91,14 @@ export const CHARACTERS: Character[] = [
     ]
   },
   {
-    id: 'alex',
-    name: 'Alex',
-    archetype: 'The Avoider',
+    id: 'hollow_stages_the_shell',
+    name: 'Hollow stages: The Shell',
+    archetype: 'a pattern, played by a robot',
     archetypeColor: 'text-indigo-600 border-indigo-200 bg-indigo-50',
     archetypeBg: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-700',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    avatarUrl: '/robots/hollow.webp',
     description: 'Tends to withdraw or change the subject to escape high-stress conversations. Needs clear, gentle boundaries and non-threatening check-ins.',
-    longDescription: 'Alex represents the avoidant coping style, where difficult emotional topics trigger freeze-or-flight reflexes. Alex responds best when conversations are broken down into small increments and when relationship safety is explicitly established.',
+    longDescription: 'the staged partner represents the avoidant coping style, where difficult emotional topics trigger freeze-or-flight reflexes. the staged partner responds best when conversations are broken down into small increments and when relationship safety is explicitly established.',
     difficulty: 4,
     scenario: 'The Silent Dinner Distraction',
     challengeBeats: [
@@ -113,8 +113,8 @@ export const CHARACTERS: Character[] = [
             xpReward: 5,
             empathyScore: 20,
             safetyScore: 30,
-            feedback: "Alex shrugs and goes completely silent, tuning you out entirely. You've hit a stonewall.",
-            coachNudge: "Using absolute terms like 'always' or 'never' is criticism. Alex withdraws further because the environment feels unsafe."
+            feedback: "the staged partner shrugs and goes completely silent, tuning you out entirely. You've hit a stonewall.",
+            coachNudge: "Using absolute terms like 'always' or 'never' is criticism. the staged partner withdraws further because the environment feels unsafe."
           },
           {
             text: "I completely understand needing to unwind after a heavy workday, and I want you to have that time. At the same time, dinner is our only chance to sync up. Can we do 10 minutes of screen-free connection, then you scroll?",
@@ -122,7 +122,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 15,
             empathyScore: 95,
             safetyScore: 100,
-            feedback: "Alex locks eyes, puts the phone face-down, and sighs. 'Yeah, okay. I can do 10 minutes. What's on your mind?'",
+            feedback: "the staged partner locks eyes, puts the phone face-down, and sighs. 'Yeah, okay. I can do 10 minutes. What's on your mind?'",
             coachNudge: "Excellent job! You validated their fatigue first ('completely understand needing to unwind') and then proposed a structured, non-threatening check-in."
           }
         ]
@@ -130,7 +130,7 @@ export const CHARACTERS: Character[] = [
       {
         id: 2,
         npcStatement: "I just feel like every time we talk about our budget or schedule, it turns into a lecture on what I spent or what I forgot to sign up for. It makes me anxious.",
-        goalDescription: "Objective: Reassure Alex of relationship safety and dismantle the 'lecture' dynamic.",
+        goalDescription: "Objective: Reassure the staged partner of relationship safety and dismantle the 'lecture' dynamic.",
         options: [
           {
             text: "It wouldn't feel like a lecture if you were proactive and paid attention to our shared responsibilities once in a while!",
@@ -138,7 +138,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 5,
             empathyScore: 30,
             safetyScore: 40,
-            feedback: "Alex pushes their plate away. 'Forget it. I'm not doing this right now,' and walks away from the table.",
+            feedback: "the staged partner pushes their plate away. 'Forget it. I'm not doing this right now,' and walks away from the table.",
             coachNudge: "Defensiveness and counter-criticism confirm Alex's fear that this is a lecture. Try validating their anxiety and establishing teamwork."
           },
           {
@@ -147,7 +147,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 15,
             empathyScore: 95,
             safetyScore: 95,
-            feedback: "Alex looks relieved. 'I really appreciate you saying that. Maybe if we kept it to just one budget category at a time instead of everything at once.'",
+            feedback: "the staged partner looks relieved. 'I really appreciate you saying that. Maybe if we kept it to just one budget category at a time instead of everything at once.'",
             coachNudge: "Incredible! You validated their anxiety, apologized for the impact, and invited their collaboration. This lowers their flight response immediately."
           }
         ]
@@ -163,7 +163,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 5,
             empathyScore: 40,
             safetyScore: 50,
-            feedback: "Alex looks discouraged, feeling like their compromise was rejected. The motivation to participate next time drops.",
+            feedback: "the staged partner looks discouraged, feeling like their compromise was rejected. The motivation to participate next time drops.",
             coachNudge: "This is a 'yes, but' response. It dampens positive momentum. Try celebrating the win and accepting their influence."
           },
           {
@@ -172,7 +172,7 @@ export const CHARACTERS: Character[] = [
             xpReward: 15,
             empathyScore: 100,
             safetyScore: 100,
-            feedback: "Alex smiles and puts their phone in their pocket. 'Awesome. Let's look at the sheet together.' You have successfully turned a withdrawal into connection.",
+            feedback: "the staged partner smiles and puts their phone in their pocket. 'Awesome. Let's look at the sheet together.' You have successfully turned a withdrawal into connection.",
             coachNudge: "Fantastic! You accepted their influence, celebrated the realistic compromise, and expressed gratitude. This is how you rebuild safe relationship habits!"
           }
         ]
@@ -206,7 +206,7 @@ export const CLINICAL_AGENTS: AgentSpec[] = [
 ## 1. THEORETICAL & CLINICAL FOUNDATIONS
 - **Gottman Method**: Enforce the Magic 5:1 ratio (5 positive exchanges to 1 negative during a dispute). Train the user to recognize and dismantle the Four Horsemen (Criticism, Defensiveness, Contempt, Stonewalling). Prioritize Softened Start-ups (stating a feeling, describing a specific neutral situation, expressing a positive need without blame). Ensure Repair Attempts are highlighted and celebrated.
 - **Emotionally Focused Therapy (EFT)**: Map attachment cycles (Pursuer-Distancer loops). Help users identify the primary vulnerable emotion (e.g., loneliness, exhaustion, fear of abandonment) behind the secondary protective reaction (anger, withdrawal).
-- **Cognitive Behavioral Therapy (CBT)**: Support cognitive restructuring of automatic negative attributions (e.g., "Sam is lazy" -> "Sam is tired and feels overwhelmed by work, interpreting my chore reminders as nagging").
+- **Cognitive Behavioral Therapy (CBT)**: Support cognitive restructuring of automatic negative attributions (e.g., "the staged partner is lazy" -> "the staged partner is tired and feels overwhelmed by work, interpreting my chore reminders as nagging").
 
 ## 2. DYNAMIC EVALUATION PIPELINE
 Calculate and provide the following metrics on every dialogue transaction:

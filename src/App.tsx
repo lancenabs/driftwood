@@ -18,6 +18,7 @@ import CheckInTab from './lance/components/LANCEGame/CheckInTab';
 import LANCEInsights from './lance/components/LANCEGame/LANCEInsights';
 import TheShore from './components/TheShore';
 import MilestoneLog from './components/MilestoneLog';
+import PerspectiveSwap from './components/PerspectiveSwap';
 import { TOOL_COMPLETION, readSaveSignature } from './lance/components/LANCEGame/challengeCompletion';
 import { appendEvent } from './lib/world';
 import { activeCastaway } from './lib/castaways';
@@ -199,7 +200,12 @@ function DriftwoodShell() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  if (tab.id === 'driftwood' && activeTab === 'driftwood') {
+                    window.dispatchEvent(new CustomEvent('driftwood:go-home'));
+                  }
+                  setActiveTab(tab.id);
+                }}
                 className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl cursor-pointer transition-colors ${active ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
               >
                 <Icon className="w-5 h-5" />
@@ -222,6 +228,12 @@ function DriftwoodShell() {
 // ─────────────────────────────────────────────────────────────────────────────
 function FamilyScreens({ onOpenTool }: { onOpenTool: (id: string) => void }) {
   const [activeScreen, setActiveScreen] = useState<ScreenType>('home');
+  // Re-tapping the Driftwood tab returns to the shore (bottom-nav convention).
+  React.useEffect(() => {
+    const home = () => setActiveScreen('home');
+    window.addEventListener('driftwood:go-home', home);
+    return () => window.removeEventListener('driftwood:go-home', home);
+  }, []);
   const [selectedChar, setSelectedChar] = useState<Character | null>(null);
   const [streak, setStreak] = useState(0);
   const [empathyScore, setEmpathyScore] = useState(0);
@@ -251,6 +263,7 @@ function FamilyScreens({ onOpenTool }: { onOpenTool: (id: string) => void }) {
     <div className="pt-3">
       {activeScreen === 'home' && <TheShore onOpenTool={onOpenTool} />}
       {activeScreen === 'home' && <MilestoneLog onOpenTool={onOpenTool} />}
+      {activeScreen === 'home' && <PerspectiveSwap />}
       {activeScreen === 'home' && (
         <HomeScreen
           onStartLesson={() => setActiveScreen('lesson')}
