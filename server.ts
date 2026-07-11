@@ -30,11 +30,13 @@ app.use(express.json());
 // ═════════════════════════════════════════════════════════════════════════════
 
 interface CampEvent { seq: number; id: string; actor: string; action: string; payload?: Record<string, unknown>; at: string; from: string }
+interface CampBuild { blocks: Record<string, string>; stamps: Array<Record<string, unknown>> } // the island keeps what you built
 interface Camp {
   code: string;
   createdAt: string;
   seq: number;
   events: CampEvent[];              // live-session log (bounded)
+  build?: CampBuild;                // THE BUILD CHANNEL — structure, not history: a compact map, never an event log
   listeners: Map<string, { res: express.Response; actor: string; name: string; since: number }>;
 }
 
@@ -46,7 +48,7 @@ const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // read-aloud friendly
 
 function campFile(code: string) { return path.join(CAMP_DIR, `${code}.json`); }
 function persistCamp(c: Camp) {
-  try { fs.writeFileSync(campFile(c.code), JSON.stringify({ code: c.code, createdAt: c.createdAt, seq: c.seq, events: c.events.slice(-CAMP_CAP) })); }
+  try { fs.writeFileSync(campFile(c.code), JSON.stringify({ code: c.code, createdAt: c.createdAt, seq: c.seq, events: c.events.slice(-CAMP_CAP), build: c.build })); }
   catch { /* the fire still burns if the disk hiccups */ }
 }
 function loadCamp(code: string): Camp | null {
@@ -116,6 +118,40 @@ app.post("/api/gathering/:code/events", (req, res) => {
   persistCamp(camp);
   broadcast(camp, { kind: "event", event: ev });
   res.json({ ok: true, seq: ev.seq });
+});
+
+// ── THE BUILD CHANNEL (the family's constructions on the shared island) ─────
+// Structure, not history: a compact idempotent map keyed by grid cell, so a
+// thousand placed blocks can never evict a single real event from the log.
+// GET returns the whole build; POST sets/clears one cell (t: null removes) or
+// drops a stamp; every change broadcasts live to the phones walking the island.
+const BUILD_BLOCK_CAP = 4000, BUILD_STAMP_CAP = 200;
+app.get("/api/gathering/:code/build", (req, res) => {
+  const camp = loadCamp(String(req.params.code).toUpperCase());
+  if (!camp) return res.status(404).json({ error: "no such camp" });
+  res.json(camp.build ?? { blocks: {}, stamps: [] });
+});
+app.post("/api/gathering/:code/build", (req, res) => {
+  const camp = loadCamp(String(req.params.code).toUpperCase());
+  if (!camp) return res.status(404).json({ error: "no such camp" });
+  camp.build ??= { blocks: {}, stamps: [] };
+  const { k, t, stamp } = req.body ?? {};
+  if (stamp && typeof stamp === "object") {
+    if (camp.build.stamps.length >= BUILD_STAMP_CAP) return res.status(409).json({ error: "the beach is full of castles" });
+    camp.build.stamps.push(stamp);
+    persistCamp(camp);
+    broadcast(camp, { kind: "stamp", stamp });
+    return res.json({ ok: true });
+  }
+  if (typeof k !== "string" || !/^-?\d+\|-?\d+\|-?\d+$/.test(k)) return res.status(400).json({ error: "k must be a grid cell x|y|z" });
+  if (t == null) delete camp.build.blocks[k];
+  else {
+    if (Object.keys(camp.build.blocks).length >= BUILD_BLOCK_CAP && !(k in camp.build.blocks)) return res.status(409).json({ error: "the island is full — break before you build" });
+    camp.build.blocks[k] = String(t).slice(0, 16);
+  }
+  persistCamp(camp);
+  broadcast(camp, { kind: "block", k, t: t == null ? null : String(t).slice(0, 16) });
+  res.json({ ok: true });
 });
 
 // Camp status (the qa gate reads this; humans never need it).

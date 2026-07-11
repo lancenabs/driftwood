@@ -49,7 +49,11 @@
 <div id="hud">
   <button class="pill" id="back">← the shore</button>
   <button class="pill" id="dress">👕 Avatar</button>
+  <button class="pill" id="buildBtn">🔨 Build</button>
 </div>
+<!-- THE BUILDER'S PALETTE — tap a material, tap the world; ⛏ breaks -->
+<div id="palette" style="display:none;position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:46;background:rgba(255,255,255,0.94);border-radius:20px;padding:8px 10px;box-shadow:0 4px 16px rgba(0,0,0,0.2);gap:6px;align-items:center"></div>
+<button id="jump" style="display:none;position:fixed;right:20px;bottom:150px;z-index:46;width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,0.6);background:rgba(255,255,255,0.35);font-size:24px;backdrop-filter:blur(2px)">⤴️</button>
 <div id="hint">drag to look · stick or WASD to walk · visit the wood robots</div>
 <div id="say"><b id="sayName"></b><span id="sayLine"></span></div>
 <div id="stick"><div id="nub"></div></div>
@@ -547,6 +551,96 @@ function swapPlayer(kind) {
   scene.add(player);
 }
 
+// ── THE BUILDER'S ISLAND — every kid an architect ────────────────────────────
+// Mario's hop meets the block game, on OUR island with Lance's real textures.
+// Voxels snap to a deterministic grid (cell key "x|i|z", i = stack level above
+// the terrain — same island every device, so builds sync exactly). One
+// InstancedMesh per material: a whole castle costs five draw calls. Builds
+// persist locally (driftwood_build_v1) and, in a Gathering, ride the camp's
+// BUILD CHANNEL — structure, not history — so the family raises one fort
+// together from three phones. The no-shame law's happy cousin: the island
+// keeps what you built.
+const BUILD_TYPES = [
+  { id: 'planks', label: '🪵', tex: '/island3d/tex/planks.jpg' },
+  { id: 'stone',  label: '🪨', tex: '/island3d/tex/path-stone.jpg' },
+  { id: 'sand',   label: '🏰', tex: '/island3d/tex/sand.jpg' },
+  { id: 'moss',   label: '🍀', tex: '/island3d/tex/moss.jpg' },
+  { id: 'leaf',   label: '🌿', color: 0x3F8A56 },
+];
+const BUILD_CAP = 1500; // per material — phones stay cool
+const buildMeshes = {};
+for (const t of BUILD_TYPES) {
+  const m = t.tex ? new THREE.MeshLambertMaterial({ map: texLoader.load(t.tex) }) : mat(t.color);
+  const im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), m, BUILD_CAP);
+  im.count = 0; im.userData.keys = [];
+  scene.add(im);
+  buildMeshes[t.id] = im;
+}
+const blocks = new Map(); // "kx|i|kz" → type id
+const cellY = (kx, i, kz) => groundY(kx, kz) + 0.5 + i;
+function rebuildBlocks() {
+  const counts = {};
+  for (const t of BUILD_TYPES) { counts[t.id] = 0; buildMeshes[t.id].userData.keys = []; }
+  for (const [k, t] of blocks) {
+    const im = buildMeshes[t]; if (!im || counts[t] >= BUILD_CAP) continue;
+    const [kx, i, kz] = k.split('|').map(Number);
+    dummy.position.set(kx, cellY(kx, i, kz), kz);
+    dummy.rotation.set(0, 0, 0); dummy.scale.setScalar(1);
+    dummy.updateMatrix();
+    im.userData.keys[counts[t]] = k;
+    im.setMatrixAt(counts[t]++, dummy.matrix);
+  }
+  for (const t of BUILD_TYPES) { buildMeshes[t.id].count = counts[t.id]; buildMeshes[t.id].instanceMatrix.needsUpdate = true; }
+}
+const BUILD_KEY = 'driftwood_build_v1';
+try { for (const [k, t] of Object.entries(JSON.parse(localStorage.getItem(BUILD_KEY) || '{}'))) blocks.set(k, t); } catch { /* fresh sand */ }
+function saveLocalBuild() {
+  try { const o = {}; for (const [k, t] of blocks) o[k] = t; localStorage.setItem(BUILD_KEY, JSON.stringify(o)); } catch { /* it stands in the scene */ }
+}
+function setBlock(k, t, fromRemote) {
+  if (t) blocks.set(k, t); else blocks.delete(k);
+  rebuildBlocks(); saveLocalBuild();
+  if (!fromRemote && campCode) fetch(`/api/gathering/${campCode}/build`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ k, t: t ?? null }),
+  }).catch(() => {});
+}
+rebuildBlocks();
+// the tallest solid under a walker's feet (terrain or the family's blocks) —
+// this is what makes builds CLIMBABLE: stairs, forts, lookout towers
+function solidTop(x, z) {
+  const kx = Math.round(x), kz = Math.round(z);
+  for (let i = 30; i >= 0; i--) if (blocks.has(`${kx}|${i}|${kz}`)) return groundY(kx, kz) + 1 + i;
+  return -Infinity;
+}
+// build UI state + palette
+const build = { on: false, type: 'planks', breaking: false };
+const paletteEl = document.getElementById('palette');
+const buildBtn = document.getElementById('buildBtn');
+const jumpBtn = document.getElementById('jump');
+const swBtn = (label, on, fn) => {
+  const b = document.createElement('button');
+  b.textContent = label;
+  b.style.cssText = `border:2px solid ${on ? '#0E7C7C' : 'transparent'};background:#fff;border-radius:12px;padding:6px 9px;font-size:18px;cursor:pointer`;
+  b.onclick = fn;
+  return b;
+};
+function renderPalette() {
+  paletteEl.innerHTML = '';
+  for (const t of BUILD_TYPES) paletteEl.appendChild(swBtn(t.label, build.type === t.id && !build.breaking, () => { build.type = t.id; build.breaking = false; renderPalette(); }));
+  paletteEl.appendChild(swBtn('⛏', build.breaking, () => { build.breaking = !build.breaking; renderPalette(); }));
+}
+buildBtn.onclick = () => {
+  build.on = !build.on;
+  paletteEl.style.display = build.on ? 'flex' : 'none';
+  buildBtn.style.background = build.on ? '#FDE68A' : 'rgba(255,255,255,0.92)';
+  if (build.on) renderPalette();
+};
+// jump physics (the Mario hop — Space or the ⤴️ thumb button)
+let vy = 0, onGround = true, wantJump = false;
+addEventListener('keydown', e => { if (e.code === 'Space') wantJump = true; });
+jumpBtn.style.display = 'block';
+jumpBtn.addEventListener('pointerdown', () => { wantJump = true; });
+
 // ── THE JUMBLE — billboards of the real portraits on driftwood stands ────────
 // Spread across the big island — finding them all is the first hike. Skip
 // stays near camp; the Collier lives up in the northwest spine, by his forge.
@@ -632,6 +726,31 @@ renderer.domElement.addEventListener('pointerup', e => {
   if (!downAt || Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) > 8) return;
   const v = new THREE.Vector2((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
   ray.setFromCamera(v, camera);
+  // BUILD MODE eats the tap: place on terrain/blocks, or break blocks
+  if (build.on) {
+    const hits = ray.intersectObjects([...Object.values(buildMeshes), terrain]);
+    const h = hits[0];
+    if (!h || h.distance > 40) return;
+    if (h.object === terrain) {
+      if (build.breaking) return;
+      const kx = Math.round(h.point.x), kz = Math.round(h.point.z);
+      let i = 0; while (blocks.has(`${kx}|${i}|${kz}`) && i < 30) i++;
+      if (i < 30) setBlock(`${kx}|${i}|${kz}`, build.type);
+      return;
+    }
+    // an existing block: break it, or grow from the tapped face
+    const k = h.object.userData.keys[h.instanceId];
+    if (!k) return;
+    if (build.breaking) return setBlock(k, null);
+    const [kx, i, kz] = k.split('|').map(Number);
+    const n = h.face.normal;
+    let nk;
+    if (n.y > 0.5) nk = `${kx}|${i + 1}|${kz}`;
+    else if (n.y < -0.5) nk = i > 0 ? `${kx}|${i - 1}|${kz}` : null;
+    else nk = `${kx + Math.round(n.x)}|${i}|${kz + Math.round(n.z)}`;
+    if (nk && !blocks.has(nk) && i < 30) setBlock(nk, build.type);
+    return;
+  }
   for (const r of robots) {
     if (r.userData.card && ray.intersectObject(r.userData.card).length) return speak(r);
   }
@@ -670,8 +789,13 @@ const fromNorm = v => v * 2 * W - W;
 if (campCode) {
   document.getElementById('hint').textContent = `camp ${campCode} — the family walks this same ground · drag to look · stick to walk`;
   const es = new EventSource(`/api/gathering/${campCode}/stream?actor=${encodeURIComponent(me.id)}&name=${encodeURIComponent(me.name)}`);
+  // the camp's build is the truth when gathered — pull it, then live-merge
+  fetch(`/api/gathering/${campCode}/build`).then(r => r.json()).then(b => {
+    if (b?.blocks) { for (const [k, t] of Object.entries(b.blocks)) blocks.set(k, t); rebuildBlocks(); }
+  }).catch(() => {});
   es.onmessage = ev => {
     let msg; try { msg = JSON.parse(ev.data); } catch { return; }
+    if (msg.kind === 'block') return setBlock(msg.k, msg.t, true);
     if (msg.kind !== 'pos' || msg.pos.actor === me.id) return;
     const p = msg.pos;
     let o = others.get(p.actor);
@@ -756,8 +880,21 @@ renderer.setAnimationLoop(() => {
     player.rotation.y = ang; // face where you walk
     broadcastPos();
   }
-  // the ground carries you — hills, beach, the spine
-  player.userData.baseY = groundY(player.position.x, player.position.z);
+  // the ground carries you — hills, beach, the spine, and the family's builds
+  // (solidTop makes every fort a staircase; the hop clears one block cleanly)
+  const solid = Math.max(groundY(player.position.x, player.position.z), solidTop(player.position.x, player.position.z));
+  let py = player.userData.baseY ?? solid;
+  if (wantJump && onGround) { vy = 7.5; onGround = false; }
+  wantJump = false;
+  if (!onGround || py > solid + 0.01) {
+    vy -= 20 * dt;
+    py += vy * dt;
+    if (py <= solid) { py = solid; vy = 0; onGround = true; }
+  } else {
+    py = Math.min(py + dt * 14, solid);              // step up smoothly onto a block
+    if (py >= solid - 0.01) { py = solid; onGround = true; }
+  }
+  player.userData.baseY = py;
   animateWalk(player, mag, dt, t);
 
   // family interpolation + their walk cycles
