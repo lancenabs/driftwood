@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import FireQuiz from '../FireQuiz';
 import TwoTruthsTide from './TwoTruthsTide';
+import AppreciationVolley from './AppreciationVolley';
+import LoveLanguageSort from './LoveLanguageSort';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -22,9 +24,14 @@ const GAMES: GameDef[] = [
   { id: 'two_truths', name: 'Two Truths & a Tide', emoji: '🏮', tier: 'ice-breaker',
     blurb: "Two true things, one tall tide — guess the lie, light the dock.",
     render: (onClose) => <TwoTruthsTide onClose={onClose} /> },
-  // → the roadmap (THE_RECONNECTION_LOOP.md) fills this list: Appreciation
-  //   Volley, Bid & Turn, Love-Language Sort, Naming the Undertow, … zero-credit,
-  //   each cloning the fire-feeding pattern.
+  { id: 'appreciation_volley', name: 'The Appreciation Volley', emoji: '🏐', tier: 'ice-breaker',
+    blurb: 'Rally specific appreciations across the fire — keep the ball up together.',
+    render: (onClose) => <AppreciationVolley onClose={onClose} /> },
+  { id: 'love_language_sort', name: 'The Love-Language Sort', emoji: '💛', tier: 'kindling',
+    blurb: 'How each of you most feels loved — guess, reveal, close the gap.',
+    render: (onClose) => <LoveLanguageSort onClose={onClose} /> },
+  // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: Bid & Turn, Weather
+  //   Report, the Repair Rope, Naming the Undertow, … each a file + a line here.
 ];
 
 export default function GamesMenu({ onClose }: { onClose: () => void }) {
