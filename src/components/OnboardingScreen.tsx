@@ -108,23 +108,20 @@ export default function OnboardingScreen({ onStart }: OnboardingScreenProps) {
         <p className="font-sans text-sm text-on-surface-variant mt-1">the island that only yields to together</p>
       </div>
 
-      {/* Hero Illustration */}
-      <div className="w-full relative aspect-square bg-surface-container-lowest rounded-[2rem] p-6 border-2 border-outline-variant mb-6 flex flex-col justify-center items-center">
-        {/* Playful, inviting flat-vector design mimicking a physical board game or a supportive family circle */}
-        <div className="relative w-40 h-40 flex items-center justify-center bg-[#CE9FFC] rounded-full shadow-inner animate-pulse">
-          <Heart className="w-20 h-20 text-white fill-white/15" />
-          <div className="absolute top-2 right-2 w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center shadow-md border border-tertiary">
-            <span className="text-lg">🔥</span>
-          </div>
-          <div className="absolute bottom-4 left-0 w-12 h-12 rounded-xl bg-surface-container-lowest shadow-md border-2 border-outline-variant flex items-center justify-center">
-            <span className="text-xl">💬</span>
-          </div>
+      {/* Hero — the boarding painting: seven scattered down a dawn tide line,
+          on the same shore. If the art is ever missing the frame simply holds
+          the words (auto-light, honest both ways). */}
+      <div className="w-full relative bg-surface-container-lowest rounded-[2rem] overflow-hidden border-2 border-outline-variant mb-6 flex flex-col items-center">
+        <img src="/shore/boarding_hero.jpg"
+          alt="Seven castaways scattered down a dawn tide line — scattered, but on the same shore"
+          className="w-full aspect-[16/10] object-cover"
+          onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+        <div className="px-6 py-4 flex flex-col items-center">
+          <p className="font-display font-black text-lg text-on-background text-center">Practice Safe Emotional Repair</p>
+          <p className="font-sans text-xs text-on-surface-variant text-center max-w-xs mt-1">
+            Learn, simulate, and resolve family tension in real-time, side-by-side or asynchronously.
+          </p>
         </div>
-        
-        <p className="font-display font-black text-lg text-on-background mt-6 text-center">Practice Safe Emotional Repair</p>
-        <p className="font-sans text-xs text-on-surface-variant text-center max-w-xs mt-1">
-          Learn, simulate, and resolve family tension in real-time, side-by-side or asynchronously.
-        </p>
       </div>
 
       {/* The honest card — sandbox truth, no borrowed trust badges. */}

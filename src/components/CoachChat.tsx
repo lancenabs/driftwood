@@ -238,14 +238,17 @@ Ask me about communication blocks, repair scripts, attachment styles, or how to 
   return (
     <div className="flex flex-col gap-4 text-[#4B4B4B] animate-fade-in" id="coach-chat-container">
       
-      {/* Immersive Chat Header */}
+      {/* Immersive Chat Header — the Jumble's village behind the glass */}
       <div className="bg-gradient-to-r from-stone-900 to-stone-800 text-white p-4 rounded-[2.2rem] shadow-sm flex justify-between items-center relative overflow-hidden">
+        <img src="/shore/jumble_village.jpg" alt="" aria-hidden
+          className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
+          onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
         <div className="absolute right-0 top-0 w-32 h-32 bg-[#FF6EA7]/10 rounded-full blur-2xl pointer-events-none"></div>
-        
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#FF6EA7] to-[#1CB0F6] flex items-center justify-center text-xl shadow-md">
-            💬
-          </div>
+
+        <div className="flex items-center gap-3 relative">
+          <img src="/robots/echo2.webp" alt="Echo-2, the listening robot"
+            className="w-10 h-10 rounded-2xl object-cover shadow-md border border-white/20"
+            onError={e => { const el = e.target as HTMLImageElement; el.outerHTML = '<div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#FF6EA7] to-[#1CB0F6] flex items-center justify-center text-xl shadow-md">💬</div>'; }} />
           <div>
             <span className="text-[8px] font-black uppercase tracking-widest text-[#FF6EA7]">Evidence-Based Advisory</span>
             <h4 className="font-display font-black text-sm text-white leading-tight mt-0.5">Clinical CoachChat</h4>
