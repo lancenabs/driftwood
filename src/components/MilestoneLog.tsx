@@ -1,0 +1,333 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { ChevronRight, X, Lock, CheckCircle2, Circle, Flag } from 'lucide-react';
+import { MILESTONES, SEASONS, isSeasonEnd, Milestone, Beat } from '../data/milestones';
+import { TOOL_COMPLETION, readSaveSignature } from '../lance/components/LANCEGame/challengeCompletion';
+import { appendEvent } from '../lib/world';
+import { activeCastaway, readCrew } from '../lib/castaways';
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  THE MILESTONE LOG — the 31 survival firsts on the proven loop:
+//  scene beats → the conjoint step (the conch passes; every present member
+//  confirms) → the REAL tool via the treaty → honest save-signature
+//  completion → planks + embers → season curtains.
+//
+//  LAWS (same engine, fourth world): the log is optional and exitable at
+//  every beat · tools are NEVER gated · crisis surfaces are never
+//  instruments · an unfinished milestone is simply unfinished.
+// ═════════════════════════════════════════════════════════════════════════════
+
+interface LogState {
+  closed: string[];
+  investigating: { id: string; baseline: string } | null;
+}
+const STATE_KEY = 'driftwood_milestone_log_v1';
+
+function loadState(): LogState {
+  try {
+    const s = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
+    if (s && Array.isArray(s.closed)) return s;
+  } catch { /* fresh log */ }
+  return { closed: [], investigating: null };
+}
+function saveState(s: LogState) { localStorage.setItem(STATE_KEY, JSON.stringify(s)); }
+
+const ROBOT_NAMES: Record<string, { name: string; emoji: string }> = {
+  skip:    { name: 'Skip',        emoji: '🤖' },
+  hollow:  { name: 'Hollow',      emoji: '🐚' },
+  echo2:   { name: 'Echo-2',      emoji: '📻' },
+  bailer:  { name: 'Bailer',      emoji: '🪣' },
+  collier: { name: 'The Collier', emoji: '⚒️' },
+};
+
+type Phase = 'log' | 'scene' | 'conch' | 'working' | 'closed';
+
+export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) => void }) {
+  const [state, setState] = useState<LogState>(loadState);
+  const [active, setActive] = useState<Milestone | null>(null);
+  const [phase, setPhase] = useState<Phase>('log');
+  const [beatIdx, setBeatIdx] = useState(0);
+  const [conchConfirms, setConchConfirms] = useState<string[]>([]);
+  const [curtain, setCurtain] = useState<{ season: number; name: string; arc: string } | null>(null);
+
+  const firstOpen = useMemo(
+    () => MILESTONES.find(m => !state.closed.includes(m.id))?.id ?? null,
+    [state.closed],
+  );
+
+  // Honest completion: when the tool overlay closes (or focus returns), check
+  // whether the investigation's instrument really saved.
+  useEffect(() => {
+    const check = () => {
+      const inv = loadState().investigating;
+      if (!inv) return;
+      const m = MILESTONES.find(x => x.id === inv.id);
+      const signal = m?.instrument
+        ? (TOOL_COMPLETION as Record<string, { kind: string; keys?: string[] }>)[m.instrument.toolId]
+        : null;
+      if (!signal || signal.kind !== 'save' || !signal.keys) return;
+      if (readSaveSignature(signal.keys) !== inv.baseline) {
+        finishMilestone(m!);
+      }
+    };
+    window.addEventListener('driftwood:world-event', check);
+    window.addEventListener('focus', check);
+    check();
+    return () => {
+      window.removeEventListener('driftwood:world-event', check);
+      window.removeEventListener('focus', check);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const openMilestone = (m: Milestone) => {
+    setActive(m); setBeatIdx(0); setConchConfirms([]);
+    setPhase(state.investigating?.id === m.id ? 'working' : 'scene');
+  };
+
+  const afterScene = (m: Milestone) => {
+    if (!m.instrument) { finishMilestone(m); return; }
+    if (m.instrument.conjoint && readCrew().length > 1) { setPhase('conch'); return; }
+    beginWork(m);
+  };
+
+  const beginWork = (m: Milestone) => {
+    if (!m.instrument) return;
+    const signal = (TOOL_COMPLETION as Record<string, { kind: string; keys?: string[] }>)[m.instrument.toolId];
+    const baseline = signal?.kind === 'save' && signal.keys ? readSaveSignature(signal.keys) : '';
+    const next = { ...loadState(), investigating: { id: m.id, baseline } };
+    setState(next); saveState(next);
+    setPhase('working');
+    onOpenTool(m.instrument.toolId);
+  };
+
+  const finishMilestone = (m: Milestone) => {
+    const already = loadState().closed.includes(m.id);
+    const next: LogState = {
+      closed: already ? loadState().closed : [...loadState().closed, m.id],
+      investigating: null,
+    };
+    setState(next); saveState(next);
+    if (!already) {
+      const me = activeCastaway();
+      appendEvent(me.id, 'milestone_closed', { milestoneId: m.id, n: m.n });
+      for (let i = 0; i < m.planks; i++) appendEvent(me.id, 'plank_earned', { milestoneId: m.id });
+      appendEvent(me.id, 'ember_earned', { milestoneId: m.id });
+      if (m.instrument?.conjoint) appendEvent(me.id, 'gathering_held', { milestoneId: m.id });
+      if (isSeasonEnd(m)) {
+        const s = SEASONS.find(x => x.n === m.season)!;
+        setCurtain({ season: s.n, name: s.name, arc: s.arc });
+      }
+    }
+    setActive(m); setPhase('closed');
+  };
+
+  const backToLog = () => { setActive(null); setPhase('log'); setBeatIdx(0); setConchConfirms([]); };
+
+  // ── Beat renderer ──────────────────────────────────────────────────────────
+  const Beats = ({ beats, onDone, doneLabel }: { beats: Beat[]; onDone: () => void; doneLabel: string }) => {
+    const visible = beats.slice(0, beatIdx + 1);
+    const atEnd = beatIdx >= beats.length - 1;
+    return (
+      <div className="flex flex-col gap-2">
+        {visible.map((b, i) => (
+          <div key={i}>
+            {b.kind === 'narration' && (
+              <p className="font-serif italic text-[12px] leading-relaxed text-slate-600 px-1">{b.text}</p>
+            )}
+            {b.kind === 'robot' && (
+              <div className="p-2.5 bg-surface-container-lowest border-2 border-outline-variant rounded-2xl flex items-start gap-2">
+                <span className="text-lg shrink-0">{ROBOT_NAMES[b.who].emoji}</span>
+                <div>
+                  <p className="text-[8px] font-black uppercase tracking-widest text-amber-600">{ROBOT_NAMES[b.who].name}</p>
+                  <p className="text-[11.5px] leading-relaxed text-slate-700">{b.text}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+        <button
+          onClick={() => (atEnd ? onDone() : setBeatIdx(beatIdx + 1))}
+          className="w-full py-2.5 bg-[#58CC02] text-white font-display font-black rounded-xl border-b-[3px] border-[#46A302] text-xs cursor-pointer hover:brightness-105 active:translate-y-[1px] flex items-center justify-center gap-1"
+        >
+          {atEnd ? doneLabel : 'Continue'} <ChevronRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    );
+  };
+
+  // ── The log shelf ──────────────────────────────────────────────────────────
+  if (phase === 'log' || !active) {
+    return (
+      <div className="bg-white rounded-[2rem] border-2 border-outline-variant p-4 mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h3 className="font-display font-black text-sm text-slate-800">The Milestone Log</h3>
+            <p className="text-[10px] text-slate-400">31 survival firsts · five seasons · the island only yields to together</p>
+          </div>
+          <span className="text-[10px] font-black text-amber-600">{state.closed.length}/31</span>
+        </div>
+        <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto pr-1">
+          {MILESTONES.map(m => {
+            const closed = state.closed.includes(m.id);
+            const isNext = m.id === firstOpen;
+            const seasonStart = MILESTONES.find(x => x.season === m.season)?.id === m.id;
+            return (
+              <React.Fragment key={m.id}>
+                {seasonStart && (
+                  <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 pt-2 px-1">
+                    Season {m.season} · {SEASONS.find(s => s.n === m.season)!.name}
+                    <span className="normal-case tracking-normal font-semibold italic"> — {SEASONS.find(s => s.n === m.season)!.arc}</span>
+                  </p>
+                )}
+                <button
+                  onClick={() => (closed || isNext) && openMilestone(m)}
+                  disabled={!closed && !isNext}
+                  className={`w-full p-2.5 rounded-xl border-2 text-left transition-all flex items-center justify-between gap-2 ${
+                    closed ? 'bg-amber-50 border-amber-200 cursor-pointer'
+                    : isNext ? 'bg-white border-primary/50 cursor-pointer hover:bg-primary/5'
+                    : 'bg-slate-50 border-slate-100'
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <p className={`text-[11px] font-black ${closed ? 'text-amber-700' : isNext ? 'text-slate-800' : 'text-slate-300'}`}>
+                      {m.n} · {m.title}
+                    </p>
+                    <p className={`text-[9px] italic ${closed || isNext ? 'text-slate-400' : 'text-slate-300'}`}>{m.first}</p>
+                    {state.investigating?.id === m.id && m.instrument && (
+                      <p className="text-[8px] font-black text-primary mt-0.5">WORK OPEN — {m.instrument.toolName}. Do it for real; the island knows.</p>
+                    )}
+                  </div>
+                  <span className="shrink-0">
+                    {closed ? <span className="text-sm">🪵</span>
+                      : isNext ? <ChevronRight className="w-4 h-4 text-primary" />
+                      : <Lock className="w-3 h-3 text-slate-200" />}
+                  </span>
+                </button>
+              </React.Fragment>
+            );
+          })}
+        </div>
+        <p className="text-center text-[8px] text-slate-400 italic mt-2">
+          The log is yours to open or set aside — every tool stays free of it, always.
+        </p>
+      </div>
+    );
+  }
+
+  // ── Season curtain (full-screen; tap to lift) ─────────────────────────────
+  if (curtain) {
+    return (
+      <button
+        onClick={() => setCurtain(null)}
+        className="fixed inset-0 z-50 cursor-pointer"
+        style={{ background: 'radial-gradient(ellipse 90% 70% at 50% 30%, #1E2A44 0%, #141C30 60%, #0C111E 100%)' }}
+        aria-label="Lift the curtain"
+      >
+        <video
+          src={`/shore/curtain${curtain.season}.mp4`}
+          autoPlay loop muted playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-0"
+          onLoadedData={e => { (e.target as HTMLVideoElement).style.opacity = '0.4'; (e.target as HTMLVideoElement).style.transition = 'opacity 1.5s'; }}
+          onError={e => { (e.target as HTMLVideoElement).remove(); }}
+        />
+        <div className="relative h-full flex flex-col items-center justify-center px-8 text-center">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-300/70">season {curtain.season} is over</p>
+          <h2 className="text-3xl font-display font-black text-amber-50 mt-3 drop-shadow-lg">{curtain.name}</h2>
+          <p className="text-[13px] italic text-amber-100/75 font-serif mt-3 max-w-sm leading-relaxed">{curtain.arc}</p>
+          <p className="text-[10px] text-amber-200/40 mt-10 uppercase tracking-widest">tap to continue the crossing</p>
+        </div>
+      </button>
+    );
+  }
+
+  // ── Scene / conch / working / closed ───────────────────────────────────────
+  return (
+    <div className="bg-white rounded-[2rem] border-2 border-outline-variant p-4 mb-4">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-600 flex items-center gap-1">
+          <Flag className="w-3 h-3" /> Milestone {active.n} · {active.title}
+        </p>
+        <button onClick={backToLog} className="p-1 text-slate-300 hover:text-slate-500 cursor-pointer" aria-label="Set the milestone aside">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      {phase === 'scene' && (
+        <Beats
+          beats={active.opening}
+          doneLabel={active.instrument
+            ? (active.instrument.conjoint && readCrew().length > 1 ? 'Pass the conch' : `Do it: ${active.instrument.toolName}`)
+            : 'Mark the first'}
+          onDone={() => afterScene(active)}
+        />
+      )}
+
+      {phase === 'conch' && active.instrument && (
+        <div className="flex flex-col gap-2">
+          <p className="font-serif italic text-[12px] text-slate-600 px-1">
+            🐚 This first is a TOGETHER first. The phone is the conch: pass it around —
+            each person taps their name to say "I'm here for this one."
+          </p>
+          {readCrew().map(c => {
+            const confirmed = conchConfirms.includes(c.slotId);
+            return (
+              <button
+                key={c.slotId}
+                onClick={() => setConchConfirms(prev => confirmed ? prev.filter(x => x !== c.slotId) : [...prev, c.slotId])}
+                className={`w-full p-2.5 rounded-xl border-2 text-left flex items-center gap-2 cursor-pointer ${confirmed ? 'border-[#58CC02] bg-[#58CC02]/5' : 'border-outline-variant'}`}
+              >
+                {confirmed ? <CheckCircle2 className="w-4 h-4 text-[#58CC02]" /> : <Circle className="w-4 h-4 text-slate-300" />}
+                <span className="text-[11px] font-black text-slate-700">{c.name}</span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => beginWork(active)}
+            disabled={conchConfirms.length < Math.min(2, readCrew().length)}
+            className={`w-full py-2.5 font-display font-black rounded-xl text-xs flex items-center justify-center gap-1 ${
+              conchConfirms.length >= Math.min(2, readCrew().length)
+                ? 'bg-[#58CC02] text-white border-b-[3px] border-[#46A302] cursor-pointer'
+                : 'bg-slate-100 text-slate-300'
+            }`}
+          >
+            Together: {active.instrument.toolName} <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+          <p className="text-[8px] text-slate-400 italic text-center">
+            Solo tonight? That's honest too — set it aside and bring the crew at the next Gathering. Nothing is lost by waiting.
+          </p>
+        </div>
+      )}
+
+      {phase === 'working' && active.instrument && (
+        <div className="flex flex-col gap-2 text-center py-2">
+          <p className="text-[12px] font-black text-slate-700">The work is open.</p>
+          <p className="text-[11px] text-slate-500 leading-relaxed px-2">{active.instrument.why}</p>
+          <button
+            onClick={() => onOpenTool(active.instrument!.toolId)}
+            className="w-full py-2.5 bg-[#1CB0F6] text-white font-display font-black rounded-xl border-b-[3px] border-[#1899D6] text-xs cursor-pointer"
+          >
+            Open {active.instrument.toolName}
+          </button>
+          <button onClick={backToLog} className="text-[10px] font-bold text-slate-400 cursor-pointer py-1">
+            Set it aside for now
+          </button>
+        </div>
+      )}
+
+      {phase === 'closed' && (
+        <div className="flex flex-col gap-2 text-center py-2">
+          <span className="text-2xl">🪵</span>
+          <p className="text-[13px] font-display font-black text-slate-800">{active.title} — done for real.</p>
+          <p className="text-[10px] text-slate-500">
+            +{active.planks} plank{active.planks > 1 ? 's' : ''} on the raft · +1 ember for the fire.
+            The camp never shrinks; this is yours forever.
+          </p>
+          <button onClick={backToLog}
+            className="w-full py-2.5 bg-amber-500 text-white font-display font-black rounded-xl border-b-[3px] border-amber-600 text-xs cursor-pointer">
+            Back to the log
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

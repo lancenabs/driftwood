@@ -16,6 +16,11 @@ import GameToolOverlay from './lance/components/LANCEGame/GameToolOverlay';
 import LibraryTab from './lance/components/LANCEGame/LibraryTab';
 import CheckInTab from './lance/components/LANCEGame/CheckInTab';
 import LANCEInsights from './lance/components/LANCEGame/LANCEInsights';
+import TheShore from './components/TheShore';
+import MilestoneLog from './components/MilestoneLog';
+import { TOOL_COMPLETION, readSaveSignature } from './lance/components/LANCEGame/challengeCompletion';
+import { appendEvent } from './lib/world';
+import { activeCastaway } from './lib/castaways';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE DRIFTWOOD SHELL — the LANCE bones, whole (the house framework):
@@ -55,6 +60,28 @@ function DriftwoodShell() {
     window.addEventListener('driftwood:open-tool', openTool as EventListener);
     return () => window.removeEventListener('driftwood:open-tool', openTool as EventListener);
   }, []);
+
+  // Real work lights lanterns: snapshot the tool's save keys on open; if the
+  // signature moved by close, the shore hears about it (the event law).
+  const toolBaseline = React.useRef<{ toolId: string; sig: string } | null>(null);
+  React.useEffect(() => {
+    if (!activeTool) return;
+    const signal = (TOOL_COMPLETION as Record<string, { kind: string; keys?: string[] }>)[activeTool];
+    toolBaseline.current = signal?.kind === 'save' && signal.keys
+      ? { toolId: activeTool, sig: readSaveSignature(signal.keys) }
+      : null;
+  }, [activeTool]);
+  const closeTool = () => {
+    const base = toolBaseline.current;
+    if (base) {
+      const signal = (TOOL_COMPLETION as Record<string, { kind: string; keys?: string[] }>)[base.toolId];
+      if (signal?.keys && readSaveSignature(signal.keys) !== base.sig) {
+        appendEvent(activeCastaway().id, 'tool_work', { toolId: base.toolId });
+      }
+      toolBaseline.current = null;
+    }
+    setActiveTool(null);
+  };
 
   const openTool = (toolId: string) =>
     window.dispatchEvent(new CustomEvent('driftwood:open-tool', { detail: { toolId } }));
@@ -149,7 +176,7 @@ function DriftwoodShell() {
           <div className="absolute inset-0 z-40 bg-slate-50">
             <GameToolOverlay
               toolId={activeTool}
-              onBack={() => setActiveTool(null)}
+              onBack={closeTool}
               onOpenTool={(next: string) => setActiveTool(next)}
             />
           </div>
@@ -222,6 +249,8 @@ function FamilyScreens({ onOpenTool }: { onOpenTool: (id: string) => void }) {
 
   return (
     <div className="pt-3">
+      {activeScreen === 'home' && <TheShore onOpenTool={onOpenTool} />}
+      {activeScreen === 'home' && <MilestoneLog onOpenTool={onOpenTool} />}
       {activeScreen === 'home' && (
         <HomeScreen
           onStartLesson={() => setActiveScreen('lesson')}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Flame, Play, Check, Trophy, Sparkles, BookOpen, Compass, Award, Gamepad2, ArrowRight, Heart, Plus, Trash2, Calendar as CalendarIcon, CheckSquare, Timer, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import SwitchUserBar, { SIMULATED_PROFILES, UserProfile } from './SwitchUserBar';
+import { activeCastaway } from '../lib/castaways';
 import CalendarSection from './CalendarSection';
 import HabitsRitualsSection from './HabitsRitualsSection';
 import FamilyToolsSection from './FamilyToolsSection';
@@ -130,7 +131,10 @@ interface HomeScreenProps {
 export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals, onViewGenogram, streak }: HomeScreenProps) {
   // Active states for couples/family expansion
   const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'calendar' | 'habits' | 'tools'>('dashboard');
-  const [activeProfile, setActiveProfile] = useState<UserProfile>(SIMULATED_PROFILES[0]); // Defaults to Alex
+  const [activeProfile, setActiveProfile] = useState<UserProfile>(() => {
+    const me = activeCastaway();
+    return { id: me.id, name: me.name, roleText: me.roleText, avatar: me.avatar, device: 'this device', color: 'bg-primary border-primary-dark text-white' };
+  });
 
   // Weekly relationship goal state with localStorage persistence
   const [goalText, setGoalText] = useState<string>(() => {

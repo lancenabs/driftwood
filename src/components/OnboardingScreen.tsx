@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { THE_SEVEN, claimSlot, setActiveCastaway } from '../lib/castaways';
 import { ShieldAlert, Heart, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 interface OnboardingScreenProps {
@@ -10,7 +11,9 @@ export default function OnboardingScreen({ onStart }: OnboardingScreenProps) {
   // NOTHING about the answer is stored (no flag, no branch in saved state);
   // showing resources leaves no trace. Conjoint work is contraindicated in
   // active intimate-partner violence — this page is why the app can exist.
-  const [step, setStep] = useState<'welcome' | 'private'>('welcome');
+  const [step, setStep] = useState<'welcome' | 'private' | 'claim'>('welcome');
+  const [claimName, setClaimName] = useState('');
+  const [claimSlotId, setClaimSlotId] = useState(THE_SEVEN[0].id);
 
   if (step === 'private') {
     return (
@@ -37,10 +40,56 @@ export default function OnboardingScreen({ onStart }: OnboardingScreenProps) {
             to the next adult, or continue.
           </p>
           <button
-            onClick={onStart}
+            onClick={() => setStep('claim')}
             className="w-full bg-[#1CB0F6] text-white font-display font-black py-3 px-6 rounded-xl border-b-[4px] border-[#1899D6] hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all duration-100 text-sm cursor-pointer"
           >
             Continue to the shore
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // THE CLAIM — each real person takes a castaway slot; the rest wake as AI
+  // hands (the honest roster). One claim is enough to make landfall.
+  if (step === 'claim') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[550px] py-6 px-5 w-full max-w-md mx-auto text-on-background">
+        <div className="w-full bg-surface-container-lowest rounded-[2rem] p-6 border-2 border-outline-variant flex flex-col gap-4">
+          <p className="font-label-bold text-[10px] uppercase tracking-widest text-on-surface-variant">The tide line · seven castaways washed ashore</p>
+          <h2 className="font-display font-black text-xl text-on-surface leading-snug">Claim your castaway</h2>
+          <input
+            value={claimName}
+            onChange={e => setClaimName(e.target.value)}
+            placeholder="Your first name or nickname"
+            maxLength={24}
+            className="w-full px-4 py-3 bg-white border-2 border-outline-variant rounded-xl text-sm font-bold focus:outline-none focus:border-primary"
+          />
+          <div className="grid grid-cols-1 gap-1.5 max-h-[240px] overflow-y-auto pr-1">
+            {THE_SEVEN.map(slot => (
+              <button
+                key={slot.id}
+                onClick={() => setClaimSlotId(slot.id)}
+                className={`w-full text-left p-3 rounded-xl border-2 transition-all cursor-pointer ${claimSlotId === slot.id ? 'border-primary bg-primary/5' : 'border-outline-variant hover:border-primary/40'}`}
+              >
+                <span className="font-display font-black text-xs text-on-surface">{slot.emoji} {slot.role}</span>
+                <span className="block font-sans text-[10px] text-on-surface-variant mt-0.5">{slot.blurb}</span>
+              </button>
+            ))}
+          </div>
+          <p className="font-sans text-[10px] text-on-surface-variant/80 leading-relaxed">
+            Unclaimed castaways wake up as robot hands from the Jumble — they keep camp
+            honestly and never pretend to be family. Real people can claim them anytime.
+          </p>
+          <button
+            onClick={() => {
+              claimSlot(claimSlotId, claimName);
+              setActiveCastaway(claimSlotId);
+              onStart();
+            }}
+            className="w-full bg-[#58CC02] text-white font-display font-black py-3 px-6 rounded-xl border-b-[4px] border-[#46A302] hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all duration-100 text-sm cursor-pointer"
+          >
+            Make landfall
           </button>
         </div>
       </div>

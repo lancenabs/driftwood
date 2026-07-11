@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { THE_SEVEN, readCrew, aiCastaways, setActiveCastaway } from '../lib/castaways';
 import { Smartphone, RefreshCw, Check, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -57,6 +58,7 @@ export default function SwitchUserBar({ currentUser, onChangeUser }: SwitchUserB
     setIsOpen(false);
     setTimeout(() => {
       setSyncing(false);
+      if (readCrew().some(c => c.slotId === user.id)) setActiveCastaway(user.id);
       onChangeUser(user);
       setSyncSuccess(true);
       setTimeout(() => setSyncSuccess(false), 2500);
@@ -131,7 +133,15 @@ export default function SwitchUserBar({ currentUser, onChangeUser }: SwitchUserB
               <span>Co-op Session Device Switcher</span>
             </span>
           </div>
-          {SIMULATED_PROFILES.map((profile) => (
+          {[
+            ...readCrew().map(c => {
+              const slot = THE_SEVEN.find(sl => sl.id === c.slotId)!;
+              return { id: c.slotId, name: c.name, roleText: slot.role, avatar: slot.emoji, device: 'claimed', color: 'bg-primary border-primary-dark text-white' };
+            }),
+            ...aiCastaways().map(sl => (
+              { id: sl.id, name: `${sl.role} (robot hands)`, roleText: 'AI castaway — honest help, never family', avatar: '🤖', device: 'the Jumble', color: 'bg-slate-400 border-slate-500 text-white' }
+            )),
+          ].map((profile) => (
             <button
               key={profile.id}
               onClick={() => handleSelect(profile)}
