@@ -9,6 +9,7 @@ import RepairRope from './RepairRope';
 import StoryCircle from './StoryCircle';
 import ChoreSwap from './ChoreSwap';
 import MemoryMatch from './MemoryMatch';
+import RidgepoleVote from './RidgepoleVote';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -54,6 +55,9 @@ const GAMES: GameDef[] = [
   { id: 'memory_match', name: 'Memory Match', emoji: '🐚', tier: 'family',
     blurb: 'Flip the shells together — every pair is a family memory to retell out loud.',
     render: (onClose) => <MemoryMatch onClose={onClose} /> },
+  { id: 'ridgepole_vote', name: 'The Ridgepole Vote', emoji: '🏗', tier: 'steady flame',
+    blurb: 'Each voice picks 3 timbers this family is built on — the matches raise the beam.',
+    render: (onClose) => <RidgepoleVote onClose={onClose} /> },
   // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: Ritual Designer,
   //   the Ridgepole Vote, Naming the Undertow, … each a file + a line here.
 ];
