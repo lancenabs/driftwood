@@ -142,12 +142,12 @@ const DEFAULT_REPAIRS: RepairAttempt[] = [
 
 export default function RepairToolkit() {
   const [repairs, setRepairs] = useState<RepairAttempt[]>(() => {
-    const saved = localStorage.getItem('rehabit_custom_repairs');
+    const saved = localStorage.getItem('driftwood_mending_custom_v1');
     return saved ? JSON.parse(saved) : DEFAULT_REPAIRS;
   });
 
   const [logs, setLogs] = useState<PracticedLog[]>(() => {
-    const saved = localStorage.getItem('rehabit_repair_logs');
+    const saved = localStorage.getItem('driftwood_mending_v1');
     return saved ? JSON.parse(saved) : [
       {
         id: 'log-1',
@@ -186,12 +186,12 @@ export default function RepairToolkit() {
 
   const saveRepairs = (updated: RepairAttempt[]) => {
     setRepairs(updated);
-    localStorage.setItem('rehabit_custom_repairs', JSON.stringify(updated));
+    localStorage.setItem('driftwood_mending_custom_v1', JSON.stringify(updated));
   };
 
   const saveLogs = (updated: PracticedLog[]) => {
     setLogs(updated);
-    localStorage.setItem('rehabit_repair_logs', JSON.stringify(updated));
+    localStorage.setItem('driftwood_mending_v1', JSON.stringify(updated));
   };
 
   const handleCopyToClipboard = (id: string, text: string) => {

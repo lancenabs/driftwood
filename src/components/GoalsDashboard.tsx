@@ -62,7 +62,7 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
   // Goals state synchronized with the same localStorage key as the Point Chart
   const [goals, setGoals] = useState<HouseholdGoal[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_weekly_goals_v1');
+      const saved = localStorage.getItem('driftwood_weekly_goals_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -162,7 +162,7 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
   // Sync to local storage
   useEffect(() => {
     try {
-      localStorage.setItem('familyframe_weekly_goals_v1', JSON.stringify(goals));
+      localStorage.setItem('driftwood_weekly_goals_v1', JSON.stringify(goals));
     } catch {}
   }, [goals]);
 
@@ -202,7 +202,7 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
           
           // Add to points in local storage
           try {
-            const membersRaw = localStorage.getItem('familyframe_members_points_v1');
+            const membersRaw = localStorage.getItem('driftwood_members_points_v1');
             if (membersRaw) {
               const list = JSON.parse(membersRaw);
               const updated = list.map((m: any) => {
@@ -215,13 +215,13 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
                 }
                 return m;
               });
-              localStorage.setItem('familyframe_members_points_v1', JSON.stringify(updated));
+              localStorage.setItem('driftwood_members_points_v1', JSON.stringify(updated));
             }
           } catch {}
 
           // Write dynamic activity logs
           try {
-            const logsRaw = localStorage.getItem('familyframe_behavior_logs_v1');
+            const logsRaw = localStorage.getItem('driftwood_behavior_logs_v1');
             const now = new Date();
             const timeStr = `Today, ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
             const newLog = {
@@ -234,9 +234,9 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
             };
             if (logsRaw) {
               const logs = JSON.parse(logsRaw);
-              localStorage.setItem('familyframe_behavior_logs_v1', JSON.stringify([newLog, ...logs.slice(0, 9)]));
+              localStorage.setItem('driftwood_behavior_logs_v1', JSON.stringify([newLog, ...logs.slice(0, 9)]));
             } else {
-              localStorage.setItem('familyframe_behavior_logs_v1', JSON.stringify([newLog]));
+              localStorage.setItem('driftwood_behavior_logs_v1', JSON.stringify([newLog]));
             }
           } catch {}
         }
@@ -273,7 +273,7 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
           
           // Reward assignee
           try {
-            const membersRaw = localStorage.getItem('familyframe_members_points_v1');
+            const membersRaw = localStorage.getItem('driftwood_members_points_v1');
             if (membersRaw) {
               const list = JSON.parse(membersRaw);
               const updated = list.map((m: any) => {
@@ -282,13 +282,13 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
                 }
                 return m;
               });
-              localStorage.setItem('familyframe_members_points_v1', JSON.stringify(updated));
+              localStorage.setItem('driftwood_members_points_v1', JSON.stringify(updated));
             }
           } catch {}
 
           // Write log
           try {
-            const logsRaw = localStorage.getItem('familyframe_behavior_logs_v1');
+            const logsRaw = localStorage.getItem('driftwood_behavior_logs_v1');
             const now = new Date();
             const timeStr = `Today, ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
             const newLog = {
@@ -301,9 +301,9 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
             };
             if (logsRaw) {
               const logs = JSON.parse(logsRaw);
-              localStorage.setItem('familyframe_behavior_logs_v1', JSON.stringify([newLog, ...logs.slice(0, 9)]));
+              localStorage.setItem('driftwood_behavior_logs_v1', JSON.stringify([newLog, ...logs.slice(0, 9)]));
             } else {
-              localStorage.setItem('familyframe_behavior_logs_v1', JSON.stringify([newLog]));
+              localStorage.setItem('driftwood_behavior_logs_v1', JSON.stringify([newLog]));
             }
           } catch {}
         }
@@ -452,6 +452,7 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
       <div className="flex items-center gap-3 bg-surface-container-lowest p-3 rounded-[2rem] border-2 border-outline-variant shadow-sm relative overflow-hidden">
         <button
           onClick={onBack}
+          aria-label="Back"
           className="w-9 h-9 rounded-full bg-slate-100 border border-outline-variant hover:bg-slate-200 transition-colors flex items-center justify-center text-on-surface cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5 text-on-surface" />

@@ -102,7 +102,7 @@ export default function GratitudeJar({ currentUser, onAddMilestone, onClose }: G
   // NOTES STATE
   const [notes, setNotes] = useState<GratitudeNote[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_gratitude_notes');
+      const saved = localStorage.getItem('driftwood_gratitude_notes');
       if (saved) {
         return JSON.parse(saved);
       }
@@ -113,7 +113,7 @@ export default function GratitudeJar({ currentUser, onAddMilestone, onClose }: G
   // ARCHIVE STATE
   const [archives, setArchives] = useState<CompletedSyncSession[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_gratitude_archives');
+      const saved = localStorage.getItem('driftwood_gratitude_archives');
       if (saved) return JSON.parse(saved);
     } catch (e) {}
     return [];
@@ -139,11 +139,11 @@ export default function GratitudeJar({ currentUser, onAddMilestone, onClose }: G
 
   // Trigger LocalStorage Sync
   useEffect(() => {
-    localStorage.setItem('familyframe_gratitude_notes', JSON.stringify(notes));
+    localStorage.setItem('driftwood_gratitude_notes', JSON.stringify(notes));
   }, [notes]);
 
   useEffect(() => {
-    localStorage.setItem('familyframe_gratitude_archives', JSON.stringify(archives));
+    localStorage.setItem('driftwood_gratitude_archives', JSON.stringify(archives));
   }, [archives]);
 
   // Synthesize soft, therapeutic chime

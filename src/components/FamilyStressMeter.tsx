@@ -27,7 +27,7 @@ interface AnonymousStressLog {
 export default function FamilyStressMeter() {
   // INITIAL SEED READINGS TO SIMULATE A LIVING HOUSEHOLD
   const [logs, setLogs] = useState<AnonymousStressLog[]>(() => {
-    const saved = localStorage.getItem('family_stress_logs');
+    const saved = localStorage.getItem('driftwood_barometer_v1');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -57,7 +57,7 @@ export default function FamilyStressMeter() {
 
   // PERSIST STATE
   useEffect(() => {
-    localStorage.setItem('family_stress_logs', JSON.stringify(logs));
+    localStorage.setItem('driftwood_barometer_v1', JSON.stringify(logs));
   }, [logs]);
 
   // BREATH PACER CLOCK

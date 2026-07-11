@@ -12,7 +12,7 @@ export interface GameTool {
   emoji: string;
   description: string;
   tier: number;
-  category: 'mood' | 'breathing' | 'cognitive' | 'somatic' | 'dbt' | 'cbt' | 'depth' | 'relational' | 'gamification' | 'habit' | 'clinical' | 'nutrition' | 'theory' | 'insight' | 'recovery';
+  category: 'mood' | 'breathing' | 'cognitive' | 'somatic' | 'dbt' | 'cbt' | 'depth' | 'relational' | 'gamification' | 'habit' | 'clinical' | 'nutrition' | 'theory' | 'insight' | 'recovery' | 'family';
   gradient: string;
   challengeToUnlock?: string;
 }
@@ -1091,6 +1091,135 @@ export const GAME_TOOLS: GameTool[] = [
     category: 'insight',
     gradient: 'from-violet-500 to-indigo-700',
   },
+  // ── DRIFTWOOD FAMILY DECK (fenced addition — not island canon) ─────────────
+  // Real interiors in src/components/. Entries land ONLY with real interiors.
+  {
+    id: 'undertow_chart',
+    name: 'The Undertow Chart',
+    emoji: '🌀',
+    description: "Map the current that pulls everyone under — trigger, armor, the soft feeling beneath, the true need. Nobody is the problem; the pattern is.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-indigo-500 to-blue-700',
+  },
+  {
+    id: 'mooring_lines',
+    name: 'The Mooring Lines',
+    emoji: '⚓',
+    description: "Chart how each of you ties to the dock — anxious lines pull tight, avoidant lines run long. Knowing your knots is half of untangling them.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-sky-500 to-indigo-600',
+  },
+  {
+    id: 'soundings',
+    name: 'The Soundings',
+    emoji: '🪢',
+    description: "Take an honest depth-reading of the relationship's seven waters. Soundings taken over time show where the channel runs deep.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-cyan-500 to-teal-700',
+  },
+  {
+    id: 'family_map',
+    name: 'The Family Map',
+    emoji: '🗺️',
+    description: "Draw the whole crew across generations — who's tied to whom, where the lines hold, where they fray. Patterns travel by bloodline until somebody maps them.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-amber-500 to-orange-700',
+  },
+  {
+    id: 'tide_table',
+    name: 'The Tide Table',
+    emoji: '🌙',
+    description: "Design the rituals that come back like tides — the weekly check-in, the shared meal, the small ceremonies a family runs on.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-violet-500 to-purple-700',
+  },
+  {
+    id: 'bottle_post',
+    name: 'The Bottle Post',
+    emoji: '💌',
+    description: "Appreciations, sealed and sent — the jar of things you noticed about each other. Read together when the jar is full.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-rose-400 to-pink-600',
+  },
+  {
+    id: 'mending_bench',
+    name: 'The Mending Bench',
+    emoji: '🔧',
+    description: "The repair phrases that actually land, kept where a hard moment can reach them. Mended things are stronger at the seam.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-emerald-500 to-green-700',
+  },
+  {
+    id: 'barometer',
+    name: 'The Barometer',
+    emoji: '🌡️',
+    description: "Read the household pressure before the weather breaks. A falling glass isn't a verdict — it's time to trim sail together.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-slate-500 to-slate-700',
+  },
+  {
+    id: 'passage_chart',
+    name: 'The Passage Chart',
+    emoji: '🧭',
+    description: "The relationship's course plotted in real milestones — where you've sailed, what you're steering for next.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-blue-500 to-indigo-700',
+  },
+  {
+    id: 'family_manifest',
+    name: 'The Manifest',
+    emoji: '📜',
+    description: "The week's goals, chores, and promises — who carries what, and every lantern lit when real work gets done. No shame for unlit ones, ever.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-yellow-500 to-amber-700',
+  },
+  {
+    id: 'daily_rigging',
+    name: 'The Daily Rigging',
+    emoji: '🪜',
+    description: "The small habits that keep the ship sailing — tended daily, celebrated lightly.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-lime-500 to-green-600',
+  },
+  {
+    id: 'ships_calendar',
+    name: "The Ship's Calendar",
+    emoji: '📅',
+    description: "Family dinners and family meetings are the Gatherings — scheduled like the tides, kept like promises.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-teal-500 to-emerald-700',
+  },
+  {
+    id: 'sea_chest',
+    name: 'The Sea Chest',
+    emoji: '🧰',
+    description: "The kept library — guides, scripts, and worksheets worth saving. Star what serves your crew.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-stone-500 to-stone-700',
+  },
+  {
+    id: 'ask_the_jumble',
+    name: 'Ask the Jumble',
+    emoji: '🤖',
+    description: "The little robots take questions about rough water — honest AI, plain answers, and the real lines always at the top of the screen.",
+    tier: 1,
+    category: 'family',
+    gradient: 'from-orange-400 to-amber-600',
+  },
+
   // ── REHABIT RECOVERY DECK (fenced addition — not island canon) ─────────────
   // Real interiors in src/recovery-tools/. Entries land ONLY with real interiors.
   {

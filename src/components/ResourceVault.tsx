@@ -192,12 +192,12 @@ Locate the universal need that is active:
 
 export default function ResourceVault() {
   const [downloadedIds, setDownloadedIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem('rehabit_downloaded_resources');
+    const saved = localStorage.getItem('driftwood_seachest_kept_v1');
     return saved ? JSON.parse(saved) : ['vault-pdf-3']; // Default cached one
   });
 
   const [favoritedIds, setFavoritedIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem('rehabit_favorited_resources');
+    const saved = localStorage.getItem('driftwood_seachest_starred_v1');
     return saved ? JSON.parse(saved) : ['vault-aud-1'];
   });
 
@@ -221,11 +221,11 @@ export default function ResourceVault() {
 
   useEffect(() => {
     // Save favorites and downloads on change
-    localStorage.setItem('rehabit_downloaded_resources', JSON.stringify(downloadedIds));
+    localStorage.setItem('driftwood_seachest_kept_v1', JSON.stringify(downloadedIds));
   }, [downloadedIds]);
 
   useEffect(() => {
-    localStorage.setItem('rehabit_favorited_resources', JSON.stringify(favoritedIds));
+    localStorage.setItem('driftwood_seachest_starred_v1', JSON.stringify(favoritedIds));
   }, [favoritedIds]);
 
   // Audio Playback Simulation

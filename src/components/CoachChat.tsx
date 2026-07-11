@@ -75,7 +75,7 @@ The PACT model stresses that the couple must operate as a secure-functioning tea
 
 export default function CoachChat() {
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    const saved = localStorage.getItem('rehabit_coach_chat_history');
+    const saved = localStorage.getItem('driftwood_jumble_chat_v1');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -108,7 +108,7 @@ Ask me about communication blocks, repair scripts, attachment styles, or how to 
   useEffect(() => {
     const checkOffline = () => {
       // We can check if parent simulated offline mode is set
-      const savedOffline = localStorage.getItem('rehabit_downloaded_resources'); // just dummy check or we can monitor a specific storage key
+      const savedOffline = localStorage.getItem('driftwood_seachest_kept_v1'); // just dummy check or we can monitor a specific storage key
       // Let's also listen to standard navigator offline state
       setIsOfflineMode(!navigator.onLine);
     };
@@ -122,7 +122,7 @@ Ask me about communication blocks, repair scripts, attachment styles, or how to 
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('rehabit_coach_chat_history', JSON.stringify(messages));
+    localStorage.setItem('driftwood_jumble_chat_v1', JSON.stringify(messages));
     scrollToBottom();
   }, [messages]);
 

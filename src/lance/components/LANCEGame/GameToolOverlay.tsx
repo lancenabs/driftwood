@@ -63,6 +63,40 @@ const DopamineMenu = React.lazy(() => import('../../../recovery-tools/DopamineMe
 const BoundaryHoop = React.lazy(() => import('../../../recovery-tools/BoundaryHoop'));
 const ClinicalScreens = React.lazy(() => import('../../../recovery-tools/ClinicalScreens'));
 
+
+// ── DRIFTWOOD FAMILY DECK (fenced addition — interiors live outside src/lance) ──
+const UndertowChart   = React.lazy(() => import('../../../components/EftCycleMapper'));
+const MooringLines    = React.lazy(() => import('../../../components/AttachmentMapper'));
+const Soundings       = React.lazy(() => import('../../../components/GottmanQuiz'));
+const FamilyMap       = React.lazy(() => import('../../../components/GenogramEditor'));
+const TideTable       = React.lazy(() => import('../../../components/RitualDesigner'));
+const BottlePost      = React.lazy(() => import('../../../components/GratitudeJar'));
+const MendingBench    = React.lazy(() => import('../../../components/RepairToolkit'));
+const Barometer       = React.lazy(() => import('../../../components/FamilyStressMeter'));
+const PassageChart    = React.lazy(() => import('../../../components/RelationshipRoadmap'));
+const FamilyManifest  = React.lazy(() => import('../../../components/GoalsDashboard'));
+const DailyRigging    = React.lazy(() => import('../../../components/HabitsRitualsSection'));
+const ShipsCalendar   = React.lazy(() => import('../../../components/CalendarSection'));
+const SeaChest        = React.lazy(() => import('../../../components/ResourceVault'));
+const AskTheJumble    = React.lazy(() => import('../../../components/CoachChat'));
+
+// The active castaway, castaway-system-lite until Phase 4's Seven land.
+const driftwoodUser = () => {
+  try {
+    const u = JSON.parse(localStorage.getItem('driftwood_active_castaway_v1') || 'null');
+    if (u?.name) return u;
+  } catch { /* not claimed yet */ }
+  return { id: 'castaway-1', name: 'You', roleText: 'Castaway', avatar: '🏝️', device: 'this device', color: 'bg-primary border-primary-dark text-white' };
+};
+// Small real wins logged as driftwood milestones (the manifest reads these).
+const driftwoodMilestone = (title: string, emoji: string) => {
+  try {
+    const log = JSON.parse(localStorage.getItem('driftwood_milestones_v1') || '[]');
+    log.push({ title, emoji, at: new Date().toISOString() });
+    localStorage.setItem('driftwood_milestones_v1', JSON.stringify(log.slice(-200)));
+  } catch { /* ignore */ }
+};
+
 // ── Original full app components ──
 const CbtReframerGym          = React.lazy(() => import('../../components/CbtReframerGym'));
 const PlutchikWheel           = React.lazy(() => import('../../components/PlutchikWheel'));
@@ -611,6 +645,53 @@ export function GameToolOverlay({ toolId, onBack, onChallengeComplete, onOpenToo
       <LanceToolShell toolId={toolId} onBack={onBack} tier={3} title="Sleep & Circadian Lab"><CircadianSleepSunset /></LanceToolShell>,
       challengeTasks, onChallengeComplete, toolId,
     ) as React.ReactElement;
+  // ── DRIFTWOOD FAMILY DECK ──
+  if (toolId === 'undertow_chart')
+    return withChallengeOverlay(
+      <LanceToolShell toolId={toolId} onBack={onBack} tier={1} title="The Undertow Chart"><UndertowChart /></LanceToolShell>,
+      challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'mooring_lines')
+    return withChallengeOverlay(<MooringLines onBack={onBack} />, challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'soundings')
+    return withChallengeOverlay(<Soundings onBack={onBack} />, challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'family_map')
+    return withChallengeOverlay(<FamilyMap onBack={onBack} />, challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'family_manifest')
+    return withChallengeOverlay(<FamilyManifest onBack={onBack} />, challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'bottle_post')
+    return withChallengeOverlay(<BottlePost currentUser={driftwoodUser()} onAddMilestone={driftwoodMilestone} onClose={onBack} />, challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'tide_table')
+    return withChallengeOverlay(
+      <LanceToolShell toolId={toolId} onBack={onBack} tier={1} title="The Tide Table"><TideTable /></LanceToolShell>,
+      challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'mending_bench')
+    return withChallengeOverlay(
+      <LanceToolShell toolId={toolId} onBack={onBack} tier={1} title="The Mending Bench"><MendingBench /></LanceToolShell>,
+      challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'barometer')
+    return withChallengeOverlay(
+      <LanceToolShell toolId={toolId} onBack={onBack} tier={1} title="The Barometer"><Barometer /></LanceToolShell>,
+      challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'passage_chart')
+    return withChallengeOverlay(
+      <LanceToolShell toolId={toolId} onBack={onBack} tier={1} title="The Passage Chart"><PassageChart /></LanceToolShell>,
+      challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'daily_rigging')
+    return withChallengeOverlay(
+      <LanceToolShell toolId={toolId} onBack={onBack} tier={1} title="The Daily Rigging"><DailyRigging currentUser={driftwoodUser()} onAddMilestone={driftwoodMilestone} /></LanceToolShell>,
+      challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'ships_calendar')
+    return withChallengeOverlay(
+      <LanceToolShell toolId={toolId} onBack={onBack} tier={1} title="The Ship's Calendar"><ShipsCalendar currentUser={driftwoodUser()} /></LanceToolShell>,
+      challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'sea_chest')
+    return withChallengeOverlay(
+      <LanceToolShell toolId={toolId} onBack={onBack} tier={1} title="The Sea Chest"><SeaChest /></LanceToolShell>,
+      challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
+  if (toolId === 'ask_the_jumble')
+    return withChallengeOverlay(
+      <LanceToolShell toolId={toolId} onBack={onBack} tier={1} title="Ask the Jumble"><AskTheJumble /></LanceToolShell>,
+      challengeTasks, onChallengeComplete, toolId) as React.ReactElement;
   // ── REHABIT RECOVERY DECK ──
   if (toolId === 'urge_surfer')
     return withChallengeOverlay(<UrgeSurfer onBack={onBack} />, challengeTasks, onChallengeComplete, toolId) as React.ReactElement;

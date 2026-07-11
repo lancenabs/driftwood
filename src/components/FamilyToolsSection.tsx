@@ -157,7 +157,7 @@ export default function FamilyToolsSection({ onViewGenogram }: { onViewGenogram?
   // --- STATE 1: BEHAVIORAL REINFORCEMENT SYSTEM ---
   const [familyMembers, setFamilyMembers] = useState<FamilyMemberPoints[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_members_points_v1');
+      const saved = localStorage.getItem('driftwood_members_points_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -170,7 +170,7 @@ export default function FamilyToolsSection({ onViewGenogram }: { onViewGenogram?
 
   const [behaviorTasks, setBehaviorTasks] = useState<BehaviorTask[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_behavior_tasks_v1');
+      const saved = localStorage.getItem('driftwood_behavior_tasks_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -184,7 +184,7 @@ export default function FamilyToolsSection({ onViewGenogram }: { onViewGenogram?
 
   const [rewards, setRewards] = useState<RewardItem[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_rewards_list_v1');
+      const saved = localStorage.getItem('driftwood_rewards_list_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -197,7 +197,7 @@ export default function FamilyToolsSection({ onViewGenogram }: { onViewGenogram?
 
   const [logs, setLogs] = useState<BehaviorLog[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_behavior_logs_v1');
+      const saved = localStorage.getItem('driftwood_behavior_logs_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -221,7 +221,7 @@ export default function FamilyToolsSection({ onViewGenogram }: { onViewGenogram?
     emoji: string;
   }[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_weekly_goals_v1');
+      const saved = localStorage.getItem('driftwood_weekly_goals_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -282,7 +282,7 @@ export default function FamilyToolsSection({ onViewGenogram }: { onViewGenogram?
   // --- COOP PLAYROOM & HOMEWORK STATES ---
   const [scavengerChallenges, setScavengerChallenges] = useState<ScavengerChallenge[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_scavenger_challenges_v1');
+      const saved = localStorage.getItem('driftwood_scavenger_challenges_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -327,7 +327,7 @@ export default function FamilyToolsSection({ onViewGenogram }: { onViewGenogram?
 
   const [therapyHomework, setTherapyHomework] = useState<TherapyHomework[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_therapy_homework_v1');
+      const saved = localStorage.getItem('driftwood_therapy_homework_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -383,13 +383,13 @@ export default function FamilyToolsSection({ onViewGenogram }: { onViewGenogram?
 
   useEffect(() => {
     try {
-      localStorage.setItem('familyframe_members_points_v1', JSON.stringify(familyMembers));
-      localStorage.setItem('familyframe_behavior_tasks_v1', JSON.stringify(behaviorTasks));
-      localStorage.setItem('familyframe_rewards_list_v1', JSON.stringify(rewards));
-      localStorage.setItem('familyframe_behavior_logs_v1', JSON.stringify(logs));
-      localStorage.setItem('familyframe_scavenger_challenges_v1', JSON.stringify(scavengerChallenges));
-      localStorage.setItem('familyframe_therapy_homework_v1', JSON.stringify(therapyHomework));
-      localStorage.setItem('familyframe_weekly_goals_v1', JSON.stringify(familyGoals));
+      localStorage.setItem('driftwood_members_points_v1', JSON.stringify(familyMembers));
+      localStorage.setItem('driftwood_behavior_tasks_v1', JSON.stringify(behaviorTasks));
+      localStorage.setItem('driftwood_rewards_list_v1', JSON.stringify(rewards));
+      localStorage.setItem('driftwood_behavior_logs_v1', JSON.stringify(logs));
+      localStorage.setItem('driftwood_scavenger_challenges_v1', JSON.stringify(scavengerChallenges));
+      localStorage.setItem('driftwood_therapy_homework_v1', JSON.stringify(therapyHomework));
+      localStorage.setItem('driftwood_weekly_goals_v1', JSON.stringify(familyGoals));
     } catch {}
   }, [familyMembers, behaviorTasks, rewards, logs, scavengerChallenges, therapyHomework, familyGoals]);
 
@@ -553,7 +553,7 @@ Clinical Feedback:
 
         // Also add a little milestone to timeline in localStorage indirectly if possible
         try {
-          const milestonesRaw = localStorage.getItem('familyframe_milestones_v1');
+          const milestonesRaw = localStorage.getItem('driftwood_milestones_v1');
           if (milestonesRaw) {
             const list = JSON.parse(milestonesRaw);
             list.push({
@@ -564,7 +564,7 @@ Clinical Feedback:
               category: 'personal',
               isCustom: true
             });
-            localStorage.setItem('familyframe_milestones_v1', JSON.stringify(list));
+            localStorage.setItem('driftwood_milestones_v1', JSON.stringify(list));
           }
         } catch {}
 

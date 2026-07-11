@@ -51,7 +51,7 @@ export default function GenogramEditor({ onBack }: GenogramEditorProps) {
   // Try loading saved state or default to a beautiful three-generation clinical baseline
   const [nodes, setNodes] = useState<GenogramNode[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_genogram_nodes_v1');
+      const saved = localStorage.getItem('driftwood_genogram_nodes_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -71,7 +71,7 @@ export default function GenogramEditor({ onBack }: GenogramEditorProps) {
 
   const [connections, setConnections] = useState<GenogramConnection[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_genogram_connections_v1');
+      const saved = localStorage.getItem('driftwood_genogram_connections_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -96,8 +96,8 @@ export default function GenogramEditor({ onBack }: GenogramEditorProps) {
   // Sync to local storage
   useEffect(() => {
     try {
-      localStorage.setItem('familyframe_genogram_nodes_v1', JSON.stringify(nodes));
-      localStorage.setItem('familyframe_genogram_connections_v1', JSON.stringify(connections));
+      localStorage.setItem('driftwood_genogram_nodes_v1', JSON.stringify(nodes));
+      localStorage.setItem('driftwood_genogram_connections_v1', JSON.stringify(connections));
     } catch {}
   }, [nodes, connections]);
 
@@ -294,6 +294,7 @@ export default function GenogramEditor({ onBack }: GenogramEditorProps) {
       <div className="flex items-center gap-3 bg-surface-container-lowest p-3 rounded-[2rem] border-2 border-outline-variant shadow-sm relative overflow-hidden">
         <button
           onClick={onBack}
+          aria-label="Back"
           className="w-9 h-9 rounded-full bg-slate-100 border border-outline-variant hover:bg-slate-200 transition-colors flex items-center justify-center text-on-surface cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5 text-on-surface" />

@@ -81,7 +81,7 @@ const PRESET_TOPICS: AgendaItem[] = [
 
 export default function RitualDesigner() {
   const [agenda, setAgenda] = useState<AgendaItem[]>(() => {
-    const saved = localStorage.getItem('couples_weekly_checkin_agenda');
+    const saved = localStorage.getItem('driftwood_tide_agenda_v1');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -107,7 +107,7 @@ export default function RitualDesigner() {
   const [downloadSuccess, setDownloadSuccess] = useState<boolean>(false);
 
   useEffect(() => {
-    localStorage.setItem('couples_weekly_checkin_agenda', JSON.stringify(agenda));
+    localStorage.setItem('driftwood_tide_agenda_v1', JSON.stringify(agenda));
   }, [agenda]);
 
   const handleToggleSelect = (id: string) => {

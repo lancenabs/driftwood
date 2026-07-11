@@ -33,7 +33,7 @@ export default function CalendarSection({ currentUser }: CalendarSectionProps) {
   // Calendar state July 2026
   const [events, setEvents] = useState<CalendarEvent[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_calendar_events_v1');
+      const saved = localStorage.getItem('driftwood_calendar_events_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -108,7 +108,7 @@ export default function CalendarSection({ currentUser }: CalendarSectionProps) {
 
   useEffect(() => {
     try {
-      localStorage.setItem('familyframe_calendar_events_v1', JSON.stringify(events));
+      localStorage.setItem('driftwood_calendar_events_v1', JSON.stringify(events));
     } catch {}
   }, [events]);
 

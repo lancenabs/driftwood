@@ -33,10 +33,16 @@ const QUIZ_QUESTIONS: Question[] = [
 
 export default function AttachmentMapper({ onBack }: { onBack?: () => void }) {
   // SCORE STATES (0 to 100)
-  const [selfAnxiety, setSelfAnxiety] = useState<number>(35);
-  const [selfAvoidance, setSelfAvoidance] = useState<number>(30);
-  const [partnerAnxiety, setPartnerAnxiety] = useState<number>(65);
-  const [partnerAvoidance, setPartnerAvoidance] = useState<number>(70);
+  // The Mooring Lines persist (driftwood_moorings_v1) — a map this hard-won
+  // doesn't evaporate on close.
+  const mooringsSaved = (() => {
+    try { return JSON.parse(localStorage.getItem('driftwood_moorings_v1') || 'null') || {}; }
+    catch { return {}; }
+  })();
+  const [selfAnxiety, setSelfAnxiety] = useState<number>(mooringsSaved.selfAnxiety ?? 35);
+  const [selfAvoidance, setSelfAvoidance] = useState<number>(mooringsSaved.selfAvoidance ?? 30);
+  const [partnerAnxiety, setPartnerAnxiety] = useState<number>(mooringsSaved.partnerAnxiety ?? 65);
+  const [partnerAvoidance, setPartnerAvoidance] = useState<number>(mooringsSaved.partnerAvoidance ?? 70);
 
   // VIEW MODE: 'manual' or 'quiz'
   const [mode, setMode] = useState<'manual' | 'quiz'>('manual');
@@ -49,6 +55,13 @@ export default function AttachmentMapper({ onBack }: { onBack?: () => void }) {
 
   // SELECTED NODE FOR DETAILS
   const [selectedNode, setSelectedNode] = useState<'self' | 'partner' | 'dance'>('dance');
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('driftwood_moorings_v1', JSON.stringify({
+        selfAnxiety, selfAvoidance, partnerAnxiety, partnerAvoidance, at: new Date().toISOString(),
+      }));
+    } catch { /* ignore */ }
+  }, [selfAnxiety, selfAvoidance, partnerAnxiety, partnerAvoidance]);
 
   // RESET QUIZ
   const handleStartQuiz = (target: 'self' | 'partner') => {

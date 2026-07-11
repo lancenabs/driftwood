@@ -38,7 +38,7 @@ export default function SettingsScreen({ onBack }: SettingsScreenProps) {
   // Family Code states
   const [familyCode, setFamilyCode] = useState<string>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_family_code_v1');
+      const saved = localStorage.getItem('driftwood_family_code_v1');
       if (saved) return saved;
     } catch {}
     return "FAM-492-Z8X";
@@ -46,7 +46,7 @@ export default function SettingsScreen({ onBack }: SettingsScreenProps) {
 
   const [familyUnitName, setFamilyUnitName] = useState<string>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_family_unit_name_v1');
+      const saved = localStorage.getItem('driftwood_family_unit_name_v1');
       if (saved) return saved;
     } catch {}
     return "The Miller Family Frame";
@@ -67,7 +67,7 @@ export default function SettingsScreen({ onBack }: SettingsScreenProps) {
   // Connected Devices states
   const [devices, setDevices] = useState<ConnectedDevice[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_connected_devices_v1');
+      const saved = localStorage.getItem('driftwood_connected_devices_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -84,9 +84,9 @@ export default function SettingsScreen({ onBack }: SettingsScreenProps) {
   // Save state helpers
   useEffect(() => {
     try {
-      localStorage.setItem('familyframe_family_code_v1', familyCode);
-      localStorage.setItem('familyframe_family_unit_name_v1', familyUnitName);
-      localStorage.setItem('familyframe_connected_devices_v1', JSON.stringify(devices));
+      localStorage.setItem('driftwood_family_code_v1', familyCode);
+      localStorage.setItem('driftwood_family_unit_name_v1', familyUnitName);
+      localStorage.setItem('driftwood_connected_devices_v1', JSON.stringify(devices));
     } catch {}
   }, [familyCode, familyUnitName, devices]);
 

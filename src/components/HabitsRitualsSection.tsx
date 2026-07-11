@@ -39,7 +39,7 @@ export default function HabitsRitualsSection({ currentUser, onAddMilestone }: Ha
   // Habit tracking state (completed dates per user)
   const [completedHabits, setCompletedHabits] = useState<Record<string, { alex: boolean; taylor: boolean }>>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_habits_v1');
+      const saved = localStorage.getItem('driftwood_habits_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return {
@@ -61,7 +61,7 @@ export default function HabitsRitualsSection({ currentUser, onAddMilestone }: Ha
 
   useEffect(() => {
     try {
-      localStorage.setItem('familyframe_habits_v1', JSON.stringify(completedHabits));
+      localStorage.setItem('driftwood_habits_v1', JSON.stringify(completedHabits));
     } catch {}
   }, [completedHabits]);
 

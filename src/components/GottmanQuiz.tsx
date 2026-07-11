@@ -156,6 +156,17 @@ export default function GottmanQuiz({ onBack }: { onBack?: () => void }) {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  // The Soundings log (driftwood_soundings_v1): every completed reading is a
+  // dated entry — trend over time is the whole point of taking soundings.
+  React.useEffect(() => {
+    if (!isCompleted) return;
+    try {
+      const log = JSON.parse(localStorage.getItem('driftwood_soundings_v1') || '[]');
+      log.push({ at: new Date().toISOString(), answers });
+      localStorage.setItem('driftwood_soundings_v1', JSON.stringify(log.slice(-24)));
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCompleted]);
 
   const totalQuestions = QUESTIONS.length;
   const currentQuestion = QUESTIONS[currentIdx];

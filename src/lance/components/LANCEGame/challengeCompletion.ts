@@ -55,6 +55,21 @@ export const TOOL_COMPLETION: Record<string, CompletionSignal> = {
   crisis_safety_plan: { kind: 'save', keys: ['lance_safety_plan_v1'], actionLabel: 'Save your plan to complete' },
   communication_lab:  { kind: 'save', keys: ['lance_commlab_v1'], actionLabel: 'Save an entry to complete' },
 
+
+  // ── DRIFTWOOD FAMILY DECK (fenced addition) ──
+  undertow_chart:  { kind: 'save', keys: ['driftwood_undertow_v1'], actionLabel: 'Chart a cycle to complete' },
+  mooring_lines:   { kind: 'save', keys: ['driftwood_moorings_v1'], actionLabel: 'Set your mooring lines to complete' },
+  soundings:       { kind: 'save', keys: ['driftwood_soundings_v1'], actionLabel: 'Take a full sounding to complete' },
+  family_map:      { kind: 'save', keys: ['driftwood_genogram_nodes_v1', 'driftwood_genogram_connections_v1'], actionLabel: 'Add to the family map to complete' },
+  tide_table:      { kind: 'save', keys: ['driftwood_couple_rituals_v2', 'driftwood_tide_agenda_v1'], actionLabel: 'Design a ritual to complete' },
+  bottle_post:     { kind: 'save', keys: ['driftwood_gratitude_notes', 'driftwood_gratitude_archives'], actionLabel: 'Post a bottle to complete' },
+  mending_bench:   { kind: 'save', keys: ['driftwood_mending_v1', 'driftwood_mending_custom_v1'], actionLabel: 'Log a repair to complete' },
+  barometer:       { kind: 'save', keys: ['driftwood_barometer_v1'], actionLabel: 'Take a pressure reading to complete' },
+  passage_chart:   { kind: 'save', keys: ['driftwood_passage_v1', 'driftwood_passage_work_v1'], actionLabel: 'Plot the passage to complete' },
+  family_manifest: { kind: 'save', keys: ['driftwood_weekly_goals_v1'], actionLabel: 'Set the week\'s manifest to complete' },
+  daily_rigging:   { kind: 'save', keys: ['driftwood_habits_v1'], actionLabel: 'Tend the rigging to complete' },
+  ships_calendar:  { kind: 'save', keys: ['driftwood_calendar_events_v1'], actionLabel: 'Schedule a Gathering to complete' },
+
   // ── Count-gated tools (real repetitions emitted via the progress bus) ──
   cranial_nerve_gym:  { kind: 'count', channel: 'cranial_nerve_gym', target: 2, unit: 'exercise', actionLabel: 'Complete 2 cranial nerve exercises' },
   breathwork_478:     { kind: 'count', channel: 'breathwork_478', target: 3, unit: 'cycle', actionLabel: 'Complete 3 full breath cycles' },

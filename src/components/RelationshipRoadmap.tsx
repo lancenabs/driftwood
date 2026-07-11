@@ -230,7 +230,7 @@ const INITIAL_MILESTONES: Milestone[] = [
 export default function RelationshipRoadmap() {
   const [milestones, setMilestones] = useState<Milestone[]>(() => {
     // Attempt local storage load or default
-    const saved = localStorage.getItem('rehabit_milestones');
+    const saved = localStorage.getItem('driftwood_passage_v1');
     return saved ? JSON.parse(saved) : INITIAL_MILESTONES;
   });
 
@@ -241,7 +241,7 @@ export default function RelationshipRoadmap() {
   // Exercise states
   const [exerciseInput, setExerciseInput] = useState('');
   const [exerciseSavedLogs, setExerciseSavedLogs] = useState<Record<string, { answer: string; date: string }>>(() => {
-    const saved = localStorage.getItem('rehabit_milestone_exercises');
+    const saved = localStorage.getItem('driftwood_passage_work_v1');
     return saved ? JSON.parse(saved) : {
       'gottman-1': {
         answer: 'I learned that Jamie feels extremely anxious about the upcoming database migration. The pressure of being primary on-call is making them lose sleep.',
@@ -260,7 +260,7 @@ export default function RelationshipRoadmap() {
 
   const saveMilestonesState = (newMilestones: Milestone[]) => {
     setMilestones(newMilestones);
-    localStorage.setItem('rehabit_milestones', JSON.stringify(newMilestones));
+    localStorage.setItem('driftwood_passage_v1', JSON.stringify(newMilestones));
   };
 
   const handleStatusChange = (id: string, newStatus: 'locked' | 'in_progress' | 'completed') => {
@@ -287,7 +287,7 @@ export default function RelationshipRoadmap() {
       }
     };
     setExerciseSavedLogs(newLogs);
-    localStorage.setItem('rehabit_milestone_exercises', JSON.stringify(newLogs));
+    localStorage.setItem('driftwood_passage_work_v1', JSON.stringify(newLogs));
 
     // Auto promote to completed if saved exercise
     const updatedMilestones = milestones.map(m => {

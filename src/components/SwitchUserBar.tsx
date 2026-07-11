@@ -36,14 +36,6 @@ export const SIMULATED_PROFILES: UserProfile[] = [
     device: "Jamie's Pixel 8",
     color: 'bg-amber-500 border-amber-600 text-white',
   },
-  {
-    id: 'evelyn',
-    name: 'Dr. Evelyn',
-    roleText: 'Therapist',
-    avatar: '🩺',
-    device: "Evelyn's MacBook Pro",
-    color: 'bg-emerald-500 border-emerald-600 text-white',
-  }
 ];
 
 interface SwitchUserBarProps {

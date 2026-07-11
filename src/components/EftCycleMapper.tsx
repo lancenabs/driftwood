@@ -113,7 +113,15 @@ export default function EftCycleMapper({ onBack }: { onBack?: () => void }) {
   const [partnerPrimary, setPartnerPrimary] = useState("");
 
   // Saved cycles journal
-  const [savedCycles, setSavedCycles] = useState<EftCycle[]>([
+  // The Undertow Chart is keep-forever work: cycles persist on-device
+  // (driftwood_undertow_v1) and reload with the tool. The demo cycle seeds
+  // only a fresh chart.
+  const [savedCycles, setSavedCycles] = useState<EftCycle[]>(() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem('driftwood_undertow_v1') || 'null');
+      if (Array.isArray(raw) && raw.length) return raw;
+    } catch { /* fresh chart */ }
+    return [
     {
       id: '1',
       title: "The Weekend Cleaning Dispute",
@@ -126,7 +134,11 @@ export default function EftCycleMapper({ onBack }: { onBack?: () => void }) {
       partnerSecondary: "Stonewalling / Shutting Down (Quiet retreat)",
       partnerPrimary: "Fear of failure / Inadequacy (Feeling like a constant disappointment)"
     }
-  ]);
+  ];
+  });
+  React.useEffect(() => {
+    try { localStorage.setItem('driftwood_undertow_v1', JSON.stringify(savedCycles)); } catch { /* ignore */ }
+  }, [savedCycles]);
 
   const [selectedCycleId, setSelectedCycleId] = useState<string | null>(null);
 

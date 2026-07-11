@@ -430,12 +430,12 @@ export default function DeveloperDocs({
                   <div className="bg-slate-50 p-3.5 rounded-xl border border-outline-variant flex flex-col gap-1">
                     <span className="text-[9px] font-bold uppercase text-on-surface-variant">User Experience Rating</span>
                     <span className="text-xl mt-1">
-                      {localStorage.getItem('familyframe_feedback_rating') || '🙂'} 
+                      {localStorage.getItem('driftwood_feedback_rating') || '🙂'} 
                       <span className="text-[11px] font-bold text-[#4B4B4B] ml-1.5">
-                        {localStorage.getItem('familyframe_feedback_rating') === '💎' ? 'Extremely Valuable' :
-                         localStorage.getItem('familyframe_feedback_rating') === '🚀' ? 'Fun' :
-                         localStorage.getItem('familyframe_feedback_rating') === '🙂' ? 'Helpful' :
-                         localStorage.getItem('familyframe_feedback_rating') === '😐' ? 'Neutral' : 'Frustrated/Difficult'}
+                        {localStorage.getItem('driftwood_feedback_rating') === '💎' ? 'Extremely Valuable' :
+                         localStorage.getItem('driftwood_feedback_rating') === '🚀' ? 'Fun' :
+                         localStorage.getItem('driftwood_feedback_rating') === '🙂' ? 'Helpful' :
+                         localStorage.getItem('driftwood_feedback_rating') === '😐' ? 'Neutral' : 'Frustrated/Difficult'}
                       </span>
                     </span>
                   </div>
@@ -444,7 +444,7 @@ export default function DeveloperDocs({
                     <span className="text-[9px] font-bold uppercase text-on-surface-variant">Most Impactful Scenario</span>
                     <span className="text-xs font-black text-primary mt-1">
                       {(() => {
-                        const s = localStorage.getItem('familyframe_feedback_scenario');
+                        const s = localStorage.getItem('driftwood_feedback_scenario');
                         if (s === 'dirty-dishes') return 'The Dirty Dish Dilemma (Gottman)';
                         if (s === 'screen-time') return 'The Screen Time Showdown (EFT)';
                         if (s === 'in-law-intrusion') return 'The In-Law Intrusion (Systems)';
@@ -457,13 +457,13 @@ export default function DeveloperDocs({
                 <div className="bg-slate-50 p-4 rounded-xl border border-outline-variant">
                   <span className="text-[9px] font-bold uppercase text-on-surface-variant block mb-1">Reflective Comments</span>
                   <p className="font-sans text-[11px] text-[#4B4B4B] leading-relaxed italic">
-                    "{localStorage.getItem('familyframe_feedback_comments') || 'No comment provided'}"
+                    "{localStorage.getItem('driftwood_feedback_comments') || 'No comment provided'}"
                   </p>
                 </div>
 
                 <div className="flex justify-between items-center bg-slate-100 p-2.5 rounded-xl border border-outline-variant text-[9px] text-on-surface-variant font-mono">
                   <span>Sign Verification: OK (SHA-256)</span>
-                  <span>Relevance: {localStorage.getItem('familyframe_feedback_realworld') === 'true' ? 'Authentic (100%)' : 'Inauthentic'}</span>
+                  <span>Relevance: {localStorage.getItem('driftwood_feedback_realworld') === 'true' ? 'Authentic (100%)' : 'Inauthentic'}</span>
                 </div>
               </div>
             ) : (
@@ -489,11 +489,11 @@ export default function DeveloperDocs({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-slate-50 p-3 rounded-xl border border-outline-variant text-center">
                 <span className="text-[8px] font-black uppercase text-on-surface-variant tracking-wider">Family ID</span>
-                <span className="font-mono font-extrabold text-xs text-primary block mt-1">{localStorage.getItem('familyframe_family_code_v1') || 'FAM-492-Z8X'}</span>
+                <span className="font-mono font-extrabold text-xs text-primary block mt-1">{localStorage.getItem('driftwood_family_code_v1') || 'FAM-492-Z8X'}</span>
               </div>
               <div className="bg-slate-50 p-3 rounded-xl border border-outline-variant text-center">
                 <span className="text-[8px] font-black uppercase text-on-surface-variant tracking-wider">Unit Title</span>
-                <span className="font-sans font-extrabold text-xs text-secondary block mt-1 truncate">{localStorage.getItem('familyframe_family_unit_name_v1') || 'The Miller Family Frame'}</span>
+                <span className="font-sans font-extrabold text-xs text-secondary block mt-1 truncate">{localStorage.getItem('driftwood_family_unit_name_v1') || 'The Miller Family Frame'}</span>
               </div>
               <div className="bg-slate-50 p-3 rounded-xl border border-outline-variant text-center">
                 <span className="text-[8px] font-black uppercase text-on-surface-variant tracking-wider">Sync Integrity</span>

@@ -14,7 +14,7 @@ export default function LiveScenarioPlayScreen({ character, onBack, onFinishSimu
   const [history] = useState(() => {
     if (sessionHistory && sessionHistory.length > 0) return sessionHistory;
     try {
-      const val = localStorage.getItem('familyframe_session_history');
+      const val = localStorage.getItem('driftwood_session_history');
       if (val) return JSON.parse(val);
     } catch {}
     return [];

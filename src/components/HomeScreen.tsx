@@ -135,7 +135,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
   // Weekly relationship goal state with localStorage persistence
   const [goalText, setGoalText] = useState<string>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_weekly_goal_text');
+      const saved = localStorage.getItem('driftwood_weekly_goal_text');
       if (saved) return saved;
     } catch {}
     return "Have a 15-minute check-in conversation using Softened Startups 🗣️";
@@ -143,7 +143,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
 
   const [isCompleted, setIsCompleted] = useState<boolean>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_weekly_goal_completed');
+      const saved = localStorage.getItem('driftwood_weekly_goal_completed');
       if (saved) return saved === 'true';
     } catch {}
     return false;
@@ -189,7 +189,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
     if (!isCompleted) {
       setIsCompleted(true);
       try {
-        localStorage.setItem('familyframe_weekly_goal_completed', 'true');
+        localStorage.setItem('driftwood_weekly_goal_completed', 'true');
       } catch {}
 
       // Celebrate! Spawn beautiful particles floating upwards and rotating
@@ -206,7 +206,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
     } else {
       setIsCompleted(false);
       try {
-        localStorage.setItem('familyframe_weekly_goal_completed', 'false');
+        localStorage.setItem('driftwood_weekly_goal_completed', 'false');
       } catch {}
     }
   };
@@ -214,7 +214,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
   const handleResetGoal = () => {
     setIsCompleted(false);
     try {
-      localStorage.setItem('familyframe_weekly_goal_completed', 'false');
+      localStorage.setItem('driftwood_weekly_goal_completed', 'false');
     } catch {}
   };
 
@@ -224,8 +224,8 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
     setIsCompleted(false);
     setIsCustomizing(false);
     try {
-      localStorage.setItem('familyframe_weekly_goal_text', finalGoalText);
-      localStorage.setItem('familyframe_weekly_goal_completed', 'false');
+      localStorage.setItem('driftwood_weekly_goal_text', finalGoalText);
+      localStorage.setItem('driftwood_weekly_goal_completed', 'false');
     } catch {}
   };
 
@@ -241,7 +241,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
 
   const [milestones, setMilestones] = useState<Milestone[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_milestones_v1');
+      const saved = localStorage.getItem('driftwood_milestones_v1');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -286,7 +286,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
 
   useEffect(() => {
     try {
-      localStorage.setItem('familyframe_milestones_v1', JSON.stringify(milestones));
+      localStorage.setItem('driftwood_milestones_v1', JSON.stringify(milestones));
     } catch {}
   }, [milestones]);
 
@@ -348,7 +348,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
   // Couples Rituals State with LocalStorage Persistence
   const [coupleRituals, setCoupleRituals] = useState<CoupleRitual[]>(() => {
     try {
-      const saved = localStorage.getItem('familyframe_couple_rituals_v2');
+      const saved = localStorage.getItem('driftwood_couple_rituals_v2');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -366,7 +366,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
 
   useEffect(() => {
     try {
-      localStorage.setItem('familyframe_couple_rituals_v2', JSON.stringify(coupleRituals));
+      localStorage.setItem('driftwood_couple_rituals_v2', JSON.stringify(coupleRituals));
     } catch {}
   }, [coupleRituals]);
 
