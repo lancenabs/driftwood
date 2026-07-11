@@ -628,6 +628,7 @@ function renderPalette() {
   paletteEl.innerHTML = '';
   for (const t of BUILD_TYPES) paletteEl.appendChild(swBtn(t.label, build.type === t.id && !build.breaking, () => { build.type = t.id; build.breaking = false; renderPalette(); }));
   paletteEl.appendChild(swBtn('⛏', build.breaking, () => { build.breaking = !build.breaking; renderPalette(); }));
+  paletteEl.appendChild(swBtn('🚩', false, () => { document.getElementById('painter').style.display = 'flex'; }));
 }
 buildBtn.onclick = () => {
   build.on = !build.on;
@@ -640,6 +641,81 @@ let vy = 0, onGround = true, wantJump = false;
 addEventListener('keydown', e => { if (e.code === 'Space') wantJump = true; });
 jumpBtn.style.display = 'block';
 jumpBtn.addEventListener('pointerdown', () => { wantJump = true; });
+
+// ── THE FLAG PAINTER — draw your family's colors, hoist them on the island ──
+// A kid draws a flag with a finger; it flies from a real flagpole at the spot
+// where they stood, visible to every phone in the camp (the stamp channel).
+// Creativity that STAYS in the world — the island keeps what you made.
+const FLAGS = [];
+function raiseFlag(png, x, z, fromRemote) {
+  const g = new THREE.Group();
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 3.4, 6), mat(0x8a6a48));
+  pole.position.y = 1.7;
+  g.add(pole);
+  const tex = new THREE.TextureLoader().load(png);
+  const cloth = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.0), new THREE.MeshLambertMaterial({ map: tex, side: THREE.DoubleSide }));
+  cloth.position.set(0.78, 2.8, 0);
+  g.add(cloth);
+  g.userData.cloth = cloth;
+  g.position.set(x, groundY(x, z), z);
+  scene.add(g);
+  FLAGS.push(g);
+  if (!fromRemote) {
+    try {
+      const f = JSON.parse(localStorage.getItem('driftwood_flags_v1') || '[]');
+      f.push({ png, x, z });
+      localStorage.setItem('driftwood_flags_v1', JSON.stringify(f.slice(-12)));
+    } catch { /* it flies in the scene */ }
+    if (campCode) fetch(`/api/gathering/${campCode}/build`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stamp: { type: 'flag', png, x, z, by: me.id } }),
+    }).catch(() => {});
+  }
+}
+try { for (const f of JSON.parse(localStorage.getItem('driftwood_flags_v1') || '[]')) raiseFlag(f.png, f.x, f.z, true); } catch { /* no colors yet */ }
+// the painter overlay
+const painter = document.createElement('div');
+painter.id = 'painter';
+painter.style.cssText = 'display:none;position:fixed;inset:0;z-index:60;background:rgba(20,30,40,0.82);flex-direction:column;align-items:center;justify-content:center;gap:10px';
+painter.innerHTML = `
+  <p style="color:#fff;font-weight:800;font-size:13px;margin:0">🚩 Paint your family's flag</p>
+  <canvas id="flagCanvas" width="256" height="192" style="background:#fff;border-radius:12px;touch-action:none;width:min(78vw,340px)"></canvas>
+  <div id="flagColors" style="display:flex;gap:8px"></div>
+  <div style="display:flex;gap:8px">
+    <button id="flagHoist" style="background:#F59E0B;color:#fff;border:none;border-radius:12px;padding:10px 18px;font-weight:800;font-size:13px">Hoist it 🚩</button>
+    <button id="flagCancel" style="background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:12px;padding:10px 18px;font-weight:800;font-size:13px">Not yet</button>
+  </div>`;
+document.body.appendChild(painter);
+{
+  const fc = painter.querySelector('#flagCanvas');
+  const fx = fc.getContext('2d');
+  fx.fillStyle = '#fff'; fx.fillRect(0, 0, 256, 192);
+  let color = '#C0392B', down = false, lastP = null;
+  const COLORS = ['#C0392B', '#F59E0B', '#2E86C1', '#1E8449', '#8E44AD', '#212121'];
+  const cwrap = painter.querySelector('#flagColors');
+  COLORS.forEach(c => {
+    const b = document.createElement('button');
+    b.style.cssText = `width:30px;height:30px;border-radius:50%;border:3px solid ${c === color ? '#fff' : 'transparent'};background:${c}`;
+    b.onclick = () => { color = c; cwrap.querySelectorAll('button').forEach(x => x.style.borderColor = 'transparent'); b.style.borderColor = '#fff'; };
+    cwrap.appendChild(b);
+  });
+  const pt = e => { const r = fc.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * 256, y: (e.clientY - r.top) / r.height * 192 }; };
+  fc.addEventListener('pointerdown', e => { down = true; lastP = pt(e); fc.setPointerCapture(e.pointerId); });
+  fc.addEventListener('pointermove', e => {
+    if (!down) return;
+    const p = pt(e);
+    fx.strokeStyle = color; fx.lineWidth = 9; fx.lineCap = 'round';
+    fx.beginPath(); fx.moveTo(lastP.x, lastP.y); fx.lineTo(p.x, p.y); fx.stroke();
+    lastP = p;
+  });
+  fc.addEventListener('pointerup', () => down = false);
+  painter.querySelector('#flagCancel').onclick = () => painter.style.display = 'none';
+  painter.querySelector('#flagHoist').onclick = () => {
+    raiseFlag(fc.toDataURL('image/png'), player.position.x + 1.2, player.position.z);
+    fx.fillStyle = '#fff'; fx.fillRect(0, 0, 256, 192);
+    painter.style.display = 'none';
+  };
+}
 
 // ── THE SHELL RUN — the Mario layer: hop, climb, collect ─────────────────────
 // Golden shells scattered by the same deterministic seed (one treasure map
@@ -841,10 +917,12 @@ if (campCode) {
   // the camp's build is the truth when gathered — pull it, then live-merge
   fetch(`/api/gathering/${campCode}/build`).then(r => r.json()).then(b => {
     if (b?.blocks) { for (const [k, t] of Object.entries(b.blocks)) blocks.set(k, t); rebuildBlocks(); }
+    if (b?.stamps) for (const s of b.stamps) if (s.type === 'flag' && s.png && s.by !== me.id) raiseFlag(s.png, s.x, s.z, true);
   }).catch(() => {});
   es.onmessage = ev => {
     let msg; try { msg = JSON.parse(ev.data); } catch { return; }
     if (msg.kind === 'block') return setBlock(msg.k, msg.t, true);
+    if (msg.kind === 'stamp') { const s = msg.stamp; if (s?.type === 'flag' && s.png && s.by !== me.id) raiseFlag(s.png, s.x, s.z, true); return; }
     if (msg.kind !== 'pos' || msg.pos.actor === me.id) return;
     const p = msg.pos;
     let o = others.get(p.actor);
@@ -954,6 +1032,9 @@ renderer.setAnimationLoop(() => {
     o.rig.userData.baseY = groundY(o.rig.position.x, o.rig.position.z);
     animateWalk(o.rig, Math.min(d, 1), dt, t);
   }
+
+  // flags ripple in the trade wind
+  for (const f of FLAGS) f.userData.cloth.rotation.y = Math.sin(t * 1.8 + f.position.x) * 0.22;
 
   // shells spin, bob, and get scooped
   for (const s of SHELLS) { s.rotation.y += dt * 2.2; s.position.y = s.userData.baseY + Math.sin(t * 2.4 + s.userData.id) * 0.12; }
