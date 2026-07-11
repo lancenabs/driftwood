@@ -11,16 +11,22 @@ import { THE_SEVEN, readCrew, aiCastaways, activeCastaway, setActiveCastaway } f
 //  rocks. No fake weather, no decay theatrics, no shame.
 // ═════════════════════════════════════════════════════════════════════════════
 
-function skyColors(): { top: string; bottom: string; sun: boolean } {
+function skyColors(): { top: string; bottom: string; sun: boolean; backdrop: string } {
   const h = new Date().getHours();
-  if (h >= 5 && h < 8)   return { top: '#F6D8C3', bottom: '#FBEAD9', sun: true };   // dawn
-  if (h >= 8 && h < 17)  return { top: '#BEE3F0', bottom: '#EAF6FA', sun: true };   // day
-  if (h >= 17 && h < 20) return { top: '#F4C7A1', bottom: '#F9E3C8', sun: true };   // dusk
-  return { top: '#1E2A44', bottom: '#33415E', sun: false };                          // night
+  // backdrop: the Foundry-cast painting for this hour (public/shore/beach_*.jpg,
+  // delivered 2026-07-11). If the file is ever missing the painted CSS layers
+  // beneath still carry the scene — the auto-light law, honest both ways.
+  if (h >= 5 && h < 8)   return { top: '#F6D8C3', bottom: '#FBEAD9', sun: true,  backdrop: '/shore/beach_dawn.jpg' };
+  if (h >= 8 && h < 17)  return { top: '#BEE3F0', bottom: '#EAF6FA', sun: true,  backdrop: '/shore/beach_day.jpg' };
+  if (h >= 17 && h < 20) return { top: '#F4C7A1', bottom: '#F9E3C8', sun: true,  backdrop: '/shore/beach_dusk.jpg' };
+  return { top: '#1E2A44', bottom: '#33415E', sun: false, backdrop: '/shore/beach_night.jpg' };
 }
 
 export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => void }) {
   const [, force] = useState(0);
+  // When the Foundry's painting loads, the CSS-painted layers stand down —
+  // one scene, never two fighting. Missing art = the painted layers hold.
+  const [artLoaded, setArtLoaded] = useState(false);
   useEffect(() => {
     const bump = () => force(x => x + 1);
     window.addEventListener('driftwood:world-event', bump);
@@ -50,6 +56,15 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
     <div className="rounded-[2rem] overflow-hidden border-2 border-outline-variant mb-4 select-none">
       {/* ── THE SCENE ── */}
       <div className="relative h-52" style={{ background: `linear-gradient(${sky.top}, ${sky.bottom})` }}>
+        {/* the real painting; the living elements ride on top of it */}
+        <img src={sky.backdrop} alt="" aria-hidden
+          className="absolute inset-0 w-full h-full object-cover object-bottom"
+          onLoad={() => setArtLoaded(true)}
+          onError={e => { (e.target as HTMLImageElement).style.display = 'none'; setArtLoaded(false); }} />
+        {/* a quiet foot of shadow so fire/planks/lanterns seat on any painting */}
+        {artLoaded && <div className="absolute bottom-0 inset-x-0 h-14" style={{ background: 'linear-gradient(transparent, rgba(30,20,8,0.28))' }} />}
+        {/* the CSS-painted scene — stands down when the real painting loads */}
+        {!artLoaded && (<>
         {/* sun / moon */}
         <div className="absolute top-4 right-8 w-9 h-9 rounded-full"
           style={{ background: night ? '#E8E4D8' : '#FFD98A', boxShadow: night ? '0 0 18px #E8E4D877' : '0 0 26px #FFD98A99' }} />
@@ -69,6 +84,7 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         {/* the beach */}
         <div className="absolute bottom-0 left-0 right-0 h-12"
           style={{ background: `linear-gradient(${night ? '#8C7A5E' : '#EBD9B4'}, ${night ? '#6E5F49' : '#D9C49A'})` }} />
+        </>)}
 
         {/* THE FIRE — height = TOGETHER, the thesis rendered */}
         <div className="absolute bottom-7 left-1/2 -translate-x-1/2 flex flex-col items-center" style={{ transform: `translateX(-50%) scale(${fireScale})`, transformOrigin: 'bottom center' }}>

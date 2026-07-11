@@ -21,6 +21,40 @@ export interface GatheringState {
   error: string | null;
 }
 
+// ── Island Seek: the ephemeral position layer ────────────────────────────────
+// Positions are play, not history — live only, never persisted, never in the
+// world log. The island keeps what you built, not where you wandered.
+export interface IslandPos {
+  actor: string; name: string;
+  x: number; y: number;                    // normalized island space 0..1
+  facing: 'left' | 'right';
+  mode: 'walking' | 'hiding';
+  emote?: string;
+  at: number;
+}
+const positions = new Map<string, IslandPos>();
+let lastPosSent = 0;
+
+export function islandPositions(): IslandPos[] {
+  const now = Date.now();
+  for (const [k, p] of positions) if (now - p.at > 8000) positions.delete(k); // stale phones fade
+  return [...positions.values()];
+}
+
+/** Throttled (~5Hz) broadcast of this phone's avatar. */
+export function sendPos(p: Omit<IslandPos, 'actor' | 'name' | 'at'>) {
+  if (!state.connected || !state.code) return;
+  const now = Date.now();
+  if (now - lastPosSent < 180) return;
+  lastPosSent = now;
+  const me = activeCastaway();
+  fetch(`/api/gathering/${state.code}/pos`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ actor: me.id, name: me.name, ...p }),
+  }).catch(() => { /* a dropped packet is just a footprint the tide took */ });
+}
+
 const SAVE_KEY = 'driftwood_gathering_v1';
 
 const state: GatheringState = { code: null, connected: false, hosting: false, presence: [], conchHolder: null, error: null };
@@ -67,6 +101,11 @@ function handleMessage(msg: any) {
     const ev: WorldEvent = msg.event;
     if (ev.from !== deviceId()) mergeRemoteEvent(ev);
     if (ev.action === 'conch_passed') state.conchHolder = String(ev.payload?.to ?? '') || null;
+  } else if (msg.kind === 'pos') {
+    const p: IslandPos = msg.pos;
+    positions.set(p.actor, p);
+    window.dispatchEvent(new CustomEvent('driftwood:island-pos'));
+    return; // positions are high-frequency — skip the full-state emit
   } else if (msg.kind === 'presence') {
     state.presence = msg.presence ?? [];
     // THE GATHERING IS HELD: two or more distinct castaways on the shore at

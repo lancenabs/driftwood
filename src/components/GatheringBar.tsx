@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { gatheringState, hostGathering, joinGathering, leaveGathering, passConch, resumeGathering, GatheringState } from '../lib/gathering';
 import { THE_SEVEN, readCrew, activeCastaway } from '../lib/castaways';
+import IslandSeek from './IslandSeek';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE GATHERING BAR — the fire circle, live (D3D-0 · bible §6).
@@ -16,6 +17,7 @@ export default function GatheringBar() {
   const [mode, setMode] = useState<'idle' | 'join'>('idle');
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [seeking, setSeeking] = useState(false);
 
   useEffect(() => {
     const sync = () => setG(gatheringState());
@@ -90,11 +92,17 @@ export default function GatheringBar() {
             {g.hosting ? 'read the code aloud — each phone joins with it' : 'gathered at the family fire'}
           </p>
         </div>
+        <button onClick={() => setSeeking(true)}
+          className="text-[9px] font-black uppercase tracking-wide rounded-full px-2.5 py-1 bg-emerald-500 text-white"
+          title="Game night on the sand — run the island together; hide-and-seek if you dare">
+          🏃 Island Seek
+        </button>
         <button onClick={() => leaveGathering()}
           className="text-[9px] font-black uppercase tracking-wide rounded-full px-2.5 py-1 border border-amber-300 text-amber-700">
           Leave quietly
         </button>
       </div>
+      {seeking && <IslandSeek onClose={() => setSeeking(false)} />}
 
       {/* presence — warm, never counting absence */}
       <div className="flex items-center gap-1.5 mt-2 flex-wrap" data-testid="gathering-presence">

@@ -125,6 +125,32 @@ app.get("/api/gathering/:code", (req, res) => {
   res.json({ code: camp.code, createdAt: camp.createdAt, seq: camp.seq, present: presenceList(camp), events: camp.events.length });
 });
 
+// ── THE EPHEMERAL CHANNEL (Island Seek) ──────────────────────────────────────
+// Positions are PLAY, not history: they broadcast live and are NEVER
+// persisted, never appended to the world log, gone when the game ends.
+// (The no-shame law's cousin: the island keeps what you built, not where
+// you wandered.) Payload is tiny: {x, y, facing, mode} at ~5Hz per phone.
+app.post("/api/gathering/:code/pos", (req, res) => {
+  const camp = loadCamp(String(req.params.code).toUpperCase());
+  if (!camp) return res.status(404).json({ error: "no such camp" });
+  const { actor, name, x, y, facing, mode, emote } = req.body ?? {};
+  if (!actor || typeof x !== "number" || typeof y !== "number") return res.status(400).json({ error: "actor, x, y required" });
+  broadcast(camp, {
+    kind: "pos",
+    pos: {
+      actor: String(actor).slice(0, 40),
+      name: String(name ?? "").slice(0, 24),
+      x: Math.max(0, Math.min(1, x)),      // island space is normalized 0..1
+      y: Math.max(0, Math.min(1, y)),
+      facing: facing === "left" ? "left" : "right",
+      mode: mode === "hiding" ? "hiding" : "walking",
+      emote: typeof emote === "string" ? emote.slice(0, 8) : undefined,
+      at: Date.now(),
+    },
+  });
+  res.json({ ok: true });
+});
+
 
 // ── THE BASE LAYER — welded under EVERY AI endpoint before the first feature
 // (the Rehabit lesson, applied on day one). Non-removable: the crisis handoff

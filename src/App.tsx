@@ -121,7 +121,7 @@ function DriftwoodShell() {
 
       {/* Header — honest brand, no borrowed badges */}
       <header className="w-full bg-white border-b border-outline-variant/30 py-2.5 px-4 shrink-0 z-30">
-        <div className="max-w-2xl mx-auto flex justify-between items-center">
+        <div className="max-w-2xl lg:max-w-5xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-white shadow-sm">
               <Heart className="w-4 h-4 fill-white" />
@@ -152,8 +152,37 @@ function DriftwoodShell() {
         </div>
       </header>
 
+      {/* The adaptive body: ≥lg the nav is a left RAIL and the content column
+          widens; <lg the nav is the bottom tab bar. One shell, both worlds —
+          the app was stuck at max-w-2xl with phone chrome on every screen. */}
+      <div className="flex-1 min-h-0 flex flex-row max-w-2xl lg:max-w-5xl w-full mx-auto">
+      {/* Desktop nav rail (hidden on phones) */}
+      <nav className="hidden lg:flex flex-col gap-1 py-4 pr-3 pl-1 w-44 shrink-0">
+        {NAV.map(tab => {
+          const Icon = tab.icon;
+          const active = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                if (tab.id === 'driftwood' && activeTab === 'driftwood') {
+                  window.dispatchEvent(new CustomEvent('driftwood:go-home'));
+                }
+                setActiveTab(tab.id);
+              }}
+              className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl cursor-pointer transition-colors text-left ${active ? 'bg-white text-primary shadow-sm border border-outline-variant/40' : 'text-on-surface-variant hover:bg-white/60'}`}
+            >
+              <Icon className="w-4.5 h-4.5" />
+              <span className="text-[12px] font-bold">{tab.label}</span>
+            </button>
+          );
+        })}
+        <div className="flex-1" />
+        <p className="text-[8px] text-on-surface-variant/70 px-3 pb-2 italic">the island that only yields to together</p>
+      </nav>
+
       {/* Main viewport */}
-      <main className="flex-1 min-h-0 relative max-w-2xl w-full mx-auto">
+      <main className="flex-1 min-h-0 relative w-full min-w-0">
         <div className="absolute inset-0 overflow-y-auto px-3 pb-4" style={{ display: activeTab === 'driftwood' ? 'block' : 'none' }}>
           <FamilyScreens onOpenTool={openTool} />
         </div>
@@ -194,9 +223,10 @@ function DriftwoodShell() {
           </div>
         )}
       </main>
+      </div>
 
-      {/* Bottom nav — four rooms */}
-      <nav className="shrink-0 bg-white border-t border-outline-variant/30 z-30">
+      {/* Bottom nav — four rooms (phones; the rail carries desktop) */}
+      <nav className="shrink-0 bg-white border-t border-outline-variant/30 z-30 lg:hidden">
         <div className="max-w-2xl mx-auto flex items-stretch justify-around px-2 py-1.5" style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}>
           {NAV.map(tab => {
             const Icon = tab.icon;
