@@ -3,6 +3,8 @@ import FireQuiz from '../FireQuiz';
 import TwoTruthsTide from './TwoTruthsTide';
 import AppreciationVolley from './AppreciationVolley';
 import LoveLanguageSort from './LoveLanguageSort';
+import BidAndTurn from './BidAndTurn';
+import WeatherReport from './WeatherReport';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -30,8 +32,14 @@ const GAMES: GameDef[] = [
   { id: 'love_language_sort', name: 'The Love-Language Sort', emoji: '💛', tier: 'kindling',
     blurb: 'How each of you most feels loved — guess, reveal, close the gap.',
     render: (onClose) => <LoveLanguageSort onClose={onClose} /> },
-  // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: Bid & Turn, Weather
-  //   Report, the Repair Rope, Naming the Undertow, … each a file + a line here.
+  { id: 'bid_and_turn', name: 'Bid & Turn', emoji: '🫧', tier: 'solo · this week',
+    blurb: "Train the #1 skill: notice the little reaches and turn toward them.",
+    render: (onClose) => <BidAndTurn onClose={onClose} /> },
+  { id: 'weather_report', name: 'Weather Report', emoji: '🌦', tier: 'kindling',
+    blurb: "Name your inner weather, guess each other's — ask before assuming.",
+    render: (onClose) => <WeatherReport onClose={onClose} /> },
+  // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: the Repair Rope,
+  //   Ritual Designer, Naming the Undertow, … each a file + a line here.
 ];
 
 export default function GamesMenu({ onClose }: { onClose: () => void }) {
