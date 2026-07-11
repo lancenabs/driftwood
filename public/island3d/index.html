@@ -175,19 +175,25 @@ const skyMat = new THREE.ShaderMaterial({
 });
 const sky = new THREE.Mesh(skyGeo, skyMat);
 scene.add(sky);
-// LANCE'S SKY — his real sunset panorama wraps the dome the moment it loads
-// (the gradient stands honest until then / if it's missing). Horizon math:
-// the photo's bottom edge (the sun on the water) lands AT the dome's horizon
-// (v=0.5), clamping warm below it; mirrored wrap hides the 360° seam.
-texLoader.load('/island3d/tex/sky-sunset.jpg', t => {
+// LANCE'S SKY — his real skies wrap the dome the moment they load (the
+// gradient stands honest until then / if they're missing). The island keeps
+// the family's clock: his blue morning by day, his sunset panorama from late
+// afternoon on (the Saturday-night island). Horizon math: the photo's bottom
+// edge lands AT the dome's horizon (v=0.5), clamping below it; mirrored wrap
+// hides the 360° seam.
+const hourNow = new Date().getHours();
+const isDay = hourNow >= 7 && hourNow < 16;
+texLoader.load(isDay ? '/island3d/tex/sky-day.jpg' : '/island3d/tex/sky-sunset.jpg', t => {
   t.wrapS = THREE.MirroredRepeatWrapping; t.wrapT = THREE.ClampToEdgeWrapping;
   t.repeat.set(2, 2); t.offset.y = -1;
   // fog:false — the dome sits far past fog-far and would flatten to fog color
   sky.material = new THREE.MeshBasicMaterial({ map: t, side: THREE.BackSide, depthWrite: false, fog: false });
-  // golden-hour weather to match the photograph (the Saturday-night island)
-  scene.fog.color.set(0xEBD9C6);
-  scene.background = new THREE.Color(0xF2DFC9);
-  sun.color.set(0xFFD9A0);
+  if (!isDay) {
+    // golden-hour weather to match the sunset photograph
+    scene.fog.color.set(0xEBD9C6);
+    scene.background = new THREE.Color(0xF2DFC9);
+    sun.color.set(0xFFD9A0);
+  }
 });
 
 // drifting clouds — soft billboards on the horizon
