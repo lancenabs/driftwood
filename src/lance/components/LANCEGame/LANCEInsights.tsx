@@ -1010,12 +1010,12 @@ ${completedChallenges.length > 0 ? `<h2>Completed Challenges</h2>
               <div className="flex items-center gap-2">
                 <Brain className="w-4 h-4" style={{ color: '#818CF8' }} />
                 <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#818CF8' }}>
-                  AI Clinical Diagnostic Center
+                  The Pattern Reader — never a diagnosis
                 </span>
               </div>
-              <h3 className="text-sm font-black text-white">Holistic Wellness Analysis</h3>
+              <h3 className="text-sm font-black text-white">A look across your own logs</h3>
               <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(199,210,254,0.7)' }}>
-                Correlates mood trends, CBT records, DBT logs, and habit patterns into a clinical synthesis report.
+                Reads your mood trends, thought records, and habit patterns back to you in plain words — psychoeducation from your own data, never a diagnosis.
               </p>
             </div>
             <Sparkles className="w-5 h-5 text-indigo-400 shrink-0 animate-pulse" style={{ fill: 'rgba(129,140,248,0.2)' }} />
