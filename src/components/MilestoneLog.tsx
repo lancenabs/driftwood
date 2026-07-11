@@ -3,6 +3,7 @@ import { ChevronRight, X, Lock, CheckCircle2, Circle, Flag } from 'lucide-react'
 import { MILESTONES, SEASONS, isSeasonEnd, Milestone, Beat } from '../data/milestones';
 import { TOOL_COMPLETION, readSaveSignature } from '../lance/components/LANCEGame/challengeCompletion';
 import { appendEvent } from '../lib/world';
+import { driftBell, tideCreak, emberPop } from '../lib/shoreSounds';
 import { activeCastaway, readCrew } from '../lib/castaways';
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -80,6 +81,7 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
   }, []);
 
   const openMilestone = (m: Milestone) => {
+    tideCreak();
     setActive(m); setBeatIdx(0); setConchConfirms([]);
     setPhase(state.investigating?.id === m.id ? 'working' : 'scene');
   };
@@ -108,6 +110,8 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
     };
     setState(next); saveState(next);
     if (!already) {
+      driftBell();
+      setTimeout(emberPop, 800);
       const me = activeCastaway();
       appendEvent(me.id, 'milestone_closed', { milestoneId: m.id, n: m.n });
       for (let i = 0; i < m.planks; i++) appendEvent(me.id, 'plank_earned', { milestoneId: m.id });

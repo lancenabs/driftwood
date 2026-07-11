@@ -9,6 +9,10 @@ export default defineConfig(() => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+        // The vendored island library imports firebase; this shore sails
+        // keyless — the stubs answer (same seam as Rehabit, runtime half).
+        'firebase/firestore': path.resolve(__dirname, 'src/lance/lib/firestore-stub.ts'),
+        'firebase/auth': path.resolve(__dirname, 'src/lance/lib/fireauth-stub.ts'),
       },
     },
     server: {

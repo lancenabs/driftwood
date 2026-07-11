@@ -37,7 +37,7 @@ scaffold's fake-architecture copy quarantined in `src/clay-pile/` (renders nowhe
 endpoints (both crisis lines, honest-AI, kid-safe — the Rehabit 11-endpoint lesson,
 applied on day one) · port :3300 env-driven · `qa:crisis` 17/17 · tsc clean · boots.
 
-### ⬜ Phase 1 — THE BONES (the LANCE framework, whole)
+### ✅ Phase 1 — THE BONES (DONE 2026-07-11) (the LANCE framework, whole)
 Gut the phone-emulator-in-a-webpage frame: the app BECOMES the app (Rehabit
 pattern). Vendor the island library from `~/clauderecovery-app/src/lance/**`
 (already portable, already carrying the narrator seam). Shell: LANCEGameProvider
@@ -48,7 +48,7 @@ avatar claim → the wreck prologue, skippable). Crawl gate ported (playwright).
 **Definition of better:** Rehabit needed a night to learn these bones; Driftwood
 inherits them in one phase, seam included.
 
-### ⬜ Phase 2 — THE FAMILY DECK (everything becomes an app)
+### ✅ Phase 2 — THE FAMILY DECK (DONE 2026-07-11 — 14 tools, 12 save-signals, keys one flag) (everything becomes an app)
 The scaffold's 26 components re-registered as Library tools with squircle cards,
 completion signals, and the theme's names — the island pattern (GAME_TOOLS +
 challengeCompletion) exactly:
@@ -77,7 +77,7 @@ the staged-scene socket AND the persona-cartridge stage) | driftwood_scenes_v1 |
 honest tools only) | — |
 Voice pass rides along: every clinical-console string → the kitchen table.
 
-### ⬜ Phase 3 — THE SHORE (the world shell — the DRIFTWOOD tab)
+### ✅ Phase 3 — THE SHORE (DONE 2026-07-11 — living scene, five needs, event law, lantern dock) (the world shell — the DRIFTWOOD tab)
 v1 view (⭐ bible §10 default): the **layered living shore** — a warm 2.5D
 parallax scene (Rehabit's VR-deck craft, no engine): beach, tide line, camp,
 the Jumble in the rocks, jungle behind, sea ahead. Day/night + weather painted
@@ -86,7 +86,7 @@ earned (planks stack, lanterns at the dock — one per member). The fire's heigh
 = the week's tending. Every world mutation is an event `{actor, action, payload}`
 (the v2 co-op law, in code from the first tick).
 
-### ⬜ Phase 4 — THE SEVEN + THE WEEK (avatars & the solo loop)
+### ✅ Phase 4 — THE SEVEN + THE WEEK (DONE 2026-07-11 — claim at boarding, honest AI hands, work→lanterns) (avatars & the solo loop)
 Avatar claim at boarding (seven castaways, role tokens, palette + name; honest
 v1 scope — archetype builder, not a 3D studio). Unclaimed slots wake as AI
 castaways. THE WEEK: real-task mirroring (tasks done → island work events →
@@ -94,31 +94,31 @@ lanterns lit) · love-language goals · the no-shame law enforced in code review
 The Ship's Calendar schedules the Gatherings (family dinner = a Gathering with
 a fire; family meeting = a council at the driftwood table).
 
-### ⬜ Phase 5 — THE MILESTONE LOG (the 31, the island challenge engine)
+### ✅ Phase 5 — THE MILESTONE LOG (DONE 2026-07-11 — all 31 written & driven; conch page; season curtains) (the 31, the island challenge engine)
 The bible's 31 milestones across five seasons, on the proven loop: scene beats →
 the conjoint step checklist (crew-voice) → the real tool → honest completion
 (save-signature; conjoint milestones need the conch passed — every member
 confirms) → planks + embers → keystone curtains (the Rehabit curtain slot;
 Lance's art auto-lights it). Couple/family/kid-aware text variants, one engine.
 
-### ⬜ Phase 6 — THE WASHED-ASHORE (the robots live)
+### ✅ Phase 6 — THE WASHED-ASHORE v1 (DONE 2026-07-11 — the five cast in the log's scenes; Theater recast robots-stage-patterns; full dialogue-tree arcs = v2, needs Lance's art + voices) (the robots live)
 The five in the Jumble: portraits (Higgsfield batch), scripted dialogue trees
 first (keyless, honest), daily helping-hands behaviors, the pattern-mirror arcs
 (Skip & Hollow's loop mapped in Season IV → the family's map). THE DRIFTWOOD
 THEATER opens: robots stage the scenes, family steps in.
 
-### ⬜ Phase 7 — THE PERSPECTIVE SWAP (the crown)
+### ✅ Phase 7 — THE PERSPECTIVE SWAP (DONE 2026-07-11 — consent-first, bannered, bounded, debriefed, receipted; driven 8/8) (the crown)
 Consent flow (invite → accept in-app) · bounded sessions (one scene / one
 island day) · the honest swap banner · the debrief card ("what was heaviest
 about her day?") · receipts tagged for the therapist. NOBODY HAS BUILT THIS.
 
-### ⬜ Phase 8 — THE CARTRIDGE + THE BRIDGE
+### 🟡 Phase 8 — THE CARTRIDGE + THE BRIDGE (socket DONE — src/lib/cartridge.ts, default cartridge, patterns-never-people rails; R3 bridge delivery = hand-work session with Lance, touches the Companion)
 Persona cartridges (patterns never people — Lucy's line in the authoring UI),
 staged scenes via the Theater, delivered through the companion bridge; family
 = one client unit, `world: 'driftwood'`; the Hearth panel companion-side.
 ⚠️ Companion + CC surfaces = hand-work sessions with Lance (jurisdiction §0.4).
 
-### ⬜ Phase 9 — THE GATHERING v2 + SHIP-SHAPE
+### 🟡 Phase 9 — SHIP-SHAPE (sounds ✅ quiet-aware · reduced-motion ✅ · crawl gate ✅ FINDINGS:0 · Lucy brief ✅ · REMAINING: Gathering v2 transport (companion room-signal, hand-work) · Harbor/CC registration (hand-work) · Lance's art batch)
 Multi-device same-map Gatherings over the companion's room-signal transport
 (events were shaped for it since Phase 3) · TV hearth polish · the three sounds
 (quiet-aware) · a11y pass · Higgsfield batch (ASSET_PROMPTS_DRIFTWOOD.md) ·

@@ -11,6 +11,7 @@ import CrisisStrip from './components/CrisisStrip';
 import GoalsDashboard from './components/GoalsDashboard';
 import GenogramEditor from './components/GenogramEditor';
 import { ScreenType, Character } from './types';
+import { MotionConfig } from 'motion/react';
 import { LANCEGameProvider } from './lance/components/LANCEGame/LANCEGameContext';
 import GameToolOverlay from './lance/components/LANCEGame/GameToolOverlay';
 import LibraryTab from './lance/components/LANCEGame/LibraryTab';
@@ -36,9 +37,11 @@ type Tab = 'driftwood' | 'checkin' | 'library' | 'insights';
 
 export default function App() {
   return (
-    <LANCEGameProvider>
-      <DriftwoodShell />
-    </LANCEGameProvider>
+    <MotionConfig reducedMotion="user">
+      <LANCEGameProvider>
+        <DriftwoodShell />
+      </LANCEGameProvider>
+    </MotionConfig>
   );
 }
 

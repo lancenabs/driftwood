@@ -9,7 +9,9 @@
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "qa:crisis": "node scripts/qa-crisis-check.mjs"
+    "qa:crisis": "node scripts/qa-crisis-check.mjs",
+    "qa:crawl": "node scripts/qa-full-crawl.mjs",
+    "qa:all": "npm run lint && npm run qa:crisis && npm run qa:crawl"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

@@ -112,3 +112,14 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+
+/* Reduced motion: CSS animations stand down when the OS asks (framer-motion
+   handles its own via MotionConfig reducedMotion="user" in App.tsx). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
