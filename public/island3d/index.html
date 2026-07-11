@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>The Island — Driftwood 3D</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #BEE3F0; font-family: -apple-system, system-ui, sans-serif; touch-action: none; }
+  /* THE DV BRIGHT LINE — native DOM, above the canvas, always (the law) */
+  #crisis { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(255,255,255,0.96);
+            font-size: 10px; text-align: center; padding: 4px 8px; color: #334; border-bottom: 1px solid #e5e7eb; }
+  #crisis a { color: #C0392B; font-weight: 800; text-decoration: none; }
+  #hud { position: fixed; top: 30px; left: 10px; z-index: 40; display: flex; gap: 6px; align-items: center; }
+  .pill { background: rgba(255,255,255,0.92); border: none; border-radius: 999px; padding: 8px 14px;
+          font-size: 11px; font-weight: 800; color: #374151; box-shadow: 0 2px 8px rgba(0,0,0,0.12); cursor: pointer; }
+  #stick { position: fixed; bottom: 26px; left: 22px; width: 116px; height: 116px; border-radius: 50%;
+           background: rgba(255,255,255,0.18); border: 2px solid rgba(255,255,255,0.5); z-index: 40; backdrop-filter: blur(2px); }
+  #nub { position: absolute; left: 50%; top: 50%; width: 48px; height: 48px; border-radius: 50%;
+         background: rgba(255,255,255,0.75); transform: translate(-50%, -50%); }
+  #say { position: fixed; left: 50%; bottom: 158px; transform: translateX(-50%); z-index: 45; max-width: 78%;
+         background: #fff; border-radius: 18px; padding: 10px 16px; font-size: 12.5px; font-weight: 700; color: #334;
+         box-shadow: 0 4px 16px rgba(0,0,0,0.18); display: none; text-align: center; line-height: 1.45; }
+  #say b { color: #B8860B; display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+  #fit { position: fixed; right: 12px; bottom: 26px; z-index: 40; display: none; flex-direction: column; gap: 8px;
+         background: rgba(255,255,255,0.94); border-radius: 20px; padding: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+  #fit h4 { margin: 0 0 2px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #9CA3AF; }
+  .swatches { display: flex; gap: 6px; }
+  .sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+  .sw.on { border-color: #0E7C7C; }
+  #hint { position: fixed; left: 50%; top: 68px; transform: translateX(-50%); z-index: 40; background: rgba(0,0,0,0.35);
+          color: #fff; font-size: 10.5px; font-weight: 700; border-radius: 14px; padding: 6px 14px; text-align: center; max-width: 86%;
+          pointer-events: none; transition: opacity 1s; }
+</style>
+</head>
+<body>
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     THE ISLAND IN THREE DIMENSIONS — D3D-1 first light (pulled forward by the
+     captain, 2026-07-11). The Horizon-Worlds-mobile experience, owned:
+     third-person avatar, thumb-stick, pastel fog, flat-shaded island — built
+     on the house's proven single-file Three.js pattern (same importmap as the
+     three shipped worlds). Same-origin with Driftwood: the castaway, the
+     avatar fit, and the Gathering all read the app's own keys.
+
+     THE LAWS RIDE ALONG: the DV strip is DOM above the canvas (a renderer
+     hang can never bury it) · positions are play, never persisted · presence
+     shows who is here, never who isn't · the Jumble are honest robots.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div id="crisis">📞 <a href="tel:988">988</a> Suicide &amp; Crisis Lifeline · <a href="tel:18007997233">1-800-799-7233</a> DV Hotline (text START to 88788) — never gated, this world can wait.</div>
+<div id="hud">
+  <button class="pill" id="back">← the shore</button>
+  <button class="pill" id="dress">👕 Avatar</button>
+</div>
+<div id="hint">drag to look · stick or WASD to walk · visit the wood robots</div>
+<div id="say"><b id="sayName"></b><span id="sayLine"></span></div>
+<div id="stick"><div id="nub"></div></div>
+<div id="fit">
+  <h4>skin</h4><div class="swatches" id="skins"></div>
+  <h4>shirt</h4><div class="swatches" id="shirts"></div>
+  <h4>shorts</h4><div class="swatches" id="shortsRow"></div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ── who am I (the app's own keys, same origin) ───────────────────────────────
+let me = { id: 'castaway-1', name: 'Castaway' };
+try { const u = JSON.parse(localStorage.getItem('driftwood_active_castaway_v1') || 'null'); if (u?.id) me = u; } catch {}
+const FIT_KEY = 'driftwood_avatar_v1';
+const SKINS = ['#F5D0A9', '#E8B88A', '#C68B59', '#9C6B43', '#6E4A2E', '#54331D'];
+const SHIRTS = ['#7FD98C', '#3ECFCF', '#F59E0B', '#CE9FFC', '#94A3B8', '#E05A6E'];
+const SHORTS = ['#334155', '#0E7C7C', '#8a5a22', '#6E4A2E', '#475569', '#B8860B'];
+let fit = { skin: SKINS[1], shirt: SHIRTS[0], shorts: SHORTS[0] };
+try { const f = JSON.parse(localStorage.getItem(FIT_KEY) || 'null'); if (f?.skin) fit = f; } catch {}
+
+// ── scene: the Horizon-mobile weather ────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xBEE3F0);
+scene.fog = new THREE.Fog(0xC9E9F2, 26, 95);
+const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 300);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+scene.add(new THREE.HemisphereLight(0xFFFDF5, 0xCBB489, 0.78));
+const sun = new THREE.DirectionalLight(0xFFF0CE, 0.95);
+sun.position.set(30, 50, -20);
+scene.add(sun);
+
+// ── the island (flat-shaded, pastel — the whole aesthetic is restraint) ─────
+const mat = (c) => new THREE.MeshLambertMaterial({ color: c });
+const sand = new THREE.Mesh(new THREE.CylinderGeometry(34, 36, 1.6, 40), mat(0xEBD9B4));
+sand.position.y = -0.8;
+scene.add(sand);
+const water = new THREE.Mesh(new THREE.CircleGeometry(160, 48), new THREE.MeshLambertMaterial({ color: 0x57B3C4 }));
+water.rotation.x = -Math.PI / 2; water.position.y = -1.1;
+scene.add(water);
+// dunes
+for (const [x, z, s] of [[-14, -10, 4], [12, -14, 5], [18, 8, 3.4], [-20, 6, 4.5]]) {
+  const d = new THREE.Mesh(new THREE.SphereGeometry(s, 12, 8), mat(0xD0B47E));
+  d.position.set(x, -s * 0.72, z); d.scale.y = 0.5;
+  scene.add(d);
+}
+// palms: trunk + cone fronds
+function palm(x, z, h = 5, lean = 0.16) {
+  const g = new THREE.Group();
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.3, h, 7), mat(0xA5805A));
+  trunk.position.y = h / 2; trunk.rotation.z = lean;
+  g.add(trunk);
+  for (let i = 0; i < 6; i++) {
+    const frond = new THREE.Mesh(new THREE.ConeGeometry(0.5, 3.1, 4), mat(i % 2 ? 0x2F6B43 : 0x3B8456));
+    frond.position.set(Math.sin(lean) * h, h * 0.98, 0);
+    frond.rotation.z = Math.PI / 2.4;
+    frond.rotation.y = (i / 6) * Math.PI * 2;
+    frond.translateY(1.1);
+    g.add(frond);
+  }
+  g.position.set(x, 0, z);
+  scene.add(g);
+}
+palm(-9, -13); palm(-11.5, -12, 6, -0.12); palm(14, -11, 5.4); palm(19, 3, 4.6, 0.2); palm(-18, 9, 5);
+// driftwood logs
+for (const [x, z, r] of [[6, 9, 0.7], [-7, 11, 2.2], [10, -4, 1.2]]) {
+  const log = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.38, 4.4, 7), mat(0xC9B08C));
+  log.position.set(x, 0.3, z); log.rotation.z = Math.PI / 2; log.rotation.y = r;
+  scene.add(log);
+}
+// the camp: fire + tent + rowboat
+const fire = new THREE.Group();
+for (let i = 0; i < 4; i++) {
+  const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 1.2, 5), mat(0x8a6a48));
+  stick.rotation.z = 0.5; stick.rotation.y = (i / 4) * Math.PI * 2;
+  stick.position.y = 0.3;
+  fire.add(stick);
+}
+const flame = new THREE.Mesh(new THREE.ConeGeometry(0.34, 1.1, 7), new THREE.MeshBasicMaterial({ color: 0xFFA64D }));
+flame.position.y = 0.9;
+fire.add(flame);
+const fireLight = new THREE.PointLight(0xFFA64D, 1.1, 12);
+fireLight.position.y = 1.4;
+fire.add(fireLight);
+fire.position.set(0, 0, 0);
+scene.add(fire);
+const tent = new THREE.Mesh(new THREE.ConeGeometry(1.6, 2.1, 4), mat(0xC96F4A));
+tent.position.set(4.5, 1.05, 5.5); tent.rotation.y = Math.PI / 4;
+scene.add(tent);
+const boat = new THREE.Group();
+const hull = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.1, 4.6, 8, 1, false, 0, Math.PI), mat(0x8a5a22));
+hull.rotation.z = Math.PI / 2; hull.rotation.x = Math.PI;
+boat.add(hull);
+boat.position.set(16, 0.7, 10); boat.rotation.y = -0.6;
+scene.add(boat);
+
+// ── THE AVATAR RIG — the Horizon-style body, owned ───────────────────────────
+// Chunky smooth primitives, flat shading, procedural walk. buildAvatar returns
+// a rig any player (or future persona-robot) wears — the customization goes
+// deep on this chassis (D3D-1 law: depth within archetypes).
+function buildAvatar({ skin, shirt, shorts }) {
+  const g = new THREE.Group();
+  const mSkin = mat(skin), mShirt = mat(shirt), mShorts = mat(shorts);
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.42, 0.85, 12), mShirt);
+  torso.position.y = 1.12;
+  const hips = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.34, 0.34, 12), mShorts);
+  hips.position.y = 0.62;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.31, 14, 12), mSkin);
+  head.position.y = 1.86;
+  // simple friendly face (visible when others face you)
+  const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.035, 6, 6), mat(0x2b2b2b));
+  const eyeR = eyeL.clone();
+  eyeL.position.set(-0.1, 1.9, 0.27); eyeR.position.set(0.1, 1.9, 0.27);
+  const limbs = {};
+  const limb = (name, w, h, m, x, y) => {
+    // r134 has no CapsuleGeometry — a cylinder with a sphere cap reads the same
+    const pivot = new THREE.Group();
+    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(w, w, h, 8), m);
+    mesh.position.y = -h / 2;
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(w, 8, 6), m);
+    cap.position.y = -h;
+    pivot.add(mesh, cap);
+    pivot.position.set(x, y, 0);
+    limbs[name] = pivot;
+    g.add(pivot);
+  };
+  limb('armL', 0.11, 0.62, mSkin, -0.5, 1.5);
+  limb('armR', 0.11, 0.62, mSkin, 0.5, 1.5);
+  limb('legL', 0.13, 0.6, mSkin, -0.18, 0.52);
+  limb('legR', 0.13, 0.6, mSkin, 0.18, 0.52);
+  // shoes
+  for (const side of [-0.18, 0.18]) {
+    const shoe = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 6), mat(0x334155));
+    shoe.scale.set(1, 0.6, 1.4);
+    shoe.position.set(side, 0.08, 0.05);
+    g.add(shoe);
+  }
+  // soft blob shadow
+  const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.55, 16), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.18 }));
+  shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.02;
+  g.add(torso, hips, head, eyeL, eyeR, shadow);
+  g.userData.limbs = limbs;
+  g.userData.mats = { mSkin, mShirt, mShorts };
+  return g;
+}
+function nameTag(text, color = '#0E7C7C') {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 64;
+  const x = c.getContext('2d');
+  x.fillStyle = 'rgba(255,255,255,0.92)'; x.beginPath();
+  x.roundRect(38, 8, 180, 44, 22); x.fill();
+  x.font = '800 26px -apple-system, sans-serif'; x.fillStyle = color; x.textAlign = 'center';
+  x.fillText(text.slice(0, 12), 128, 39);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+  s.scale.set(1.3, 0.32, 1);
+  s.position.y = 2.6;
+  return s;
+}
+const player = buildAvatar(fit);
+player.add(nameTag(me.name || 'You'));
+player.position.set(0, 0, 7);
+scene.add(player);
+
+// walk animation
+function animateWalk(rig, speed, t) {
+  const L = rig.userData.limbs;
+  const a = speed > 0.05 ? Math.sin(t * 9) * Math.min(speed * 9, 0.75) : 0;
+  L.armL.rotation.x = a; L.armR.rotation.x = -a;
+  L.legL.rotation.x = -a; L.legR.rotation.x = a;
+  rig.position.y = speed > 0.05 ? Math.abs(Math.sin(t * 9)) * 0.05 : 0;
+}
+
+// ── THE JUMBLE — billboards of the real portraits on driftwood stands ────────
+const JUMBLE = [
+  { id: 'skip', name: 'Skip', x: 3, z: -3, lines: ['A stick! For you! Or— for me? For US.', 'Race you to the rocks! I will lose on purpose. Maybe.'] },
+  { id: 'hollow', name: 'Hollow', x: -12, z: 2, lines: ['…it is safe in the shell. But it is warmer at the fire.', '…I come out slower than I go in. That is allowed.'] },
+  { id: 'echo2', name: 'Echo-2', x: -3, z: -12, lines: ['You said— you SAID— something kind. I am keeping it.', 'Say the important ones twice.'] },
+  { id: 'bailer', name: 'Bailer', x: 15.4, z: 9, lines: ['The boat is dry! I am keeping it that way.', 'Worry is water. I have a bucket. We will be fine.'] },
+  { id: 'collier', name: 'the Collier', x: 9, z: 13, lines: ['Sit, sit. The forge remembers every mended thing.', 'The seam shows, little one. That is how you know it held.'] },
+];
+const loader = new THREE.TextureLoader();
+const robots = [];
+for (const r of JUMBLE) {
+  const g = new THREE.Group();
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 0.8, 6), mat(0xA5805A));
+  post.position.y = 0.4;
+  g.add(post);
+  loader.load(`/robots/${r.id}.webp`, tex => {
+    const size = r.id === 'collier' ? 2.0 : 1.55;
+    const card = new THREE.Mesh(
+      new THREE.PlaneGeometry(size, size),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: false }),
+    );
+    card.position.y = 0.8 + size / 2;
+    g.add(card);
+    g.userData.card = card;
+  }, undefined, () => { /* portrait missing → the post stands honest */ });
+  g.add(nameTag(r.name, '#B8860B'));
+  g.userData.tagY = r.id === 'collier' ? 3.1 : 2.7;
+  g.children[g.children.length - 1].position.y = g.userData.tagY;
+  g.position.set(r.x, 0, r.z);
+  g.userData.info = r;
+  scene.add(g);
+  robots.push(g);
+}
+const say = document.getElementById('say');
+let lastSpoke = {};
+function speak(r) {
+  const info = r.userData.info;
+  const n = (lastSpoke[info.id] ?? -1) + 1;
+  lastSpoke[info.id] = n;
+  document.getElementById('sayName').textContent = info.name;
+  document.getElementById('sayLine').textContent = info.lines[n % info.lines.length];
+  say.style.display = 'block';
+  clearTimeout(say._t);
+  say._t = setTimeout(() => { say.style.display = 'none'; }, 4500);
+}
+
+// ── input: stick + WASD + drag-orbit ─────────────────────────────────────────
+const stickEl = document.getElementById('stick'), nub = document.getElementById('nub');
+const stick = { dx: 0, dz: 0, on: false };
+let stickBase = null;
+stickEl.addEventListener('pointerdown', e => { stickBase = { x: e.clientX, y: e.clientY }; stick.on = true; stickEl.setPointerCapture(e.pointerId); });
+stickEl.addEventListener('pointermove', e => {
+  if (!stick.on || !stickBase) return;
+  const dx = (e.clientX - stickBase.x) / 42, dy = (e.clientY - stickBase.y) / 42;
+  const m = Math.max(1, Math.hypot(dx, dy));
+  stick.dx = dx / m; stick.dz = dy / m;
+  nub.style.left = `${50 + stick.dx * 28}%`; nub.style.top = `${50 + stick.dz * 28}%`;
+});
+const stickEnd = () => { stick.on = false; stick.dx = stick.dz = 0; nub.style.left = '50%'; nub.style.top = '50%'; };
+stickEl.addEventListener('pointerup', stickEnd); stickEl.addEventListener('pointercancel', stickEnd);
+const keys = {};
+addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+// drag to orbit (outside the stick)
+let camYaw = 0, camPitch = 0.34, dragging = false, px = 0, py = 0;
+renderer.domElement.addEventListener('pointerdown', e => { dragging = true; px = e.clientX; py = e.clientY; });
+addEventListener('pointerup', () => dragging = false);
+addEventListener('pointermove', e => {
+  if (!dragging) return;
+  camYaw -= (e.clientX - px) * 0.005;
+  camPitch = Math.max(0.12, Math.min(1.1, camPitch + (e.clientY - py) * 0.004));
+  px = e.clientX; py = e.clientY;
+});
+// tap a robot → it speaks (raycast on pointerup with little movement)
+const ray = new THREE.Raycaster();
+let downAt = null;
+renderer.domElement.addEventListener('pointerdown', e => downAt = { x: e.clientX, y: e.clientY });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!downAt || Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) > 8) return;
+  const v = new THREE.Vector2((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  ray.setFromCamera(v, camera);
+  for (const r of robots) {
+    if (r.userData.card && ray.intersectObject(r.userData.card).length) return speak(r);
+  }
+});
+
+// ── the avatar fit panel ─────────────────────────────────────────────────────
+const fitEl = document.getElementById('fit');
+document.getElementById('dress').onclick = () => fitEl.style.display = fitEl.style.display === 'flex' ? 'none' : 'flex';
+function swatchRow(elId, colors, key) {
+  const el = document.getElementById(elId);
+  for (const c of colors) {
+    const b = document.createElement('button');
+    b.className = 'sw' + (fit[key] === c ? ' on' : '');
+    b.style.background = c;
+    b.onclick = () => {
+      fit[key] = c;
+      localStorage.setItem(FIT_KEY, JSON.stringify(fit));
+      const m = player.userData.mats;
+      m.mSkin.color.set(fit.skin); m.mShirt.color.set(fit.shirt); m.mShorts.color.set(fit.shorts);
+      el.querySelectorAll('.sw').forEach(s => s.classList.toggle('on', s === b));
+    };
+    el.appendChild(b);
+  }
+}
+swatchRow('skins', SKINS, 'skin');
+swatchRow('shirts', SHIRTS, 'shirt');
+swatchRow('shortsRow', SHORTS, 'shorts');
+
+// ── THE GATHERING in 3D — family avatars on the same ground ─────────────────
+// Positions ride the existing ephemeral channel (normalized 0..1 ↔ world ±30).
+const others = new Map(); // actor → { rig, target, name }
+let campCode = null;
+try { const g = JSON.parse(localStorage.getItem('driftwood_gathering_v1') || 'null'); campCode = g?.code ?? null; } catch {}
+const W = 30; // world half-size ↔ normalized map
+const toNorm = v => Math.max(0, Math.min(1, (v + W) / (2 * W)));
+const fromNorm = v => v * 2 * W - W;
+if (campCode) {
+  document.getElementById('hint').textContent = `camp ${campCode} — the family walks this same ground · drag to look · stick to walk`;
+  const es = new EventSource(`/api/gathering/${campCode}/stream?actor=${encodeURIComponent(me.id)}&name=${encodeURIComponent(me.name)}`);
+  es.onmessage = ev => {
+    let msg; try { msg = JSON.parse(ev.data); } catch { return; }
+    if (msg.kind !== 'pos' || msg.pos.actor === me.id) return;
+    const p = msg.pos;
+    let o = others.get(p.actor);
+    if (!o) {
+      const rig = buildAvatar({ skin: SKINS[(p.actor.charCodeAt(9) || 2) % SKINS.length], shirt: SHIRTS[(p.actor.charCodeAt(9) || 3) % SHIRTS.length], shorts: SHORTS[1] });
+      rig.add(nameTag(p.name || 'family', '#E05A6E'));
+      scene.add(rig);
+      o = { rig, target: new THREE.Vector3(), speed: 0 };
+      others.set(p.actor, o);
+    }
+    const nx = fromNorm(p.x), nz = fromNorm(p.y);
+    o.speed = o.rig.position.distanceTo(new THREE.Vector3(nx, 0, nz)) * 2;
+    o.target.set(nx, 0, nz);
+    o.at = Date.now();
+  };
+  setInterval(() => {
+    // stale family fade (left the island)
+    for (const [k, o] of others) if (Date.now() - (o.at ?? 0) > 9000) { scene.remove(o.rig); others.delete(k); }
+  }, 3000);
+}
+let lastSent = 0;
+function broadcastPos() {
+  if (!campCode) return;
+  const now = Date.now();
+  if (now - lastSent < 180) return;
+  lastSent = now;
+  fetch(`/api/gathering/${campCode}/pos`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ actor: me.id, name: me.name, x: toNorm(player.position.x), y: toNorm(player.position.z), facing: 'right', mode: 'walking' }),
+  }).catch(() => {});
+}
+
+// the hint earns its exit after the first steps
+setTimeout(() => { document.getElementById('hint').style.opacity = '0'; }, 9000);
+
+// ── back to the shore ────────────────────────────────────────────────────────
+document.getElementById('back').onclick = () => {
+  if (window.parent !== window) window.parent.postMessage({ type: 'driftwood:leave-island' }, '*');
+  else history.back();
+};
+
+// ── the loop ─────────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta() || 0.016, 0.05);
+  const t = clock.elapsedTime;
+
+  // input → camera-relative motion
+  let ix = stick.dx + ((keys['d'] || keys['arrowright']) ? 1 : 0) - ((keys['a'] || keys['arrowleft']) ? 1 : 0);
+  let iz = stick.dz + ((keys['s'] || keys['arrowdown']) ? 1 : 0) - ((keys['w'] || keys['arrowup']) ? 1 : 0);
+  const mag = Math.min(1, Math.hypot(ix, iz));
+  if (mag > 0.05) {
+    const ang = Math.atan2(ix, iz) + camYaw + Math.PI;
+    const SPEED = 5.2;
+    player.position.x += Math.sin(ang) * SPEED * mag * dt;
+    player.position.z += Math.cos(ang) * SPEED * mag * dt;
+    // stay on the sand
+    const rr = Math.hypot(player.position.x, player.position.z);
+    if (rr > 32) { player.position.x *= 32 / rr; player.position.z *= 32 / rr; }
+    player.rotation.y = ang + Math.PI; // face where you walk
+    broadcastPos();
+  }
+  animateWalk(player, mag, t);
+
+  // family interpolation + their walk cycles
+  for (const [, o] of others) {
+    const d = o.rig.position.distanceTo(o.target);
+    o.rig.position.lerp(o.target, Math.min(1, dt * 8));
+    if (d > 0.05) o.rig.lookAt(o.target.x, 0, o.target.z);
+    animateWalk(o.rig, Math.min(d, 1), t);
+  }
+
+  // robots breathe; near one → it speaks (throttled)
+  for (const r of robots) {
+    if (r.userData.card) r.userData.card.lookAt(camera.position.x, r.userData.card.getWorldPosition(new THREE.Vector3()).y, camera.position.z);
+    if (r.userData.info.id === 'skip') { r.position.x = r.userData.info.x + Math.sin(t * 0.6) * 1.6; }
+    const near = r.position.distanceTo(player.position) < 2.6;
+    if (near && (r.userData.lastNear ?? 0) < Date.now() - 16000) { r.userData.lastNear = Date.now(); speak(r); }
+  }
+
+  // fire flicker
+  flame.scale.setScalar(1 + Math.sin(t * 8) * 0.1);
+  fireLight.intensity = 1.0 + Math.sin(t * 7.3) * 0.15;
+
+  // third-person camera: behind + above, orbit by drag
+  const cx = player.position.x + Math.sin(camYaw) * 8.0 * Math.cos(camPitch);
+  const cz = player.position.z + Math.cos(camYaw) * 8.0 * Math.cos(camPitch);
+  const cy = 2.2 + Math.sin(camPitch) * 8.0;
+  camera.position.lerp(new THREE.Vector3(cx, cy, cz), Math.min(1, dt * 7));
+  camera.lookAt(player.position.x, player.position.y + 1.5, player.position.z);
+
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

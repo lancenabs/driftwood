@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { readNeeds, planksEarned, embersHeld, lanternLit, appendEvent } from '../lib/world';
 import { THE_SEVEN, readCrew, aiCastaways, activeCastaway, setActiveCastaway } from '../lib/castaways';
-import IslandSeek from './IslandSeek';
+// (the 2D seek map remains the Gathering bar's game; the shore door now opens
+// the REAL island — public/island3d/, third person, the Horizon-mobile shape)
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE SHORE — the living scene at the top of the Driftwood tab.
@@ -31,13 +32,17 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
   const [walking, setWalking] = useState(false);   // 🏝 the one-click island door
   useEffect(() => {
     const bump = () => force(x => x + 1);
+    // the 3D island's "← the shore" button lands here
+    const leave = (e: MessageEvent) => { if (e.data?.type === 'driftwood:leave-island') setWalking(false); };
     window.addEventListener('driftwood:world-event', bump);
     window.addEventListener('driftwood:castaway-changed', bump);
     window.addEventListener('focus', bump);
+    window.addEventListener('message', leave);
     return () => {
       window.removeEventListener('driftwood:world-event', bump);
       window.removeEventListener('driftwood:castaway-changed', bump);
       window.removeEventListener('focus', bump);
+      window.removeEventListener('message', leave);
     };
   }, []);
 
@@ -167,8 +172,13 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         )}
       </div>
 
-      {/* the island itself, one click deep */}
-      {walking && <IslandSeek onClose={() => setWalking(false)} />}
+      {/* the island itself, one click deep — 3D, third person, same origin so
+          your castaway, your fit, and the live camp all carry over */}
+      {walking && (
+        <div className="fixed inset-0 z-[60] bg-[#BEE3F0]">
+          <iframe src="/island3d/index.html" title="The Island in three dimensions" className="w-full h-full border-0" allow="fullscreen" />
+        </div>
+      )}
     </div>
   );
 }
