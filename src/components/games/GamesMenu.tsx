@@ -18,6 +18,8 @@ import GameShell from './GameShell';
 import PerspectiveSwap from '../PerspectiveSwap';
 import LetterInTheBottle from './LetterInTheBottle';
 import ApologyForge from './ApologyForge';
+import LoadTest from './LoadTest';
+import GenogramHunt from './GenogramHunt';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -94,6 +96,12 @@ const GAMES: GameDef[] = [
   { id: 'apology_forge', name: 'The Apology Forge', emoji: '⚒️', tier: 'deep water',
     blurb: 'Walk one real repair through the four hammers — your "but" burns in the fire, not the apology.',
     render: (onClose) => <ApologyForge onClose={onClose} /> },
+  { id: 'load_test', name: 'The Load Test', emoji: '🧗', tier: 'deep water',
+    blurb: 'Rehearse the hard conversation in the shallows — build the startup, clear the reef, then go live.',
+    render: (onClose) => <LoadTest onClose={onClose} /> },
+  { id: 'genogram_hunt', name: 'The Genogram Hunt', emoji: '🗿', tier: 'steady flame',
+    blurb: "Find the pattern stones your family carries, then choose each one's fate: keep, reforge, or set down.",
+    render: (onClose) => <GenogramHunt onClose={onClose} /> },
   // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: Ritual Designer,
   //   the Ridgepole Vote, Naming the Undertow, … each a file + a line here.
 ];
