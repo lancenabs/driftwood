@@ -16,6 +16,8 @@ import RitualDesigner from './RitualDesigner';
 import NamingTheUndertow from './NamingTheUndertow';
 import GameShell from './GameShell';
 import PerspectiveSwap from '../PerspectiveSwap';
+import LetterInTheBottle from './LetterInTheBottle';
+import ApologyForge from './ApologyForge';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -86,6 +88,12 @@ const GAMES: GameDef[] = [
         <div className="px-5 py-6 max-w-md mx-auto w-full"><PerspectiveSwap /></div>
       </GameShell>
     ) },
+  { id: 'letter_in_the_bottle', name: 'The Letter in the Bottle', emoji: '🍾', tier: 'deep water',
+    blurb: 'Write to this family one year out and launch it — sealed means sealed, until the tide returns it.',
+    render: (onClose) => <LetterInTheBottle onClose={onClose} /> },
+  { id: 'apology_forge', name: 'The Apology Forge', emoji: '⚒️', tier: 'deep water',
+    blurb: 'Walk one real repair through the four hammers — your "but" burns in the fire, not the apology.',
+    render: (onClose) => <ApologyForge onClose={onClose} /> },
   // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: Ritual Designer,
   //   the Ridgepole Vote, Naming the Undertow, … each a file + a line here.
 ];
