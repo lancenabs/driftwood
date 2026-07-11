@@ -11,6 +11,7 @@ import ChoreSwap from './ChoreSwap';
 import MemoryMatch from './MemoryMatch';
 import RidgepoleVote from './RidgepoleVote';
 import SandDrawings from './SandDrawings';
+import TwoHuts from './TwoHuts';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -62,6 +63,9 @@ const GAMES: GameDef[] = [
   { id: 'sand_drawings', name: 'Sand Drawings', emoji: '🖐', tier: 'ice-breaker',
     blurb: 'One tells a memory, the other draws it in the sand — the gap is the laugh.',
     render: (onClose) => <SandDrawings onClose={onClose} /> },
+  { id: 'two_huts', name: 'Two Huts or One', emoji: '🏕', tier: 'steady flame',
+    blurb: "Place your bedroll on tonight's camp map, honestly — distance is data, not failure.",
+    render: (onClose) => <TwoHuts onClose={onClose} /> },
   // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: Ritual Designer,
   //   the Ridgepole Vote, Naming the Undertow, … each a file + a line here.
 ];
