@@ -18,6 +18,7 @@ import LibraryTab from './lance/components/LANCEGame/LibraryTab';
 import CheckInTab from './lance/components/LANCEGame/CheckInTab';
 import LANCEInsights from './lance/components/LANCEGame/LANCEInsights';
 import TheShore from './components/TheShore';
+import GatheringBar from './components/GatheringBar';
 import MilestoneLog from './components/MilestoneLog';
 import PerspectiveSwap from './components/PerspectiveSwap';
 import { TOOL_COMPLETION, readSaveSignature } from './lance/components/LANCEGame/challengeCompletion';
@@ -265,6 +266,7 @@ function FamilyScreens({ onOpenTool }: { onOpenTool: (id: string) => void }) {
   return (
     <div className="pt-3">
       {activeScreen === 'home' && <TheShore onOpenTool={onOpenTool} />}
+      {activeScreen === 'home' && <GatheringBar />}
       {activeScreen === 'home' && <MilestoneLog onOpenTool={onOpenTool} />}
       {activeScreen === 'home' && <PerspectiveSwap />}
       {activeScreen === 'home' && (

@@ -17,18 +17,50 @@ export interface WorldEvent {
   action: string;             // 'tool_work' | 'milestone_closed' | 'lantern_lit' | 'gathering_held' | 'swap_debriefed' | …
   payload?: Record<string, unknown>;
   at: string;                 // ISO
+  id?: string;                // dedup key for the Gathering transport (v2 law)
+  from?: string;              // which device spoke (this device's id, or a remote one)
 }
 
 const EVENTS_KEY = 'driftwood_events_v1';
 const EVENT_CAP = 2000;       // plenty of history, bounded on-device
+const DEVICE_KEY = 'driftwood_device_v1';
+
+/** This device's stable id — how the Gathering tells its own voice from the family's. */
+export function deviceId(): string {
+  try {
+    let d = localStorage.getItem(DEVICE_KEY);
+    if (!d) { d = `dev-${Math.random().toString(36).slice(2, 10)}`; localStorage.setItem(DEVICE_KEY, d); }
+    return d;
+  } catch { return 'dev-volatile'; }
+}
 
 export function appendEvent(actor: string, action: string, payload?: Record<string, unknown>) {
   try {
+    const ev: WorldEvent = {
+      actor, action, payload, at: new Date().toISOString(),
+      id: `ev-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      from: deviceId(),
+    };
     const log: WorldEvent[] = JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]');
-    log.push({ actor, action, payload, at: new Date().toISOString() });
+    log.push(ev);
     localStorage.setItem(EVENTS_KEY, JSON.stringify(log.slice(-EVENT_CAP)));
-    window.dispatchEvent(new CustomEvent('driftwood:world-event'));
+    window.dispatchEvent(new CustomEvent('driftwood:world-event', { detail: ev }));
   } catch { /* the shore forgives a full disk */ }
+}
+
+/** The Gathering's inbound door: merge a family member's event into this
+ *  device's log (dedup by id) — the shore re-renders exactly as if the work
+ *  had happened here, because on the island it did. Never re-broadcast. */
+export function mergeRemoteEvent(ev: WorldEvent): boolean {
+  try {
+    if (!ev?.actor || !ev?.action) return false;
+    const log: WorldEvent[] = JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]');
+    if (ev.id && log.some(e => e.id === ev.id)) return false;
+    log.push({ ...ev, at: ev.at ?? new Date().toISOString() });
+    localStorage.setItem(EVENTS_KEY, JSON.stringify(log.slice(-EVENT_CAP)));
+    window.dispatchEvent(new CustomEvent('driftwood:world-event', { detail: ev }));
+    return true;
+  } catch { return false; }
 }
 
 export function readEvents(): WorldEvent[] {

@@ -1,5 +1,7 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
+import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
@@ -10,6 +12,118 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3300;
 
 app.use(express.json());
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  THE GATHERING RELAY (D3D-0 · bible §6 v2 — "a transport, not a rewrite")
+//
+//  The event law pays off: every world mutation was already an event
+//  { actor, action, payload, at } — this relay simply carries that stream
+//  between the family's devices. One camp = one family = one isolated log
+//  (the room-actor pattern from THE_TWO_HORIZONS blueprint §2.3).
+//
+//  Transport: SSE down + POST up. Zero new dependencies; works over the
+//  tailnet on any phone browser. Live events only in v1 — history/week-sync
+//  rides the companion-sync pattern at R3 (hand-work).
+//
+//  Sandbox honesty: camps are code-joined (readable alphabet, the companion's
+//  pairing pattern), no accounts, no PHI — trials only, same as the whole app.
+// ═════════════════════════════════════════════════════════════════════════════
+
+interface CampEvent { seq: number; id: string; actor: string; action: string; payload?: Record<string, unknown>; at: string; from: string }
+interface Camp {
+  code: string;
+  createdAt: string;
+  seq: number;
+  events: CampEvent[];              // live-session log (bounded)
+  listeners: Map<string, { res: express.Response; actor: string; name: string; since: number }>;
+}
+
+const CAMPS = new Map<string, Camp>();
+const CAMP_DIR = path.join(process.cwd(), "store", "gatherings");
+fs.mkdirSync(CAMP_DIR, { recursive: true });
+const CAMP_CAP = 500;
+const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // read-aloud friendly
+
+function campFile(code: string) { return path.join(CAMP_DIR, `${code}.json`); }
+function persistCamp(c: Camp) {
+  try { fs.writeFileSync(campFile(c.code), JSON.stringify({ code: c.code, createdAt: c.createdAt, seq: c.seq, events: c.events.slice(-CAMP_CAP) })); }
+  catch { /* the fire still burns if the disk hiccups */ }
+}
+function loadCamp(code: string): Camp | null {
+  if (CAMPS.has(code)) return CAMPS.get(code)!;
+  try {
+    const d = JSON.parse(fs.readFileSync(campFile(code), "utf8"));
+    const c: Camp = { ...d, listeners: new Map() };
+    CAMPS.set(code, c);
+    return c;
+  } catch { return null; }
+}
+function broadcast(c: Camp, msg: unknown) {
+  const line = `data: ${JSON.stringify(msg)}\n\n`;
+  for (const [, l] of c.listeners) { try { l.res.write(line); } catch { /* gone */ } }
+}
+function presenceList(c: Camp) {
+  return [...c.listeners.values()].map(l => ({ actor: l.actor, name: l.name }));
+}
+
+// Host a new camp → the code the family reads aloud.
+app.post("/api/gathering", (_req, res) => {
+  const code = Array.from(crypto.randomBytes(6)).map(b => CODE_ALPHABET[b % CODE_ALPHABET.length]).join("");
+  const camp: Camp = { code, createdAt: new Date().toISOString(), seq: 0, events: [], listeners: new Map() };
+  CAMPS.set(code, camp);
+  persistCamp(camp);
+  res.json({ code });
+});
+
+// The live stream: presence + events, one SSE connection per device.
+app.get("/api/gathering/:code/stream", (req, res) => {
+  const camp = loadCamp(String(req.params.code).toUpperCase());
+  if (!camp) return res.status(404).json({ error: "no such camp — check the code" });
+  const actor = String(req.query.actor ?? "castaway-1");
+  const name = String(req.query.name ?? "Castaway").slice(0, 24);
+  const lid = crypto.randomBytes(8).toString("hex");
+  res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });
+  camp.listeners.set(lid, { res, actor, name, since: Date.now() });
+  // arrival: the newcomer gets the session-so-far; everyone learns who's here
+  res.write(`data: ${JSON.stringify({ kind: "welcome", code: camp.code, events: camp.events, presence: presenceList(camp) })}\n\n`);
+  broadcast(camp, { kind: "presence", presence: presenceList(camp) });
+  const beat = setInterval(() => { try { res.write(": beat\n\n"); } catch { /* closing */ } }, 25000);
+  req.on("close", () => {
+    clearInterval(beat);
+    camp.listeners.delete(lid);
+    broadcast(camp, { kind: "presence", presence: presenceList(camp) });
+  });
+});
+
+// A device posts a world event to the shared fire.
+app.post("/api/gathering/:code/events", (req, res) => {
+  const camp = loadCamp(String(req.params.code).toUpperCase());
+  if (!camp) return res.status(404).json({ error: "no such camp" });
+  const { id, actor, action, payload, at, from } = req.body ?? {};
+  if (!actor || !action) return res.status(400).json({ error: "actor and action required (the event law)" });
+  if (camp.events.some(e => e.id === id)) return res.json({ ok: true, dedup: true });
+  const ev: CampEvent = {
+    seq: ++camp.seq,
+    id: String(id ?? crypto.randomBytes(8).toString("hex")),
+    actor: String(actor).slice(0, 40),
+    action: String(action).slice(0, 60),
+    payload: payload && typeof payload === "object" ? payload : undefined,
+    at: typeof at === "string" ? at : new Date().toISOString(),
+    from: String(from ?? "").slice(0, 32),
+  };
+  camp.events.push(ev);
+  if (camp.events.length > CAMP_CAP) camp.events = camp.events.slice(-CAMP_CAP);
+  persistCamp(camp);
+  broadcast(camp, { kind: "event", event: ev });
+  res.json({ ok: true, seq: ev.seq });
+});
+
+// Camp status (the qa gate reads this; humans never need it).
+app.get("/api/gathering/:code", (req, res) => {
+  const camp = loadCamp(String(req.params.code).toUpperCase());
+  if (!camp) return res.status(404).json({ error: "no such camp" });
+  res.json({ code: camp.code, createdAt: camp.createdAt, seq: camp.seq, present: presenceList(camp), events: camp.events.length });
+});
 
 
 // ── THE BASE LAYER — welded under EVERY AI endpoint before the first feature

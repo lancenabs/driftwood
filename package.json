@@ -11,7 +11,8 @@
     "lint": "tsc --noEmit",
     "qa:crisis": "node scripts/qa-crisis-check.mjs",
     "qa:crawl": "node scripts/qa-full-crawl.mjs",
-    "qa:all": "npm run lint && npm run qa:crisis && npm run qa:crawl"
+    "qa:gathering": "node scripts/qa-gathering.mjs",
+    "qa:all": "npm run lint && npm run qa:crisis && npm run qa:crawl && npm run qa:gathering"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
