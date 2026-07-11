@@ -152,8 +152,8 @@ export function readNeeds(): NeedReading[] {
     {
       id: 'together', label: 'TOGETHER', emoji: '🫂',
       // The soul-meter: ONLY conjoint acts feed it.
-      level: recencyLevel([...eventDates(['gathering_held', 'swap_debriefed', 'milestone_closed']), ...keyDates(['driftwood_gratitude_notes', 'driftwood_calendar_events_v1'])], 4),
-      fedBy: 'only together — gatherings held, bottles posted, milestones closed as a crew',
+      level: recencyLevel([...eventDates(['gathering_held', 'swap_debriefed', 'milestone_closed', 'fire_quiz_played']), ...keyDates(['driftwood_gratitude_notes', 'driftwood_calendar_events_v1'])], 4),
+      fedBy: 'only together — gatherings held, the fire quiz played, milestones closed as a crew',
     },
   ];
 }

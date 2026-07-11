@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { readNeeds, planksEarned, embersHeld, lanternLit, appendEvent } from '../lib/world';
 import { THE_SEVEN, readCrew, aiCastaways, activeCastaway, setActiveCastaway } from '../lib/castaways';
+import FireQuiz from './FireQuiz';
 // (the 2D seek map remains the Gathering bar's game; the shore door now opens
 // the REAL island — public/island3d/, third person, the Horizon-mobile shape)
 
@@ -30,6 +31,7 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
   // one scene, never two fighting. Missing art = the painted layers hold.
   const [artLoaded, setArtLoaded] = useState(false);
   const [walking, setWalking] = useState(false);   // 🏝 the one-click island door
+  const [firing, setFiring] = useState(false);     // 🔥 the Fire Quiz
   useEffect(() => {
     const bump = () => force(x => x + 1);
     // the 3D island's "← the shore" button lands here
@@ -148,6 +150,15 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         <span className="text-[10px] font-bold opacity-90 normal-case">· walk it in 3D, meet the wood robots</span>
       </button>
 
+      {/* 🔥 THE FIRE QUIZ — build a shared fire by learning each other. Pass the
+          phone; every log warms the whole family's camp. */}
+      <button onClick={() => setFiring(true)} data-testid="fire-quiz"
+        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-sm cursor-pointer hover:brightness-105 active:brightness-95 transition-all border-t-2 border-outline-variant">
+        <span className="text-lg">🔥</span>
+        <span className="uppercase tracking-wide">The Fire Quiz</span>
+        <span className="text-[10px] font-bold opacity-90 normal-case">· learn each other, lay a log, warm the family</span>
+      </button>
+
       {/* ── THE FIVE NEEDS ── */}
       <div className="bg-white p-3 border-t-2 border-outline-variant">
         <div className="grid grid-cols-5 gap-1.5">
@@ -177,6 +188,9 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
           </p>
         )}
       </div>
+
+      {/* the Fire Quiz — pass-the-phone, feeds the shared camp fire */}
+      {firing && <FireQuiz onClose={() => setFiring(false)} />}
 
       {/* the island itself, one click deep — 3D, third person, same origin so
           your castaway, your fit, and the live camp all carry over */}
