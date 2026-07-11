@@ -197,6 +197,26 @@ const AVATARS = {
   chip:     { glb: '/island3d/chip_idle.glb',  label: '🤖 Chip',     h: 1.5 },
   shipmate: { glb: '/island3d/shipmate.glb',   label: '🔩 Shipmate', h: 1.6 },
 };
+// THE FAMILY — auto-light: when family-<id>.glb lands in /island3d/ (the
+// meshes cast from Lance's Higgsfield family), each joins the roster and the
+// character picker automatically. Missing = simply absent, never broken.
+const FAMILY_SLOTS = [
+  { id: 'family-dad',      label: '👨 Dad',      h: 1.8 },
+  { id: 'family-mom',      label: '👩 Mom',      h: 1.65 },
+  { id: 'family-boy-oldest',   label: '🧒 Oldest',   h: 1.3 },
+  { id: 'family-boy-middle',   label: '🧒 Middle',   h: 1.15 },
+  { id: 'family-boy-youngest', label: '🧒 Youngest', h: 1.0 },
+  { id: 'family-robot',    label: '🤖 Buddy-bot', h: 0.9 },
+];
+const rosterReady = Promise.all(FAMILY_SLOTS.map(async s => {
+  try {
+    const r = await fetch(`/island3d/${s.id}.glb`, { method: 'HEAD' });
+    // assert the content-type, not just the status — the dev server's SPA
+    // catch-all answers missing files with 200 text/html (the 07-09 lesson)
+    const ct = r.headers.get('content-type') || '';
+    if (r.ok && !ct.includes('text/html')) AVATARS[s.id] = { glb: `/island3d/${s.id}.glb`, label: s.label, h: s.h };
+  } catch { /* not cast yet — the slot waits */ }
+}));
 const glbLoader = new GLTFLoader();
 const glbCache = new Map();
 function loadGLB(url) {
@@ -409,15 +429,18 @@ renderer.domElement.addEventListener('pointerup', e => {
 // ── the avatar fit panel ─────────────────────────────────────────────────────
 const fitEl = document.getElementById('fit');
 document.getElementById('dress').onclick = () => fitEl.style.display = fitEl.style.display === 'flex' ? 'none' : 'flex';
-// the character picker — real rigged meshes
+// the character picker — real rigged meshes (built after the family roster
+// probe so cast meshes appear the moment they exist)
 const charsEl = document.getElementById('chars');
-for (const [kind, spec] of Object.entries(AVATARS)) {
-  const b = document.createElement('button');
-  b.textContent = spec.label;
-  b.style.cssText = `border:2px solid ${kind === myKind ? '#0E7C7C' : 'transparent'};background:#fff;border-radius:12px;padding:8px 12px;font-size:12px;font-weight:800;color:#374151;cursor:pointer;white-space:nowrap`;
-  b.onclick = () => { swapPlayer(kind); charsEl.querySelectorAll('button').forEach(x => x.style.borderColor = x === b ? '#0E7C7C' : 'transparent'); };
-  charsEl.appendChild(b);
-}
+rosterReady.then(() => {
+  for (const [kind, spec] of Object.entries(AVATARS)) {
+    const b = document.createElement('button');
+    b.textContent = spec.label;
+    b.style.cssText = `border:2px solid ${kind === myKind ? '#0E7C7C' : 'transparent'};background:#fff;border-radius:12px;padding:8px 12px;font-size:12px;font-weight:800;color:#374151;cursor:pointer;white-space:nowrap`;
+    b.onclick = () => { swapPlayer(kind); charsEl.querySelectorAll('button').forEach(x => x.style.borderColor = x === b ? '#0E7C7C' : 'transparent'); };
+    charsEl.appendChild(b);
+  }
+});
 
 // ── THE GATHERING in 3D — family avatars on the same ground ─────────────────
 // Positions ride the existing ephemeral channel (normalized 0..1 ↔ world ±30).
