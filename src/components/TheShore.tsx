@@ -34,15 +34,20 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
     const bump = () => force(x => x + 1);
     // the 3D island's "← the shore" button lands here
     const leave = (e: MessageEvent) => { if (e.data?.type === 'driftwood:leave-island') setWalking(false); };
+    // ANY door into the island (the shore button OR the Gathering bar) opens
+    // the same 3D world — one island, no confusion.
+    const enter = () => setWalking(true);
     window.addEventListener('driftwood:world-event', bump);
     window.addEventListener('driftwood:castaway-changed', bump);
     window.addEventListener('focus', bump);
     window.addEventListener('message', leave);
+    window.addEventListener('driftwood:walk-island', enter);
     return () => {
       window.removeEventListener('driftwood:world-event', bump);
       window.removeEventListener('driftwood:castaway-changed', bump);
       window.removeEventListener('focus', bump);
       window.removeEventListener('message', leave);
+      window.removeEventListener('driftwood:walk-island', enter);
     };
   }, []);
 
@@ -117,15 +122,6 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
           <span className="text-[7px] font-black uppercase tracking-wider text-white bg-black/30 rounded-full px-1.5 mt-0.5">the Jumble</span>
         </button>
 
-        {/* 🏝 THE ISLAND DOOR — one click, you're standing on it. Solo works
-            (the Jumble keeps you company); gathering brings the family live. */}
-        <button onClick={() => setWalking(true)} data-testid="walk-island"
-          className="absolute top-3 left-3 flex items-center gap-1.5 bg-white/90 hover:bg-white rounded-full pl-2 pr-3 py-1.5 shadow-md cursor-pointer transition-transform hover:scale-105"
-          title="Walk the island — your avatar, third person, the Jumble at their posts">
-          <span className="text-sm">🏝</span>
-          <span className="text-[10px] font-black uppercase tracking-wide text-slate-700">Walk the island</span>
-        </button>
-
         {/* THE LANTERN DOCK — one per castaway; lit = real work this week */}
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 translate-x-10 flex items-end gap-1.5">
           {THE_SEVEN.map(slot => {
@@ -141,6 +137,16 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
           })}
         </div>
       </div>
+
+      {/* 🏝 ENTER THE ISLAND — the unmissable door into the 3D world. Third
+          person, your avatar, the Jumble at their posts. Solo works; the
+          Gathering brings the family onto the same ground live. */}
+      <button onClick={() => setWalking(true)} data-testid="walk-island"
+        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-[#3ECFCF] to-[#7FD98C] text-white font-black text-sm cursor-pointer hover:brightness-105 active:brightness-95 transition-all border-t-2 border-outline-variant">
+        <span className="text-lg">🏝</span>
+        <span className="uppercase tracking-wide">Enter the Island</span>
+        <span className="text-[10px] font-bold opacity-90 normal-case">· walk it in 3D, meet the wood robots</span>
+      </button>
 
       {/* ── THE FIVE NEEDS ── */}
       <div className="bg-white p-3 border-t-2 border-outline-variant">
