@@ -2,6 +2,7 @@ import React, { Suspense, useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Wind, Heart, Moon, Anchor, Smile, Activity, RefreshCw, Zap } from 'lucide-react';
 import { useGame } from './LANCEGameContext';
+import { NARRATOR, SECOND_VOICE } from './narrator';
 import { useLANCEAI } from './useLANCEAI';
 import { GAME_CHALLENGES } from './lanceGameData';
 import type { MoodEntry } from './LANCEGameContext';
@@ -23,11 +24,11 @@ function ToolLoader() {
 }
 
 const LANCE_FALLBACK_LINES = [
-  "Your check-in data is... surprisingly coherent today. Proceed.",
-  "I'm monitoring your vitals. You may begin your wellness protocols.",
-  "The compound systems are stable. Your psychological metrics await calibration.",
-  "I've allocated 3.7 minutes for your self-regulation exercises. Use them wisely.",
-  "Your presence has been logged. The intern is insufferably pleased about this.",
+  "You came back! I KNEW you'd come back. Okay okay okay — how's the water today?",
+  "I saved you a spot by the fire. Checking in counts as tending it, that's a REAL rule.",
+  "One honest minute. That's the whole chore. I'll hold your stick.",
+  "The Collier says a read barometer never sinks a ship. He says everything like that.",
+  "However today actually went — bring it. The Jumble doesn't grade weather.",
 ];
 
 const QUICK_TOOLS = [
@@ -72,8 +73,8 @@ const DAILY_TIPS = [
 const MILESTONE_STREAKS = [3, 7, 30];
 
 const MILESTONE_MESSAGES: Record<number, { title: string; sub: string }> = {
-  3:  { title: '3-Day Streak! 🔥',  sub: 'Three days in a row. LANCE would say this is statistically meaningful. It is.' },
-  7:  { title: 'One Full Week! 🌟',  sub: 'Seven consecutive check-ins. The Intern is insufferably proud of you. So is LANCE, though he denies it.' },
+  3:  { title: '3-Day Streak! 🔥',  sub: 'Three days in a row. The little robots are counting along. It counts.' },
+  7:  { title: 'One Full Week! 🌟',  sub: 'Seven consecutive check-ins. The whole Jumble is insufferably proud of you.' },
   30: { title: '30 Days Strong! 🏆', sub: 'A full month. You have proven something about yourself that no algorithm predicted. This is extraordinary.' },
 };
 
@@ -137,6 +138,14 @@ export default function CheckInTab({ onOpenTool }: Props) {
     return 'Good evening';
   })();
 
+  // DRIFTWOOD SEAM: the island's challenge arc doesn't sail here — the card
+  // points at this world's own Milestone Log instead.
+  const nextMilestone = (() => {
+    try {
+      const closed = (JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || '{}').closed ?? []) as string[];
+      return { n: closed.length + 1, total: 31, closed: closed.length };
+    } catch { return { n: 1, total: 31, closed: 0 }; }
+  })();
   const currentChallenge = currentChallengeId
     ? GAME_CHALLENGES.find(c => c.id === currentChallengeId)
     : null;
@@ -209,18 +218,15 @@ export default function CheckInTab({ onOpenTool }: Props) {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-start gap-3"
         >
-          <div
-            className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-base font-black"
-            style={{ background: 'linear-gradient(135deg,#1CB0F6,#0EA5E9)', color: 'white' }}
-          >
-            L
-          </div>
+          <img src={NARRATOR.portrait} alt="" draggable={false}
+            className="shrink-0 w-9 h-9 rounded-xl object-cover"
+            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
           <div className="flex-1">
             <div
               className="text-[9px] font-black uppercase tracking-widest mb-1 flex items-center justify-between"
               style={{ color: '#1CB0F688' }}
             >
-              <span>L.A.N.C.E.</span>
+              <span>{NARRATOR.name}</span>
               {!aiLoading && (
                 <button
                   onClick={() => fetchResponses({ trigger: 'home' })}
@@ -287,13 +293,13 @@ export default function CheckInTab({ onOpenTool }: Props) {
         </motion.button>
 
         {/* ── Today's Challenge Banner ── */}
-        {currentChallenge && (
+        {nextMilestone.closed < nextMilestone.total && (
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => onOpenTool?.('__challenges__')}
+            onClick={() => window.dispatchEvent(new CustomEvent('driftwood:go-home'))}
             className="w-full text-left rounded-3xl overflow-hidden"
             style={{
               background: 'linear-gradient(135deg, #FF9600 0%, #00CD9C 100%)',
@@ -312,16 +318,16 @@ export default function CheckInTab({ onOpenTool }: Props) {
                   className="text-[9px] font-black uppercase tracking-[0.2em] mb-0.5"
                   style={{ color: 'rgba(255,255,255,0.8)' }}
                 >
-                  Today's Challenge
+                  The Milestone Log
                 </div>
                 <div className="text-sm font-black text-white truncate">
-                  {currentChallenge.title}
+                  Survival first {nextMilestone.n} of {nextMilestone.total} awaits
                 </div>
                 <div
                   className="text-[11px] mt-0.5 leading-snug line-clamp-1"
                   style={{ color: 'rgba(255,255,255,0.75)' }}
                 >
-                  {currentChallenge.taskDescription}
+                  Open the log on the shore — the crew is waiting at the next first.
                 </div>
               </div>
               <div className="shrink-0 text-white opacity-70">›</div>
@@ -337,13 +343,13 @@ export default function CheckInTab({ onOpenTool }: Props) {
             transition={{ delay: 0.15 }}
             className="flex items-start gap-3"
           >
-            <div className="text-3xl shrink-0 mt-0.5">{intern.avatar}</div>
+            <img src={SECOND_VOICE.portrait} alt="" draggable={false} className="w-9 h-9 rounded-xl object-cover shrink-0 mt-0.5" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
             <div className="flex-1">
               <div
                 className="text-[9px] font-black uppercase tracking-widest mb-1"
                 style={{ color: '#46A30288' }}
               >
-                {intern.name}
+                {SECOND_VOICE.name}
               </div>
               <div
                 className="px-4 py-3 rounded-2xl rounded-tl-sm text-xs font-medium leading-relaxed"

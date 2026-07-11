@@ -3,6 +3,7 @@ import { Flame, Play, Check, Trophy, Sparkles, BookOpen, Compass, Award, Gamepad
 import { motion, AnimatePresence } from 'motion/react';
 import SwitchUserBar, { SIMULATED_PROFILES, UserProfile } from './SwitchUserBar';
 import { activeCastaway } from '../lib/castaways';
+import { planksEarned, embersHeld } from '../lib/world';
 import CalendarSection from './CalendarSection';
 import HabitsRitualsSection from './HabitsRitualsSection';
 import FamilyToolsSection from './FamilyToolsSection';
@@ -356,10 +357,10 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
-      { id: 'cr1', name: 'Weekly Date Night', emoji: '🍕', frequency: 'weekly', streak: 4, completed: false },
-      { id: 'cr2', name: 'Morning Coffee Check-in', emoji: '☕', frequency: 'daily', streak: 12, completed: false },
-      { id: 'cr3', name: '6-Second Kiss Anchor', emoji: '💋', frequency: 'daily', streak: 18, completed: false },
-      { id: 'cr4', name: 'Appreciation Exchange', emoji: '💬', frequency: 'daily', streak: 7, completed: false }
+      { id: 'cr1', name: 'Weekly Date Night', emoji: '🍕', frequency: 'weekly', streak: 0, completed: false },
+      { id: 'cr2', name: 'Morning Coffee Check-in', emoji: '☕', frequency: 'daily', streak: 0, completed: false },
+      { id: 'cr3', name: '6-Second Kiss Anchor', emoji: '💋', frequency: 'daily', streak: 0, completed: false },
+      { id: 'cr4', name: 'Appreciation Exchange', emoji: '💬', frequency: 'daily', streak: 0, completed: false }
     ];
   });
 
@@ -454,30 +455,15 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Flame streak */}
-          <div className="group relative flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border-2 border-outline-variant shadow-sm hover:border-orange-400 transition-all cursor-help">
-            <span className="text-orange-500 font-display font-black text-[10px] uppercase tracking-wider flex items-center gap-1">
-              <span>🔥</span>
-              <span>{streak} DAY STREAK</span>
-            </span>
-            {/* Tooltip */}
-            <div className="absolute bottom-full right-0 mb-2.5 hidden group-hover:block bg-neutral-900 text-white text-[10px] font-sans font-normal rounded-xl p-2.5 shadow-xl w-56 text-center z-50 border border-neutral-800 leading-relaxed pointer-events-none">
-              <strong>Habit Loop Streak</strong><br />
-              Consistent 5-minute daily sessions build emotional reflexes to handle real conflict.
-              <div className="absolute top-full right-6 -mt-1 border-4 border-transparent border-t-neutral-900" />
-            </div>
+          {/* The real wage — planks stack and never un-earn (the no-shame law:
+              no streaks up here; lanterns unlit are simply unlit). */}
+          <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border-2 border-outline-variant shadow-sm" title="Planks — earned by milestones and real work; never lost">
+            <span className="text-sm">🪵</span>
+            <span className="font-display font-black text-xs text-[#4B4B4B]">{planksEarned()}</span>
           </div>
-
-          {/* Coins */}
-          <div className="group relative flex items-center gap-1 bg-white px-3 py-1.5 rounded-full border-2 border-outline-variant shadow-sm cursor-help">
-            <span className="text-sm">🪙</span>
-            <span className="font-display font-black text-xs text-[#4B4B4B]">250</span>
-            {/* Tooltip */}
-            <div className="absolute bottom-full right-0 mb-2.5 hidden group-hover:block bg-neutral-900 text-white text-[10px] font-sans font-normal rounded-xl p-2.5 shadow-xl w-56 text-center z-50 border border-neutral-800 leading-relaxed pointer-events-none">
-              <strong>Practice Tokens</strong><br />
-              Earned by successfully validating and active listening during co-op drills.
-              <div className="absolute top-full right-4 -mt-1 border-4 border-transparent border-t-neutral-900" />
-            </div>
+          <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border-2 border-outline-variant shadow-sm" title="Embers — the small currency; feed the fire, light lanterns">
+            <span className="text-sm">✨</span>
+            <span className="font-display font-black text-xs text-[#4B4B4B]">{embersHeld()}</span>
           </div>
         </div>
       </div>
@@ -518,8 +504,8 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
         <div className="flex flex-col gap-6 animate-fade-in text-on-surface">
           {/* Motivational statement */}
           <div>
-            <h1 className="font-display font-black text-2xl text-on-surface tracking-tight">Your Connected Space</h1>
-            <p className="font-sans text-xs text-on-surface-variant">Consistent small steps build powerful family resilience.</p>
+            <h1 className="font-display font-black text-2xl text-on-surface tracking-tight">The Camp</h1>
+            <p className="font-sans text-xs text-on-surface-variant">Small real work, tended daily — the island only yields to together.</p>
           </div>
 
           {/* Daily Micro-Lesson Card */}
@@ -576,9 +562,9 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
               <div className="bg-white/10 w-fit p-2 rounded-xl backdrop-blur-sm border border-white/25">
                 <Gamepad2 className="w-6 h-6 text-white" />
               </div>
-              <h3 className="font-display font-black text-xl text-white mt-1">Co-op Practice Gym</h3>
+              <h3 className="font-display font-black text-xl text-white mt-1">The Driftwood Theater</h3>
               <p className="font-sans text-xs text-white/90 max-w-[280px]">
-                Step into interactive, branching roleplay scenarios to master de-escalation safely.
+                The Jumble stages a family pattern on neutral ground — step in and practice the repair, safely.
               </p>
             </div>
 
@@ -586,7 +572,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
               onClick={(e) => { e.stopPropagation(); onEnterPractice(); }}
               className="relative z-10 w-full bg-white text-secondary font-display font-black py-3 rounded-xl border-b-[4px] border-[#E5E5E5] hover:bg-slate-50 active:translate-y-[2px] active:border-b-[2px] transition-all flex items-center justify-center gap-2 mt-5 shadow-sm cursor-pointer"
             >
-              <span>Enter the Gym</span>
+              <span>Take the stage</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </section>

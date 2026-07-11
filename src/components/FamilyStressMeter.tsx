@@ -40,8 +40,7 @@ export default function FamilyStressMeter() {
       }
     }
     return [
-      { id: 'l1', level: 8, timestamp: new Date(Date.now() - 1000 * 60 * 45), roleHint: 'Anonymous Member' },
-      { id: 'l2', level: 5, timestamp: new Date(Date.now() - 1000 * 60 * 120), roleHint: 'Anonymous Member' },
+      // No seeded readings — the barometer starts honest and empty.
       { id: 'l3', level: 7, timestamp: new Date(Date.now() - 1000 * 60 * 240), roleHint: 'Anonymous Member' },
     ];
   });
@@ -163,8 +162,7 @@ export default function FamilyStressMeter() {
   // RESET TO DEFAULT FOR CONVENIENCE
   const handleResetToDefaults = () => {
     setLogs([
-      { id: 'l1', level: 8, timestamp: new Date(Date.now() - 1000 * 60 * 45), roleHint: 'Anonymous Member' },
-      { id: 'l2', level: 5, timestamp: new Date(Date.now() - 1000 * 60 * 120), roleHint: 'Anonymous Member' },
+      // No seeded readings — the barometer starts honest and empty.
       { id: 'l3', level: 7, timestamp: new Date(Date.now() - 1000 * 60 * 240), roleHint: 'Anonymous Member' },
     ]);
     setIsBreathing(false);
