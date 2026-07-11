@@ -12,6 +12,7 @@ import MemoryMatch from './MemoryMatch';
 import RidgepoleVote from './RidgepoleVote';
 import SandDrawings from './SandDrawings';
 import TwoHuts from './TwoHuts';
+import RitualDesigner from './RitualDesigner';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -66,6 +67,9 @@ const GAMES: GameDef[] = [
   { id: 'two_huts', name: 'Two Huts or One', emoji: '🏕', tier: 'steady flame',
     blurb: "Place your bedroll on tonight's camp map, honestly — distance is data, not failure.",
     render: (onClose) => <TwoHuts onClose={onClose} /> },
+  { id: 'ritual_designer', name: 'Ritual Designer', emoji: '🕯', tier: 'steady flame',
+    blurb: 'Invent a ceremony only this family would understand — it enters the tide table for real.',
+    render: (onClose) => <RitualDesigner onClose={onClose} /> },
   // → the roadmap (THE_RECONNECTION_LOOP.md) fills the rest: Ritual Designer,
   //   the Ridgepole Vote, Naming the Undertow, … each a file + a line here.
 ];
