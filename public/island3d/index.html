@@ -76,8 +76,8 @@ const FIT_KEY = 'driftwood_avatar_v1';
 // ── scene: the Horizon-mobile weather ────────────────────────────────────────
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xBEE3F0);
-scene.fog = new THREE.Fog(0xC9E9F2, 26, 95);
-const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 300);
+scene.fog = new THREE.Fog(0xC9E9F2, 60, 320);
+const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 900);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -89,20 +89,83 @@ const sun = new THREE.DirectionalLight(0xFFF0CE, 0.95);
 sun.position.set(30, 50, -20);
 scene.add(sun);
 
-// ── the island (flat-shaded, pastel — the whole aesthetic is restraint) ─────
+// ── THE BIG ISLAND — the VR island's proven terrain recipe, scaled up ────────
+// islandHeight() is the same heightfield law the Quest-proven island uses
+// (smoothstep beach ring, noisy interior shelf, a rocky spine), at 3× the
+// radius: a world you can genuinely hike. Lance's own 4K textures (the sand
+// ripples, the mossy rock, the island's rock) paint it via a splat blend
+// injected into ONE MeshLambertMaterial (onBeforeCompile) — lighting and fog
+// stay stock, phones pay one draw call for the whole ground.
 const mat = (c) => new THREE.MeshLambertMaterial({ color: c });
-const sand = new THREE.Mesh(new THREE.CylinderGeometry(34, 36, 1.6, 40), mat(0xEBD9B4));
-sand.position.y = -0.8;
-scene.add(sand);
+const ISLAND_R = 110;
+const SEA_Y = 0;                          // sea level; beach crests ~+0.9
+function smoothNoise(x, z) {
+  return Math.sin(x * 0.055) * Math.cos(z * 0.047) + Math.sin(x * 0.021 + z * 0.033) * 1.6;
+}
+function islandHeight(x, z) {
+  const r = Math.hypot(x, z);
+  if (r > ISLAND_R + 26) return -6;                                            // seabed
+  const edge  = 1 - THREE.MathUtils.smoothstep(r, ISLAND_R - 12, ISLAND_R + 20); // 1 land → 0 sea
+  const shore = 1 - THREE.MathUtils.smoothstep(r, ISLAND_R - 55, ISLAND_R - 8);  // 1 inland → 0 beach
+  let h = -5 + edge * 5.9;                                                     // beach at ~+0.9
+  h += shore * (7 + smoothNoise(x, z) * 2.4);                                  // jungle shelf
+  // the rocky spine (northwest highlands — the Collier's forge country)
+  const spine = Math.exp(-Math.pow((x + 40) / 55, 2)) * Math.exp(-Math.pow((z + 55) / 70, 2));
+  h += spine * 26 * shore;
+  return h;
+}
+// ground height clamped to walkable land (players never sink under the sea)
+const groundY = (x, z) => Math.max(islandHeight(x, z), SEA_Y + 0.25);
+
+// the terrain mesh
+const texLoader = new THREE.TextureLoader();
+const tile = (url, rep) => { const t = texLoader.load(url); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep, rep); return t; };
+const texSand = tile('/island3d/tex/sand.jpg', 170);
+const texMoss = tile('/island3d/tex/moss.jpg', 130);
+const texRock = tile('/island3d/tex/rock.jpg', 110);
+const terrainGeo = new THREE.PlaneGeometry(ISLAND_R * 2 + 60, ISLAND_R * 2 + 60, 160, 160);
+terrainGeo.rotateX(-Math.PI / 2);
+{
+  const pos = terrainGeo.attributes.position;
+  for (let i = 0; i < pos.count; i++) pos.setY(i, islandHeight(pos.getX(i), pos.getZ(i)));
+  terrainGeo.computeVertexNormals();
+}
+// splat: sand low → moss (jungle floor) mid → rock high/steep, one material
+const terrainMat = new THREE.MeshLambertMaterial({ map: texSand });
+terrainMat.onBeforeCompile = (shader) => {
+  shader.uniforms.tMoss = { value: texMoss };
+  shader.uniforms.tRock = { value: texRock };
+  shader.vertexShader = shader.vertexShader
+    .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
+    .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+  shader.fragmentShader = shader.fragmentShader
+    .replace('#include <common>', '#include <common>\nuniform sampler2D tMoss;\nuniform sampler2D tRock;\nvarying vec3 vWPos;')
+    .replace('#include <map_fragment>', `
+      // two-scale sampling (second sample ROTATED 90°) kills tile periodicity
+      vec4 cSand = mix(texture2D(map, vUv),          texture2D(map, vUv.yx * 0.23 + 0.37),  0.5);
+      vec4 cMoss = mix(texture2D(tMoss, vUv * 0.8),  texture2D(tMoss, vUv.yx * 0.19 + 0.53), 0.5);
+      vec4 cRock = mix(texture2D(tRock, vUv * 0.66), texture2D(tRock, vUv.yx * 0.15 + 0.11), 0.5);
+      // organic band edges: world-noise wobbles the height thresholds
+      float wob = sin(vWPos.x * 0.19) * sin(vWPos.z * 0.17) * 1.4
+                + sin(vWPos.x * 0.043 + vWPos.z * 0.051) * 2.2;
+      float mossMix = smoothstep(1.2, 6.0, vWPos.y + wob);   // beach → jungle floor
+      float rockMix = smoothstep(9.5, 17.5, vWPos.y + wob);  // shelf → highlands
+      vec4 sampledDiffuseColor = mix(mix(cSand, cMoss, mossMix), cRock, rockMix);
+      diffuseColor *= sampledDiffuseColor;
+    `);
+};
+const terrain = new THREE.Mesh(terrainGeo, terrainMat);
+scene.add(terrain);
+
 // living water — a low-poly plane with gentle vertex swell (animated in the loop)
-const waterGeo = new THREE.PlaneGeometry(320, 320, 40, 40);
-const water = new THREE.Mesh(waterGeo, new THREE.MeshLambertMaterial({ color: 0x4FA9BC }));
-water.rotation.x = -Math.PI / 2; water.position.y = -1.1;
+const waterGeo = new THREE.PlaneGeometry(900, 900, 48, 48);
+const water = new THREE.Mesh(waterGeo, new THREE.MeshLambertMaterial({ color: 0x3D98AC, transparent: true, opacity: 0.78 }));
+water.rotation.x = -Math.PI / 2; water.position.y = SEA_Y;
 scene.add(water);
 const waterBase = Float32Array.from(waterGeo.attributes.position.array);
 
 // a gradient sky dome — richer than flat fog, the pastel Horizon ceiling
-const skyGeo = new THREE.SphereGeometry(200, 24, 16);
+const skyGeo = new THREE.SphereGeometry(600, 24, 16);
 const skyMat = new THREE.ShaderMaterial({
   side: THREE.BackSide, depthWrite: false,
   uniforms: { top: { value: new THREE.Color(0x8FC7E8) }, bottom: { value: new THREE.Color(0xEAF6FA) } },
@@ -121,43 +184,81 @@ const cloudTex = (() => {
   return new THREE.CanvasTexture(c);
 })();
 const clouds = [];
-for (let i = 0; i < 7; i++) {
+for (let i = 0; i < 9; i++) {
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, transparent: true, opacity: 0.8, depthWrite: false }));
-  const a = (i / 7) * Math.PI * 2;
-  s.position.set(Math.cos(a) * 120, 34 + Math.random() * 22, Math.sin(a) * 120);
-  s.scale.set(48 + Math.random() * 30, 20 + Math.random() * 10, 1);
+  const a = (i / 9) * Math.PI * 2;
+  s.position.set(Math.cos(a) * 320, 90 + Math.random() * 60, Math.sin(a) * 320);
+  s.scale.set(130 + Math.random() * 80, 55 + Math.random() * 26, 1);
   clouds.push(s); scene.add(s);
 }
-// dunes
-for (const [x, z, s] of [[-14, -10, 4], [12, -14, 5], [18, 8, 3.4], [-20, 6, 4.5]]) {
-  const d = new THREE.Mesh(new THREE.SphereGeometry(s, 12, 8), mat(0xD0B47E));
-  d.position.set(x, -s * 0.72, z); d.scale.y = 0.5;
-  scene.add(d);
-}
-// palms: trunk + cone fronds
-function palm(x, z, h = 5, lean = 0.16) {
-  const g = new THREE.Group();
-  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.3, h, 7), mat(0xA5805A));
-  trunk.position.y = h / 2; trunk.rotation.z = lean;
-  g.add(trunk);
-  for (let i = 0; i < 6; i++) {
-    const frond = new THREE.Mesh(new THREE.ConeGeometry(0.5, 3.1, 4), mat(i % 2 ? 0x2F6B43 : 0x3B8456));
-    frond.position.set(Math.sin(lean) * h, h * 0.98, 0);
-    frond.rotation.z = Math.PI / 2.4;
-    frond.rotation.y = (i / 6) * Math.PI * 2;
-    frond.translateY(1.1);
-    g.add(frond);
+
+// ── THE JUNGLE — instanced, phone-cheap, thousands of plants in 6 draw calls ─
+// Deterministic scatter (seeded) so every family member sees the same island.
+let seed = 42;
+const rand = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+function scatterOn(count, fits) {
+  const spots = [];
+  let guard = count * 40;
+  while (spots.length < count && guard-- > 0) {
+    const a = rand() * Math.PI * 2, rr = Math.sqrt(rand()) * (ISLAND_R - 6);
+    const x = Math.cos(a) * rr, z = Math.sin(a) * rr;
+    const h = islandHeight(x, z);
+    if (fits(h, x, z)) spots.push({ x, z, h });
   }
-  g.position.set(x, 0, z);
-  scene.add(g);
+  return spots;
 }
-palm(-9, -13); palm(-11.5, -12, 6, -0.12); palm(14, -11, 5.4); palm(19, 3, 4.6, 0.2); palm(-18, 9, 5);
-// driftwood logs
-for (const [x, z, r] of [[6, 9, 0.7], [-7, 11, 2.2], [10, -4, 1.2]]) {
-  const log = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.38, 4.4, 7), mat(0xC9B08C));
-  log.position.set(x, 0.3, z); log.rotation.z = Math.PI / 2; log.rotation.y = r;
-  scene.add(log);
+const dummy = new THREE.Object3D();
+function instancedScatter(geo, material, spots, place) {
+  const m = new THREE.InstancedMesh(geo, material, spots.length);
+  spots.forEach((s, i) => { place(dummy, s, i); dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix); });
+  m.instanceMatrix.needsUpdate = true;
+  scene.add(m);
+  return m;
 }
+// palm trunks + fronds (beach ring + scattered inland): two instanced meshes
+const palmSpots = scatterOn(90, h => h > 0.6 && h < 7);
+instancedScatter(new THREE.CylinderGeometry(0.16, 0.34, 7, 6), mat(0xA5805A), palmSpots, (d, s) => {
+  d.position.set(s.x, s.h + 3.2, s.z);
+  d.rotation.set(0, rand() * Math.PI * 2, (rand() - 0.5) * 0.3);
+  d.scale.setScalar(0.8 + rand() * 0.5);
+});
+const frondSpots = [];
+for (const s of palmSpots) for (let i = 0; i < 6; i++) frondSpots.push({ ...s, fi: i });
+instancedScatter(new THREE.ConeGeometry(0.55, 3.6, 4), mat(0x3B8456), frondSpots, (d, s) => {
+  const top = s.h + 6.6;
+  d.position.set(s.x + Math.cos((s.fi / 6) * Math.PI * 2) * 0.9, top + 0.3, s.z + Math.sin((s.fi / 6) * Math.PI * 2) * 0.9);
+  d.rotation.set(Math.PI / 2.5 * Math.sin((s.fi / 6) * Math.PI * 2), 0, Math.PI / 2.5 * Math.cos((s.fi / 6) * Math.PI * 2));
+});
+// jungle canopy trees (the deep interior): trunk + two-tone leaf blobs
+const treeSpots = scatterOn(160, h => h > 3.5 && h < 13);
+instancedScatter(new THREE.CylinderGeometry(0.3, 0.5, 5, 6), mat(0x7A5C3A), treeSpots, (d, s) => {
+  d.position.set(s.x, s.h + 2.2, s.z);
+  d.scale.setScalar(0.8 + rand() * 0.8);
+});
+instancedScatter(new THREE.SphereGeometry(2.6, 8, 6), mat(0x2F6B43), treeSpots, (d, s, i) => {
+  d.position.set(s.x, s.h + 6 + (i % 3) * 0.5, s.z);
+  d.scale.set(1 + rand() * 0.7, 0.75 + rand() * 0.4, 1 + rand() * 0.7);
+});
+instancedScatter(new THREE.SphereGeometry(1.7, 7, 5), mat(0x3F8A56), treeSpots, (d, s) => {
+  d.position.set(s.x + (rand() - 0.5) * 2.4, s.h + 7.4, s.z + (rand() - 0.5) * 2.4);
+  d.scale.set(0.9 + rand() * 0.5, 0.6 + rand() * 0.3, 0.9 + rand() * 0.5);
+});
+// ferns (undergrowth) + boulders (the spine wears Lance's rock)
+instancedScatter(new THREE.ConeGeometry(0.5, 1.1, 5), mat(0x4E9B63), scatterOn(240, h => h > 3 && h < 11), (d, s) => {
+  d.position.set(s.x, s.h + 0.4, s.z);
+  d.rotation.y = rand() * Math.PI;
+  d.scale.setScalar(0.7 + rand());
+});
+instancedScatter(new THREE.DodecahedronGeometry(1.3, 0), new THREE.MeshLambertMaterial({ map: texRock }), scatterOn(70, h => h > 8), (d, s) => {
+  d.position.set(s.x, s.h + 0.4, s.z);
+  d.rotation.set(rand() * Math.PI, rand() * Math.PI, 0);
+  d.scale.setScalar(0.6 + rand() * 2.2);
+});
+// driftwood logs along the tide line
+instancedScatter(new THREE.CylinderGeometry(0.3, 0.4, 4.6, 7), mat(0xC9B08C), scatterOn(40, h => h > 0.5 && h < 1.6), (d, s) => {
+  d.position.set(s.x, s.h + 0.3, s.z);
+  d.rotation.set(0, rand() * Math.PI, Math.PI / 2);
+});
 // the camp: fire + tent + rowboat
 const fire = new THREE.Group();
 for (let i = 0; i < 4; i++) {
@@ -172,16 +273,18 @@ fire.add(flame);
 const fireLight = new THREE.PointLight(0xFFA64D, 1.1, 12);
 fireLight.position.y = 1.4;
 fire.add(fireLight);
-fire.position.set(0, 0, 0);
+// THE CAMP — on the south shore, where the family washed in
+const CAMP = { x: 0, z: 92 };
+fire.position.set(CAMP.x, groundY(CAMP.x, CAMP.z), CAMP.z);
 scene.add(fire);
 const tent = new THREE.Mesh(new THREE.ConeGeometry(1.6, 2.1, 4), mat(0xC96F4A));
-tent.position.set(4.5, 1.05, 5.5); tent.rotation.y = Math.PI / 4;
+tent.position.set(6, groundY(6, 96) + 1.05, 96); tent.rotation.y = Math.PI / 4;
 scene.add(tent);
 const boat = new THREE.Group();
 const hull = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.1, 4.6, 8, 1, false, 0, Math.PI), mat(0x8a5a22));
 hull.rotation.z = Math.PI / 2; hull.rotation.x = Math.PI;
 boat.add(hull);
-boat.position.set(16, 0.7, 10); boat.rotation.y = -0.6;
+boat.position.set(-16, groundY(-16, 102) + 0.4, 102); boat.rotation.y = 0.6;
 scene.add(boat);
 
 // ── THE AVATAR RIG — REAL rigged 3D meshes, the VR island's own bones ────────
@@ -311,6 +414,7 @@ function animateWalk(rig, speed, dt, t) {
     rig.userData.model.position.y -= (_fw.y - groundY);
     rig.userData.needsGround = false;
   }
+  const base = rig.userData.baseY ?? rig.position.y;   // terrain carries the rig
   const stride = Math.min(speed * 6, 1);
   if (stride > 0.05) {
     const a = Math.sin(t * 8) * 0.5 * stride;
@@ -318,9 +422,9 @@ function animateWalk(rig, speed, dt, t) {
     if (B.legR) B.legR.rotation.x -= a;
     if (B.armL) B.armL.rotation.x += -a * 0.6;
     if (B.armR) B.armR.rotation.x += a * 0.6;
-    rig.position.y = Math.abs(Math.sin(t * 8)) * 0.05;
+    rig.position.y = base + Math.abs(Math.sin(t * 8)) * 0.05;
   } else {
-    rig.position.y = 0;
+    rig.position.y = base;
   }
 }
 
@@ -328,7 +432,7 @@ function animateWalk(rig, speed, dt, t) {
 let myKind = 'human';
 try { const f = JSON.parse(localStorage.getItem(FIT_KEY) || 'null'); if (f?.kind && AVATARS[f.kind]) myKind = f.kind; } catch {}
 let player = buildAvatar({ kind: myKind, name: me.name || 'You' });
-player.position.set(0, 0, 7);
+player.position.set(2, groundY(2, 86), 86);   // wake up at the camp, facing the fire
 scene.add(player);
 function swapPlayer(kind) {
   const pos = player.position.clone(), rot = player.rotation.y;
@@ -341,12 +445,14 @@ function swapPlayer(kind) {
 }
 
 // ── THE JUMBLE — billboards of the real portraits on driftwood stands ────────
+// Spread across the big island — finding them all is the first hike. Skip
+// stays near camp; the Collier lives up in the northwest spine, by his forge.
 const JUMBLE = [
-  { id: 'skip', name: 'Skip', x: 3, z: -3, lines: ['A stick! For you! Or— for me? For US.', 'Race you to the rocks! I will lose on purpose. Maybe.'] },
-  { id: 'hollow', name: 'Hollow', x: -12, z: 2, lines: ['…it is safe in the shell. But it is warmer at the fire.', '…I come out slower than I go in. That is allowed.'] },
-  { id: 'echo2', name: 'Echo-2', x: -3, z: -12, lines: ['You said— you SAID— something kind. I am keeping it.', 'Say the important ones twice.'] },
-  { id: 'bailer', name: 'Bailer', x: 15.4, z: 9, lines: ['The boat is dry! I am keeping it that way.', 'Worry is water. I have a bucket. We will be fine.'] },
-  { id: 'collier', name: 'the Collier', x: 9, z: 13, lines: ['Sit, sit. The forge remembers every mended thing.', 'The seam shows, little one. That is how you know it held.'] },
+  { id: 'skip', name: 'Skip', x: 6, z: 84, lines: ['A stick! For you! Or— for me? For US.', 'Race you to the rocks! I will lose on purpose. Maybe.'] },
+  { id: 'hollow', name: 'Hollow', x: -74, z: 22, lines: ['…it is safe in the shell. But it is warmer at the fire.', '…I come out slower than I go in. That is allowed.'] },
+  { id: 'echo2', name: 'Echo-2', x: 12, z: -38, lines: ['You said— you SAID— something kind. I am keeping it.', 'Say the important ones twice.'] },
+  { id: 'bailer', name: 'Bailer', x: 84, z: 38, lines: ['The boat is dry! I am keeping it that way.', 'Worry is water. I have a bucket. We will be fine.'] },
+  { id: 'collier', name: 'the Collier', x: -40, z: -55, lines: ['Sit, sit. The forge remembers every mended thing.', 'The seam shows, little one. That is how you know it held.'] },
 ];
 const loader = new THREE.TextureLoader();
 const robots = [];
@@ -368,7 +474,7 @@ for (const r of JUMBLE) {
   g.add(nameTag(r.name, '#B8860B'));
   g.userData.tagY = r.id === 'collier' ? 3.1 : 2.7;
   g.children[g.children.length - 1].position.y = g.userData.tagY;
-  g.position.set(r.x, 0, r.z);
+  g.position.set(r.x, groundY(r.x, r.z), r.z);
   g.userData.info = r;
   scene.add(g);
   robots.push(g);
@@ -447,7 +553,7 @@ rosterReady.then(() => {
 const others = new Map(); // actor → { rig, target, name }
 let campCode = null;
 try { const g = JSON.parse(localStorage.getItem('driftwood_gathering_v1') || 'null'); campCode = g?.code ?? null; } catch {}
-const W = 30; // world half-size ↔ normalized map
+const W = 120; // world half-size ↔ normalized map (covers the big island)
 const toNorm = v => Math.max(0, Math.min(1, (v + W) / (2 * W)));
 const fromNorm = v => v * 2 * W - W;
 if (campCode) {
@@ -469,7 +575,7 @@ if (campCode) {
     }
     const nx = fromNorm(p.x), nz = fromNorm(p.y);
     o.speed = o.rig.position.distanceTo(new THREE.Vector3(nx, 0, nz)) * 2;
-    o.target.set(nx, 0, nz);
+    o.target.set(nx, groundY(nx, nz), nz);
     o.at = Date.now();
   };
   setInterval(() => {
@@ -509,23 +615,31 @@ renderer.setAnimationLoop(() => {
   let iz = stick.dz + ((keys['s'] || keys['arrowdown']) ? 1 : 0) - ((keys['w'] || keys['arrowup']) ? 1 : 0);
   const mag = Math.min(1, Math.hypot(ix, iz));
   if (mag > 0.05) {
-    const ang = Math.atan2(ix, iz) + camYaw + Math.PI;
-    const SPEED = 5.2;
+    const prevX = player.position.x, prevZ = player.position.z;
+    const ang = Math.atan2(ix, iz) + camYaw;
+    const SPEED = 7.5;                     // a hiking pace for a big island
     player.position.x += Math.sin(ang) * SPEED * mag * dt;
     player.position.z += Math.cos(ang) * SPEED * mag * dt;
-    // stay on the sand
-    const rr = Math.hypot(player.position.x, player.position.z);
-    if (rr > 32) { player.position.x *= 32 / rr; player.position.z *= 32 / rr; }
-    player.rotation.y = ang + Math.PI; // face where you walk
+    // the sea is the edge of the world: ankle-deep is allowed, swimming isn't.
+    // Slide along the waterline (keep whichever axis stays on land).
+    if (islandHeight(player.position.x, player.position.z) < -0.2) {
+      if (islandHeight(prevX, player.position.z) >= -0.2) player.position.x = prevX;
+      else if (islandHeight(player.position.x, prevZ) >= -0.2) player.position.z = prevZ;
+      else { player.position.x = prevX; player.position.z = prevZ; }
+    }
+    player.rotation.y = ang; // face where you walk
     broadcastPos();
   }
+  // the ground carries you — hills, beach, the spine
+  player.userData.baseY = groundY(player.position.x, player.position.z);
   animateWalk(player, mag, dt, t);
 
   // family interpolation + their walk cycles
   for (const [, o] of others) {
     const d = o.rig.position.distanceTo(o.target);
     o.rig.position.lerp(o.target, Math.min(1, dt * 8));
-    if (d > 0.05) o.rig.lookAt(o.target.x, 0, o.target.z);
+    if (d > 0.05) o.rig.lookAt(o.target.x, o.rig.position.y, o.target.z);
+    o.rig.userData.baseY = groundY(o.rig.position.x, o.rig.position.z);
     animateWalk(o.rig, Math.min(d, 1), dt, t);
   }
 
@@ -555,9 +669,10 @@ renderer.setAnimationLoop(() => {
   // third-person camera: behind + above, orbit by drag
   const cx = player.position.x + Math.sin(camYaw) * 9.0 * Math.cos(camPitch);
   const cz = player.position.z + Math.cos(camYaw) * 9.0 * Math.cos(camPitch);
-  const cy = 2.4 + Math.sin(camPitch) * 9.0;
+  // ride the hills with the player (never sink the camera into a slope)
+  const cy = Math.max(player.position.y + 2.4 + Math.sin(camPitch) * 9.0, groundY(cx, cz) + 1.2);
   camera.position.lerp(new THREE.Vector3(cx, cy, cz), Math.min(1, dt * 7));
-  camera.lookAt(player.position.x, 1.0, player.position.z); // aim at the torso, steady
+  camera.lookAt(player.position.x, player.position.y + 1.2, player.position.z);
 
   renderer.render(scene, camera);
 });
