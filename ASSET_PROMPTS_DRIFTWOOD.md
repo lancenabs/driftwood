@@ -36,3 +36,30 @@ course) · family_manifest (a lantern list) · daily_rigging (a small ladder of
 rope) · ships_calendar (a tide wheel) · sea_chest (an open chest) ·
 ask_the_jumble (a small robot hand raised).
 ## 💰 COIN TIER (MCP, later): the five Jumble GLBs for a future 3D/VR shore.
+
+## 5 · 🏝 THE BIG ISLAND'S 4K TEXTURE TILES (2026-07-11 — Lance's FREE tier)
+*The 3D island (public/island3d/) wears seamless 1:1 tiles. Your sand-ripple,
+mossy-rock, and rock tiles are IN and painting the ground now. These fill the
+gaps — same recipe as your originals: **top-down, perfectly seamless/tileable,
+4K, painterly-realistic, even lighting, no text/watermark.** Drop them in
+`public/island3d/tex/` at the names below (Claude converts + wires).*
+
+- `grass.png` — **jungle floor** (the one real gap): dense low tropical
+  undergrowth seen straight down — mixed grass, small ferns, fallen leaves,
+  warm greens · *replaces the moss-rock standing in for jungle ground*
+- `path.png` — a worn sandy-dirt footpath: packed earth, scattered pebbles,
+  the trail the family wears between camp and the forge
+- `bark.png` — palm-trunk bark, vertical tile (wraps the instanced trunks)
+- `canopy.png` — dense jungle canopy from above: layered tropical leaves
+  (becomes tree cards/billboards for cheap distant jungle)
+- `planks.png` — sun-bleached driftwood planks with rope lashings and carved
+  names (the camp structures + the raft; the kintsugi seams welcome)
+- `seabed.png` — pale sand + coral rubble under shallow water (the swim-line
+  shallows; your night-pebbles tile is in as a dusk variant already)
+
+## 6 · 👨‍👩‍👦‍👦 THE FAMILY MESH CAST (MCP coin tier — priced 2026-07-11)
+The six A-pose sheets are cast and staged (`~/Downloads/driftwood-family-sheets/`).
+**True cost preflighted: 38 credits/character** (image_to_3d + texture +
+rigging + a real walk clip, id 30 'Casual_Walk') → **~228 for all six.**
+Order: dad first alone (the quality gate), then the batch. Landing paths in
+`FAMILY_MESH_RECIPE.md` — the island auto-lights each one.
