@@ -1280,7 +1280,7 @@ export default function AppTutorialOverlay({ onClose, internName, internAvatar }
           </div>
 
           <div className="flex items-center gap-1">
-            <span className="text-[9px] font-mono text-zinc-650">HIPAA DIRECTIVE: EXEMPT SECURE BYPASS CHANNEL // APP_STORE_SUITE</span>
+            <span className="text-[9px] font-mono text-zinc-650">CONSOLE DIRECTIVE 7-C: EXEMPT SECURE BYPASS CHANNEL // APP_STORE_SUITE</span>
           </div>
         </div>
 
