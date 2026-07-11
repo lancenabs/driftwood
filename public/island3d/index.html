@@ -120,9 +120,9 @@ const groundY = (x, z) => Math.max(islandHeight(x, z), SEA_Y + 0.25);
 // the terrain mesh
 const texLoader = new THREE.TextureLoader();
 const tile = (url, rep) => { const t = texLoader.load(url); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep, rep); return t; };
-const texSand = tile('/island3d/tex/sand.jpg', 170);
-const texMoss = tile('/island3d/tex/moss.jpg', 130);
-const texRock = tile('/island3d/tex/rock.jpg', 110);
+const texSand  = tile('/island3d/tex/sand.jpg', 170);
+const texGrass = tile('/island3d/tex/grass.jpg', 150);   // Lance's real tropical grass — the jungle floor
+const texRock  = tile('/island3d/tex/rock.jpg', 110);
 const terrainGeo = new THREE.PlaneGeometry(ISLAND_R * 2 + 60, ISLAND_R * 2 + 60, 160, 160);
 terrainGeo.rotateX(-Math.PI / 2);
 {
@@ -130,27 +130,27 @@ terrainGeo.rotateX(-Math.PI / 2);
   for (let i = 0; i < pos.count; i++) pos.setY(i, islandHeight(pos.getX(i), pos.getZ(i)));
   terrainGeo.computeVertexNormals();
 }
-// splat: sand low → moss (jungle floor) mid → rock high/steep, one material
+// splat: sand (beach) low → grass (jungle floor) mid → rock high/steep, one material
 const terrainMat = new THREE.MeshLambertMaterial({ map: texSand });
 terrainMat.onBeforeCompile = (shader) => {
-  shader.uniforms.tMoss = { value: texMoss };
+  shader.uniforms.tGrass = { value: texGrass };
   shader.uniforms.tRock = { value: texRock };
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
     .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
   shader.fragmentShader = shader.fragmentShader
-    .replace('#include <common>', '#include <common>\nuniform sampler2D tMoss;\nuniform sampler2D tRock;\nvarying vec3 vWPos;')
+    .replace('#include <common>', '#include <common>\nuniform sampler2D tGrass;\nuniform sampler2D tRock;\nvarying vec3 vWPos;')
     .replace('#include <map_fragment>', `
       // two-scale sampling (second sample ROTATED 90°) kills tile periodicity
-      vec4 cSand = mix(texture2D(map, vUv),          texture2D(map, vUv.yx * 0.23 + 0.37),  0.5);
-      vec4 cMoss = mix(texture2D(tMoss, vUv * 0.8),  texture2D(tMoss, vUv.yx * 0.19 + 0.53), 0.5);
-      vec4 cRock = mix(texture2D(tRock, vUv * 0.66), texture2D(tRock, vUv.yx * 0.15 + 0.11), 0.5);
+      vec4 cSand  = mix(texture2D(map, vUv),           texture2D(map, vUv.yx * 0.23 + 0.37),  0.5);
+      vec4 cGrass = mix(texture2D(tGrass, vUv * 0.9),  texture2D(tGrass, vUv.yx * 0.21 + 0.53), 0.5);
+      vec4 cRock  = mix(texture2D(tRock, vUv * 0.66),  texture2D(tRock, vUv.yx * 0.15 + 0.11), 0.5);
       // organic band edges: world-noise wobbles the height thresholds
       float wob = sin(vWPos.x * 0.19) * sin(vWPos.z * 0.17) * 1.4
                 + sin(vWPos.x * 0.043 + vWPos.z * 0.051) * 2.2;
-      float mossMix = smoothstep(1.2, 6.0, vWPos.y + wob);   // beach → jungle floor
-      float rockMix = smoothstep(9.5, 17.5, vWPos.y + wob);  // shelf → highlands
-      vec4 sampledDiffuseColor = mix(mix(cSand, cMoss, mossMix), cRock, rockMix);
+      float grassMix = smoothstep(1.2, 6.0, vWPos.y + wob);   // beach → jungle floor
+      float rockMix  = smoothstep(9.5, 17.5, vWPos.y + wob);  // shelf → highlands
+      vec4 sampledDiffuseColor = mix(mix(cSand, cGrass, grassMix), cRock, rockMix);
       diffuseColor *= sampledDiffuseColor;
     `);
 };
