@@ -34,8 +34,12 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
   const [firing, setFiring] = useState(false);     // 🔥 the Fire Quiz
   useEffect(() => {
     const bump = () => force(x => x + 1);
-    // the 3D island's "← the shore" button lands here
-    const leave = (e: MessageEvent) => { if (e.data?.type === 'driftwood:leave-island') setWalking(false); };
+    // the 3D island's "← the shore" button lands here; the campfire's
+    // "gather round" opens the games right over the island
+    const leave = (e: MessageEvent) => {
+      if (e.data?.type === 'driftwood:leave-island') setWalking(false);
+      if (e.data?.type === 'driftwood:open-games') setFiring(true);
+    };
     // ANY door into the island (the shore button OR the Gathering bar) opens
     // the same 3D world — one island, no confusion.
     const enter = () => setWalking(true);

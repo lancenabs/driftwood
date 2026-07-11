@@ -604,6 +604,21 @@ document.getElementById('back').onclick = () => {
   else history.back();
 };
 
+// ── GATHER ROUND — walk to the campfire and the games open ──────────────────
+// The fire is the island's heart: stand close and a warm prompt rises; tap it
+// (or press E) and the Campfire Games open over the island. The world and the
+// work are one place now.
+const gatherEl = document.createElement('button');
+gatherEl.textContent = '🔥 Gather round — play a campfire game';
+gatherEl.style.cssText = 'position:fixed;left:50%;bottom:160px;transform:translateX(-50%);z-index:45;display:none;background:linear-gradient(100deg,#F59E0B,#F2683A);color:#fff;border:none;border-radius:999px;padding:12px 20px;font-size:13px;font-weight:800;box-shadow:0 4px 18px rgba(242,104,58,0.5);cursor:pointer;font-family:inherit';
+document.body.appendChild(gatherEl);
+const openGames = () => {
+  if (window.parent !== window) window.parent.postMessage({ type: 'driftwood:open-games' }, '*');
+};
+gatherEl.onclick = openGames;
+let nearFire = false;
+addEventListener('keydown', e => { if (e.key.toLowerCase() === 'e' && nearFire) openGames(); });
+
 // ── the loop ─────────────────────────────────────────────────────────────────
 const clock = new THREE.Clock();
 renderer.setAnimationLoop(() => {
@@ -665,6 +680,11 @@ renderer.setAnimationLoop(() => {
   // fire flicker
   flame.scale.setScalar(1 + Math.sin(t * 8) * 0.1);
   fireLight.intensity = 1.0 + Math.sin(t * 7.3) * 0.15;
+
+  // gather round: near the fire → the games prompt rises
+  const wasNear = nearFire;
+  nearFire = player.position.distanceTo(fire.position) < 5;
+  if (nearFire !== wasNear) gatherEl.style.display = nearFire ? 'block' : 'none';
 
   // third-person camera: behind + above, orbit by drag
   const cx = player.position.x + Math.sin(camYaw) * 9.0 * Math.cos(camPitch);
