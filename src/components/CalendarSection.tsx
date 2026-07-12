@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Calendar as CalendarIcon, Clock, Plus, Users, Sparkles, Trash2, Heart, ShieldAlert, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile } from './SwitchUserBar';
@@ -106,9 +106,14 @@ export default function CalendarSection({ currentUser }: CalendarSectionProps) {
   const [newNotes, setNewNotes] = useState('');
   const [customNotification, setCustomNotification] = useState<string | null>(null);
 
+  // only on REAL change (completion-law key, 2026-07-12; value comparison
+  // because StrictMode double-fires effects)
+  const eventsInitial = useRef(JSON.stringify(events));
   useEffect(() => {
+    const sig = JSON.stringify(events);
+    if (sig === eventsInitial.current) return;
     try {
-      localStorage.setItem('driftwood_calendar_events_v1', JSON.stringify(events));
+      localStorage.setItem('driftwood_calendar_events_v1', sig);
     } catch {}
   }, [events]);
 

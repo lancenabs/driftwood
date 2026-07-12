@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Heart, Check, Flame, Award, BookOpen, Sparkles, HelpCircle, CheckSquare, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile } from './SwitchUserBar';
@@ -59,9 +59,14 @@ export default function HabitsRitualsSection({ currentUser, onAddMilestone }: Ha
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [xpEarned, setXpEarned] = useState(0);
 
+  // only on REAL change (completion-law key, 2026-07-12; value comparison
+  // because StrictMode double-fires effects)
+  const habitsInitial = useRef(JSON.stringify(completedHabits));
   useEffect(() => {
+    const sig = JSON.stringify(completedHabits);
+    if (sig === habitsInitial.current) return;
     try {
-      localStorage.setItem('driftwood_habits_v1', JSON.stringify(completedHabits));
+      localStorage.setItem('driftwood_habits_v1', sig);
     } catch {}
   }, [completedHabits]);
 

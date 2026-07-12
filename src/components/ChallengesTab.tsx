@@ -1,6 +1,7 @@
 import React from 'react';
 import { Map as MapIcon } from 'lucide-react';
 import { MILESTONES, SEASONS } from '../data/milestones';
+import { matchesHeld, rationsHeld } from '../lib/world';
 import { useGame } from '../lance/components/LANCEGame/LANCEGameContext';
 import MilestoneLog from './MilestoneLog';
 import TideChart from './TideChart';
@@ -72,6 +73,8 @@ export default function ChallengesTab({ onOpenTool, onOpenGames, onLeaveIsland }
         <span className="text-[10px] font-black text-amber-300">{closed.length}/{MILESTONES.length}</span>
         <span className="text-[10px] font-black text-yellow-300">⚡ {xp.toLocaleString()}</span>
         <span className="text-[10px] font-black text-white/90">💎 {gems.toLocaleString()}</span>
+        <span className="text-[10px] font-black text-orange-300" title="Matches — struck by checked steps">🔥 {matchesHeld()}</span>
+        <span className="text-[10px] font-black text-amber-100" title="Rations — landed by checked steps">🍲 {rationsHeld()}</span>
       </div>
 
       {/* The Trail — a read-only progress view (insight data; allowed off the

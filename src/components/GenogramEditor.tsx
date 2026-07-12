@@ -93,8 +93,15 @@ export default function GenogramEditor({ onBack }: GenogramEditorProps) {
   const [newNodeGen, setNewNodeGen] = useState<'grandparent' | 'parent' | 'child'>('parent');
   const [newNodeBirth, setNewNodeBirth] = useState('1985');
 
-  // Sync to local storage
+  // Sync to local storage — but only on REAL change: the completion law reads
+  // these keys as proof of real work, and a default-state write on open was
+  // closing milestone 1 without a single edit (the honesty bug behind
+  // "the first challenge is off", caught 2026-07-12). Value comparison, not a
+  // first-run flag — StrictMode double-fires effects and eats flags.
+  const genogramInitial = useRef(JSON.stringify(nodes) + '|' + JSON.stringify(connections));
   useEffect(() => {
+    const sig = JSON.stringify(nodes) + '|' + JSON.stringify(connections);
+    if (sig === genogramInitial.current) return;
     try {
       localStorage.setItem('driftwood_genogram_nodes_v1', JSON.stringify(nodes));
       localStorage.setItem('driftwood_genogram_connections_v1', JSON.stringify(connections));

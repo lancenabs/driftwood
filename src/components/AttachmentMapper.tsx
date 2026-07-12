@@ -55,7 +55,12 @@ export default function AttachmentMapper({ onBack }: { onBack?: () => void }) {
 
   // SELECTED NODE FOR DETAILS
   const [selectedNode, setSelectedNode] = useState<'self' | 'partner' | 'dance'>('dance');
+  // only on REAL change (completion-law key, 2026-07-12; value comparison
+  // because StrictMode double-fires effects)
+  const mooringsInitial = React.useRef(JSON.stringify([selfAnxiety, selfAvoidance, partnerAnxiety, partnerAvoidance]));
   React.useEffect(() => {
+    const sig = JSON.stringify([selfAnxiety, selfAvoidance, partnerAnxiety, partnerAvoidance]);
+    if (sig === mooringsInitial.current) return;
     try {
       localStorage.setItem('driftwood_moorings_v1', JSON.stringify({
         selfAnxiety, selfAvoidance, partnerAnxiety, partnerAvoidance, at: new Date().toISOString(),

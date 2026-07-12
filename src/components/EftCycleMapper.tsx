@@ -136,8 +136,13 @@ export default function EftCycleMapper({ onBack }: { onBack?: () => void }) {
     }
   ];
   });
+  // only on REAL change — the completion law reads this key as proof of real
+  // work (value comparison: StrictMode double-fires effects and eats flags)
+  const undertowInitial = React.useRef(JSON.stringify(savedCycles));
   React.useEffect(() => {
-    try { localStorage.setItem('driftwood_undertow_v1', JSON.stringify(savedCycles)); } catch { /* ignore */ }
+    const sig = JSON.stringify(savedCycles);
+    if (sig === undertowInitial.current) return;
+    try { localStorage.setItem('driftwood_undertow_v1', sig); } catch { /* ignore */ }
   }, [savedCycles]);
 
   const [selectedCycleId, setSelectedCycleId] = useState<string | null>(null);

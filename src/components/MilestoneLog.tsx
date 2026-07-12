@@ -22,7 +22,13 @@ import { useGame } from '../lance/components/LANCEGame/LANCEGameContext';
 
 interface LogState {
   closed: string[];
-  investigating: { id: string; baseline: string } | null;
+  // THE CHECKBOX GATE (the LANCE law, walked ashore 2026-07-12): work carries
+  // a task list — the CRAFT steps as real checkboxes on the right of the
+  // screen. A milestone closes only when the instrument's save signature
+  // moved AND every box is checked. Each first check strikes a match or
+  // lands a ration (rewarded[] guards the double-tap; the tide keeps what
+  // it pays).
+  investigating: { id: string; baseline: string; tasks?: boolean[]; rewarded?: boolean[] } | null;
 }
 const STATE_KEY = 'driftwood_milestone_log_v1';
 
@@ -78,14 +84,18 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
     [state.closed],
   );
 
-  // Honest completion: when the tool overlay closes (or focus returns), check
-  // whether the investigation's instrument really saved.
+  // Honest completion, twice over (the checkbox gate): the instrument's real
+  // store must have grown AND every task box must be checked. Neither alone
+  // closes a milestone — the save proves the work, the boxes prove the crew
+  // walked every step of it.
   useEffect(() => {
     const check = () => {
       const inv = loadState().investigating;
       if (!inv) return;
       const m = MILESTONES.find(x => x.id === inv.id);
       if (!m) return;
+      const boxesDone = !inv.tasks?.length || inv.tasks.every(Boolean);
+      if (!boxesDone) return;
       const craft = CRAFT[m.id];
       if (craft?.gameId) {
         // game instrument: a new finished round since the baseline closes it
@@ -124,6 +134,17 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
     document.querySelector('.absolute.inset-0.overflow-y-auto')?.scrollTo({ top: 0 });
   }, [phase, beatIdx]);
 
+  // Returning to the island mid-work: the checklist dock resumes on its own —
+  // a family that walked away from an open milestone doesn't lose the trail.
+  React.useEffect(() => {
+    if (!hideShelf) return;
+    const inv = loadState().investigating;
+    if (!inv) return;
+    const m = MILESTONES.find(x => x.id === inv.id);
+    if (m) { setActive(m); setPhase('working'); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const openMilestone = (m: Milestone) => {
     tideCreak();
     setActive(m); setBeatIdx(0); setConchConfirms([]);
@@ -139,10 +160,13 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
   const beginWork = (m: Milestone) => {
     if (!m.instrument) return;
     const craft = CRAFT[m.id];
+    // the task list boards with the work: one checkbox per CRAFT step
+    const tasks = craft?.steps?.length ? craft.steps.map(() => false) : undefined;
+    const rewarded = tasks ? tasks.map(() => false) : undefined;
     if (craft?.gameId) {
       // the instrument is a campfire game — baseline the real round count,
       // then send the crew to the fire with the right game queued
-      const next = { ...loadState(), investigating: { id: m.id, baseline: String(gameRounds(craft.gameId)) } };
+      const next = { ...loadState(), investigating: { id: m.id, baseline: String(gameRounds(craft.gameId)), tasks, rewarded } };
       setState(next); saveState(next);
       setPhase('working');
       try { sessionStorage.setItem('driftwood_pending_game', craft.gameId); } catch { /* menu still opens */ }
@@ -151,10 +175,45 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
     }
     const signal = (TOOL_COMPLETION as Record<string, { kind: string; keys?: string[] }>)[m.instrument.toolId];
     const baseline = signal?.kind === 'save' && signal.keys ? readSaveSignature(signal.keys) : '';
-    const next = { ...loadState(), investigating: { id: m.id, baseline } };
+    const next = { ...loadState(), investigating: { id: m.id, baseline, tasks, rewarded } };
     setState(next); saveState(next);
     setPhase('working');
     onOpenTool(m.instrument.toolId);
+  };
+
+  // A box gets checked: persist it, pay the survival wage on the FIRST check
+  // (even steps strike a match 🔥, odd steps land a ration 🍲 — warmth and
+  // food, the two needs a shipwrecked family works for), then re-run the
+  // completion check in case the instrument's save already landed.
+  const toggleTask = (i: number) => {
+    const s = loadState();
+    const inv = s.investigating;
+    if (!inv?.tasks) return;
+    const tasks = [...inv.tasks];
+    tasks[i] = !tasks[i];
+    const rewarded = [...(inv.rewarded ?? inv.tasks.map(() => false))];
+    if (tasks[i] && !rewarded[i]) {
+      rewarded[i] = true;
+      appendEvent(activeCastaway().id, i % 2 === 0 ? 'match_earned' : 'food_earned', { milestoneId: inv.id, step: i });
+      emberPop();
+    }
+    const next = { ...s, investigating: { ...inv, tasks, rewarded } };
+    setState(next); saveState(next);
+    if (tasks.every(Boolean)) {
+      const m = MILESTONES.find(x => x.id === inv.id);
+      if (!m) return;
+      const craft = CRAFT[m.id];
+      if (craft?.gameId) {
+        if (gameRounds(craft.gameId) > Number(inv.baseline || 0)) finishMilestone(m);
+        return;
+      }
+      const signal = m.instrument
+        ? (TOOL_COMPLETION as Record<string, { kind: string; keys?: string[] }>)[m.instrument.toolId]
+        : null;
+      if (signal?.kind === 'save' && signal.keys && readSaveSignature(signal.keys) !== inv.baseline) {
+        finishMilestone(m);
+      }
+    }
   };
 
   const finishMilestone = (m: Milestone) => {
@@ -397,15 +456,20 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
         <div className="flex flex-col gap-2 py-2">
           <p className="text-[12px] font-black text-slate-700 text-center">The work is open.</p>
           <p className="text-[11px] text-slate-500 leading-relaxed px-2 text-center">{active.instrument.why}</p>
-          {CRAFT[active.id]?.steps && (
-            <ol className="flex flex-col gap-1.5 my-1">
-              {CRAFT[active.id].steps.map((st, i) => (
-                <li key={i} className="flex items-start gap-2 p-2 bg-surface-container-lowest border border-outline-variant rounded-xl">
-                  <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-black flex items-center justify-center">{i + 1}</span>
-                  <span className="text-[11px] leading-relaxed text-slate-600">{st}</span>
-                </li>
-              ))}
-            </ol>
+          {state.investigating?.tasks && CRAFT[active.id]?.steps && (
+            <div className="flex flex-col gap-1.5 my-1" data-testid="work-checklist">
+              {CRAFT[active.id].steps.map((st, i) => {
+                const done = !!state.investigating?.tasks?.[i];
+                return (
+                  <button key={i} onClick={() => toggleTask(i)} data-testid={`work-task-${i}`}
+                    className={`flex items-start gap-2 p-2 rounded-xl border-2 text-left cursor-pointer transition-all ${done ? 'bg-emerald-50 border-emerald-300' : 'bg-surface-container-lowest border-outline-variant hover:border-primary/40'}`}>
+                    {done ? <CheckCircle2 className="shrink-0 w-5 h-5 text-emerald-500" /> : <Circle className="shrink-0 w-5 h-5 text-slate-300" />}
+                    <span className={`text-[11px] leading-relaxed ${done ? 'text-emerald-800' : 'text-slate-600'}`}>{st}</span>
+                    <span className="shrink-0 ml-auto text-xs" title={i % 2 === 0 ? 'strikes a match' : 'lands a ration'}>{i % 2 === 0 ? '🔥' : '🍲'}</span>
+                  </button>
+                );
+              })}
+            </div>
           )}
           <button
             onClick={() => {
@@ -420,7 +484,7 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
             {CRAFT[active.id]?.gameId ? `🏕 To the fire: ${active.instrument.toolName}` : `Open ${active.instrument.toolName}`}
           </button>
           <p className="text-[8px] text-slate-400 italic text-center">
-            The island counts the real work — a saved entry or a finished round — never a checked box.
+            The island counts twice: the real saved work AND every step walked. Checked steps strike matches 🔥 and land rations 🍲.
           </p>
           <button onClick={backToLog} className="text-[10px] font-bold text-slate-400 cursor-pointer py-1 text-center w-full">
             Set it aside for now
@@ -457,6 +521,57 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
   // above the 3D world instead of an inline tab card — the story circle calls,
   // this answers, and closing it drops you right back on the ground you stood on.
   if (hideShelf) {
+    // While the WORK is open, the milestone must not block the instrument
+    // beneath it — it docks as the flagship's checkbox panel on the RIGHT of
+    // the screen (the LANCE law, verbatim from the captain), checking off the
+    // steps while the family does the real thing.
+    if (phase === 'working' && active.instrument) {
+      const steps = CRAFT[active.id]?.steps ?? [];
+      const tasks = state.investigating?.tasks;
+      const doneCount = tasks?.filter(Boolean).length ?? 0;
+      return (
+        <div className="fixed right-3 top-24 bottom-24 z-[80] w-[240px] max-w-[62vw] flex flex-col pointer-events-none">
+          <div className="pointer-events-auto bg-white/95 backdrop-blur-md rounded-3xl border-2 border-outline-variant shadow-xl flex flex-col overflow-hidden max-h-full" data-testid="work-checklist">
+            <div className="px-3.5 pt-3 pb-2 border-b border-outline-variant/50 shrink-0">
+              <p className="text-[8px] font-black uppercase tracking-[0.2em] text-amber-600 flex items-center gap-1">
+                <Flag className="w-2.5 h-2.5" /> Milestone {active.n}
+              </p>
+              <p className="text-[11px] font-display font-black text-slate-800 leading-tight">{active.title}</p>
+              <p className="text-[9px] font-bold text-slate-400 mt-0.5">{doneCount}/{tasks?.length ?? 0} steps · every ✓ pays 🔥 or 🍲</p>
+            </div>
+            <div className="flex-1 overflow-y-auto px-2.5 py-2 flex flex-col gap-1.5">
+              {steps.map((st, i) => {
+                const done = !!tasks?.[i];
+                return (
+                  <button key={i} onClick={() => toggleTask(i)} data-testid={`work-task-${i}`}
+                    className={`flex items-start gap-1.5 p-2 rounded-xl border-2 text-left cursor-pointer transition-all ${done ? 'bg-emerald-50 border-emerald-300' : 'bg-slate-50 border-outline-variant hover:border-primary/40'}`}>
+                    {done ? <CheckCircle2 className="shrink-0 w-4 h-4 text-emerald-500 mt-0.5" /> : <Circle className="shrink-0 w-4 h-4 text-slate-300 mt-0.5" />}
+                    <span className={`text-[9.5px] leading-snug ${done ? 'text-emerald-800' : 'text-slate-600'}`}>{st}</span>
+                    <span className="shrink-0 ml-auto text-[10px]">{i % 2 === 0 ? '🔥' : '🍲'}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="px-2.5 pb-2.5 shrink-0 flex flex-col gap-1">
+              <button
+                onClick={() => {
+                  const craft = CRAFT[active.id];
+                  if (craft?.gameId) {
+                    try { sessionStorage.setItem('driftwood_pending_game', craft.gameId); } catch { /* menu opens */ }
+                    window.dispatchEvent(new CustomEvent('driftwood:open-campfire'));
+                  } else onOpenTool(active.instrument!.toolId);
+                }}
+                className="w-full py-2 bg-secondary text-white font-display font-black rounded-xl border-b-[3px] border-on-secondary-container text-[10px] cursor-pointer">
+                {CRAFT[active.id]?.gameId ? '🏕 To the fire' : `Open ${active.instrument.toolName}`}
+              </button>
+              <button onClick={backToLog} className="text-[9px] font-bold text-slate-400 cursor-pointer text-center w-full">
+                Set it aside
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="fixed inset-0 z-[70] bg-black/55 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 overflow-y-auto">
         <div className="w-full max-w-md sm:my-auto">{activeCard}</div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { readNeeds, planksEarned, embersHeld, lanternLit, appendEvent } from '../lib/world';
+import { readNeeds, planksEarned, embersHeld, matchesHeld, rationsHeld, lanternLit, appendEvent } from '../lib/world';
 import { THE_SEVEN, readCrew, aiCastaways, activeCastaway, setActiveCastaway } from '../lib/castaways';
 // The island itself — its 3D world, its postMessage handling, its Campfire
 // Games trigger — now lives entirely in the Island tab (ChallengesTab.tsx,
@@ -182,9 +182,11 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         <p className="text-[8px] text-slate-400 text-center mt-2 italic">
           TOGETHER refills only together — a low meter is an invitation, never a verdict. The camp never shrinks.
         </p>
-        <div className="flex items-center justify-center gap-4 mt-1.5 text-[9px] font-black text-slate-500">
+        <div className="flex items-center justify-center gap-3 mt-1.5 text-[9px] font-black text-slate-500 flex-wrap">
           <span title="Planks — earned by milestones and real work; never lost">🪵 {planks} planks</span>
           <span title="Embers — the small currency; feed the fire, light lanterns">✨ {embers} embers</span>
+          <span title="Matches — struck by checked steps on the trail; they feed Warmth">🔥 {matchesHeld()} matches</span>
+          <span title="Rations — landed by checked steps on the trail; they feed Food">🍲 {rationsHeld()} rations</span>
           <span className="text-slate-300">·</span>
           <span className="text-slate-400 font-bold">{me.avatar} {me.name} · {me.roleText}</span>
         </div>

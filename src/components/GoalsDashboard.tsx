@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowLeft, 
   Check, 
@@ -159,10 +159,14 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
     }
   ];
 
-  // Sync to local storage
+  // Sync to local storage — only on REAL change (completion-law key,
+  // 2026-07-12; value comparison because StrictMode double-fires effects)
+  const goalsInitial = useRef(JSON.stringify(goals));
   useEffect(() => {
+    const sig = JSON.stringify(goals);
+    if (sig === goalsInitial.current) return;
     try {
-      localStorage.setItem('driftwood_weekly_goals_v1', JSON.stringify(goals));
+      localStorage.setItem('driftwood_weekly_goals_v1', sig);
     } catch {}
   }, [goals]);
 

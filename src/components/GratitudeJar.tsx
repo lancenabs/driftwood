@@ -137,13 +137,22 @@ export default function GratitudeJar({ currentUser, onAddMilestone, onClose }: G
   // VIEW MODE STATE
   const [activeSubView, setActiveSubView] = useState<'jar' | 'archive'>('jar');
 
-  // Trigger LocalStorage Sync
+  // Trigger LocalStorage Sync — only on REAL change: the completion law reads
+  // these keys as proof of real work; a default write on open closed
+  // milestones without a single note posted (the honesty bug, 2026-07-12).
+  // Value comparison, not a first-run flag — StrictMode double-fires effects.
+  const notesInitial = useRef(JSON.stringify(notes));
   useEffect(() => {
-    localStorage.setItem('driftwood_gratitude_notes', JSON.stringify(notes));
+    const sig = JSON.stringify(notes);
+    if (sig === notesInitial.current) return;
+    localStorage.setItem('driftwood_gratitude_notes', sig);
   }, [notes]);
 
+  const archivesInitial = useRef(JSON.stringify(archives));
   useEffect(() => {
-    localStorage.setItem('driftwood_gratitude_archives', JSON.stringify(archives));
+    const sig = JSON.stringify(archives);
+    if (sig === archivesInitial.current) return;
+    localStorage.setItem('driftwood_gratitude_archives', sig);
   }, [archives]);
 
   // Synthesize soft, therapeutic chime

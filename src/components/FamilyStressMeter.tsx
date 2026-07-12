@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Activity, 
   Sparkles, 
@@ -54,9 +54,13 @@ export default function FamilyStressMeter() {
   const [breathTimer, setBreathTimer] = useState<number>(4);
   const [completedCycles, setCompletedCycles] = useState<number>(0);
 
-  // PERSIST STATE
+  // PERSIST STATE — only on REAL change (completion-law key, 2026-07-12;
+  // value comparison because StrictMode double-fires effects)
+  const logsInitial = useRef(JSON.stringify(logs));
   useEffect(() => {
-    localStorage.setItem('driftwood_barometer_v1', JSON.stringify(logs));
+    const sig = JSON.stringify(logs);
+    if (sig === logsInitial.current) return;
+    localStorage.setItem('driftwood_barometer_v1', sig);
   }, [logs]);
 
   // BREATH PACER CLOCK

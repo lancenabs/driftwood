@@ -83,6 +83,19 @@ export function embersHeld(): number {
   return Math.max(0, earned - spent);
 }
 
+// ── Matches & rations (the survival wage of the task list) ──────────────────
+// Every checked task in a milestone's work checklist strikes a MATCH or lands
+// a RATION (Lance's 2026-07-12 order: "these tasks give matches, or food, so
+// they must be on the island where they are shipwrecked"). Derived from
+// events, same as everything: they can never drift from the truth, and they
+// feed the Warmth and Food needs for real.
+export function matchesHeld(): number {
+  return readEvents().filter(e => e.action === 'match_earned').length;
+}
+export function rationsHeld(): number {
+  return readEvents().filter(e => e.action === 'food_earned').length;
+}
+
 // ── The five needs (derived, honest) ─────────────────────────────────────────
 // Each need reads the RECENCY of its real work. Fresh (≤2 days) = full;
 // stale fades gently; nothing punishes — a low meter is an invitation, not a
@@ -131,8 +144,8 @@ export function readNeeds(): NeedReading[] {
   return [
     {
       id: 'warmth', label: 'Warmth', emoji: '🔥',
-      level: recencyLevel([...eventDates(['fire_tended', 'ember_earned']), ...keyDates(['driftwood_habits_v1'])], 3),
-      fedBy: 'tending the fire — daily rigging kept, embers earned',
+      level: recencyLevel([...eventDates(['fire_tended', 'ember_earned', 'match_earned']), ...keyDates(['driftwood_habits_v1'])], 3),
+      fedBy: 'tending the fire — daily rigging kept, embers earned, matches struck',
     },
     {
       id: 'water', label: 'Water', emoji: '💧',
@@ -141,8 +154,8 @@ export function readNeeds(): NeedReading[] {
     },
     {
       id: 'food', label: 'Food', emoji: '🍲',
-      level: recencyLevel(keyDates(['driftwood_weekly_goals_v1', 'driftwood_milestones_v1']), 5),
-      fedBy: 'the manifest worked — real chores and goals done',
+      level: recencyLevel([...eventDates(['food_earned']), ...keyDates(['driftwood_weekly_goals_v1', 'driftwood_milestones_v1'])], 5),
+      fedBy: 'the manifest worked — real chores done, rations earned on the trail',
     },
     {
       id: 'shelter', label: 'Shelter', emoji: '⛺',
