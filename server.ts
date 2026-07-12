@@ -1,4 +1,5 @@
 import express from "express";
+import http from "http";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
@@ -310,9 +311,14 @@ Strict Guidelines:
 
 // Configure Vite middleware for dev mode and static serving for production mode
 async function startServer() {
+  // one http.Server for everything — Express routes, Vite middleware, AND the
+  // HMR websocket (middlewareMode alone leaves HMR with no server to upgrade
+  // on, so hot-reload silently never connected; hand it the real server)
+  const httpServer = http.createServer(app);
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, hmr: { server: httpServer } },
       appType: "spa",
     });
     app.use(vite.middlewares);
@@ -324,7 +330,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`Clinical custom server running on http://localhost:${PORT}`);
   });
 }

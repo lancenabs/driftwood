@@ -1,5 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap');
 @import "tailwindcss";
+
+/* self-hosted variable fonts — no external fetches; the island works with no
+   internet at all (tailnet phones, airplane mode, the door policy) */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/Inter.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/Montserrat.woff2') format('woff2');
+}
 
 @theme {
   --font-display: "Montserrat", sans-serif;
@@ -9,9 +25,9 @@
      ashore with LANCE; this island is sea-glass and driftwood) */
   --color-primary: #0E7C7C;
   --color-primary-dark: #0A5F5F;
-  --color-secondary: #1CB0F6;
+  --color-secondary: #2E96B5; /* lagoon — the scaffold's sky-blue, run aground and calmed */
   --color-secondary-container: #CE9FFC;
-  --color-on-secondary-container: #1899D6;
+  --color-on-secondary-container: #20789A;
   --color-tertiary: #FF9600;
   --color-tertiary-container: #FFE16D;
   --color-tertiary-fixed: #FFE16D;

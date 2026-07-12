@@ -37,7 +37,7 @@ export default function CharacterSelectScreen({ onBack, onSelectCharacter }: Cha
       </div>
 
       {/* Scenario Context Card */}
-      <div className="bg-[#1CB0F6]/10 rounded-[2rem] p-4 border-2 border-[#1CB0F6]/20 shadow-sm flex gap-3 items-start">
+      <div className="bg-secondary/10 rounded-[2rem] p-4 border-2 border-secondary/20 shadow-sm flex gap-3 items-start">
         <span className="text-2xl mt-0.5">ℹ️</span>
         <p className="font-sans text-xs text-[#4B4B4B] leading-relaxed">
           Sam promised to do the dishes but is on their phone. It's getting late, and the kitchen is still a mess. How will you approach this without triggering a major escalation?
@@ -85,7 +85,7 @@ export default function CharacterSelectScreen({ onBack, onSelectCharacter }: Cha
               </p>
 
               {/* Action trigger button */}
-              <div className="w-full bg-[#1CB0F6] text-white font-display font-black py-2.5 px-4 rounded-xl border-b-[4px] border-[#1899D6] group-hover:brightness-105 transition-all mt-1 flex justify-center items-center gap-1.5 shadow-3d-secondary">
+              <div className="w-full bg-secondary text-white font-display font-black py-2.5 px-4 rounded-xl border-b-[4px] border-on-secondary-container group-hover:brightness-105 transition-all mt-1 flex justify-center items-center gap-1.5 shadow-3d-secondary">
                 <span>Select {char.name}</span>
                 <ArrowRight className="w-4 h-4" />
               </div>

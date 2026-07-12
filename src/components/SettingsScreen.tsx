@@ -80,7 +80,7 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
                       className="w-20 px-2 py-1 text-[10px] border-2 border-outline-variant rounded-lg focus:outline-none focus:border-primary" />
                     <button
                       onClick={() => { claimSlot(slot.id, claimName); setClaimingSlot(null); setClaimName(''); force(x => x + 1); }}
-                      className="text-[9px] font-black text-white bg-[#58CC02] px-2 py-1 rounded-lg cursor-pointer">
+                      className="text-[9px] font-black text-white bg-primary px-2 py-1 rounded-lg cursor-pointer">
                       Claim
                     </button>
                   </span>
@@ -111,7 +111,7 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
           <p className="text-[9px] text-slate-400 mt-0.5">silences the bell, the creak, and the ember pop — never hides a tool or a safety line</p>
         </div>
         <button onClick={toggleQuiet}
-          className={`shrink-0 w-12 h-7 rounded-full border-2 transition-colors cursor-pointer relative ${quiet ? 'bg-slate-200 border-slate-300' : 'bg-[#58CC02]/20 border-[#58CC02]'}`}
+          className={`shrink-0 w-12 h-7 rounded-full border-2 transition-colors cursor-pointer relative ${quiet ? 'bg-slate-200 border-slate-300' : 'bg-primary/20 border-primary'}`}
           role="switch" aria-checked={!quiet} aria-label="Shore sounds">
           <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white border border-slate-200 shadow transition-all ${quiet ? 'left-0.5' : 'left-[22px]'}`} />
         </button>

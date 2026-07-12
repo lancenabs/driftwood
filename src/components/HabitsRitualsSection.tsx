@@ -143,7 +143,7 @@ export default function HabitsRitualsSection({ currentUser, onAddMilestone }: Ha
             initial={{ opacity: 0, y: -15, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -15, scale: 0.95 }}
-            className="bg-[#58CC02] text-white p-3.5 rounded-2xl text-[10px] font-sans font-black uppercase tracking-wider flex items-center gap-2 shadow-lg border border-green-400 z-50"
+            className="bg-primary text-white p-3.5 rounded-2xl text-[10px] font-sans font-black uppercase tracking-wider flex items-center gap-2 shadow-lg border border-green-400 z-50"
           >
             <Sparkles className="w-4.5 h-4.5 text-yellow-300 animate-spin" style={{ animationDuration: '4s' }} />
             <span>{toastMessage}</span>
@@ -247,7 +247,7 @@ export default function HabitsRitualsSection({ currentUser, onAddMilestone }: Ha
           >
             <div className="flex justify-between items-center w-full">
               <span className="text-lg">🗺️</span>
-              <span className="text-[7px] font-black bg-[#1CB0F6]/10 text-[#1CB0F6] border border-[#1CB0F6]/20 px-1.5 py-0.25 rounded">Gottman</span>
+              <span className="text-[7px] font-black bg-secondary/10 text-secondary border border-secondary/20 px-1.5 py-0.25 rounded">Gottman</span>
             </div>
             <h4 className="font-sans text-[10.5px] font-black text-[#4B4B4B] mt-1">Love Maps Update</h4>
             <p className="font-sans text-[8.5px] text-on-surface-variant leading-relaxed">

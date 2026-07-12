@@ -481,7 +481,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
         </button>
         <button
           onClick={() => setActiveSubTab('calendar')}
-          className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1 ${activeSubTab === 'calendar' ? 'bg-[#58CC02] text-white border-b-4 border-[#46A302]' : 'text-[#4B4B4B] hover:bg-surface-container-high'}`}
+          className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1 ${activeSubTab === 'calendar' ? 'bg-primary text-white border-b-4 border-primary-dark' : 'text-[#4B4B4B] hover:bg-surface-container-high'}`}
         >
           <span>📅 Calendar</span>
         </button>
@@ -933,7 +933,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
               {weeklyGoals.map((g, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-1.5">
                   {g.completed ? (
-                    <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-3d-primary border-2 border-[#46A302] animate-fade-in">
+                    <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-3d-primary border-2 border-primary-dark animate-fade-in">
                       <Check className="w-5 h-5 text-white stroke-[3px]" />
                     </div>
                   ) : g.active ? (
@@ -1050,8 +1050,8 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
                       onClick={() => handleToggleRitual(ritual.id)}
                       className={`w-9 h-9 rounded-full flex items-center justify-center border-2.5 cursor-pointer transition-all shrink-0 ${
                         ritual.completed
-                          ? 'bg-[#58CC02] border-[#58CC02] text-white shadow-3d-secondary'
-                          : 'bg-white border-outline-variant hover:border-[#58CC02] text-transparent hover:text-[#58CC02]/30'
+                          ? 'bg-primary border-primary text-white shadow-3d-secondary'
+                          : 'bg-white border-outline-variant hover:border-primary text-transparent hover:text-primary/30'
                       }`}
                     >
                       {ritual.completed ? (

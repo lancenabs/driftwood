@@ -240,7 +240,7 @@ export default function RitualDesigner() {
             setActiveRunIndex(0);
             setRunCompleted(false);
           }}
-          className={`flex-1 text-center font-display font-black text-[10px] uppercase tracking-wider py-2.5 px-2 rounded-xl transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${currentStep === 'run' ? 'bg-[#58CC02] text-white border-b-4 border-[#46A302]' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+          className={`flex-1 text-center font-display font-black text-[10px] uppercase tracking-wider py-2.5 px-2 rounded-xl transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${currentStep === 'run' ? 'bg-primary text-white border-b-4 border-primary-dark' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
         >
           🚀 Run Agenda Session ({selectedItems.length} steps)
         </button>

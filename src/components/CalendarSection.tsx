@@ -213,7 +213,7 @@ export default function CalendarSection({ currentUser }: CalendarSectionProps) {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-[#1CB0F6] text-white p-3 rounded-2xl text-[9.5px] font-sans font-black uppercase tracking-wider flex items-center justify-between shadow-md border border-sky-400 gap-1.5 z-40"
+            className="bg-secondary text-white p-3 rounded-2xl text-[9.5px] font-sans font-black uppercase tracking-wider flex items-center justify-between shadow-md border border-sky-400 gap-1.5 z-40"
           >
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-amber-300 animate-bounce" />

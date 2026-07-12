@@ -151,7 +151,7 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
         ))}
         <button
           onClick={() => (atEnd ? onDone() : setBeatIdx(beatIdx + 1))}
-          className="w-full py-2.5 bg-[#58CC02] text-white font-display font-black rounded-xl border-b-[3px] border-[#46A302] text-xs cursor-pointer hover:brightness-105 active:translate-y-[1px] flex items-center justify-center gap-1"
+          className="w-full py-2.5 bg-primary text-white font-display font-black rounded-xl border-b-[3px] border-primary-dark text-xs cursor-pointer hover:brightness-105 active:translate-y-[1px] flex items-center justify-center gap-1"
         >
           {atEnd ? doneLabel : 'Continue'} <ChevronRight className="w-3.5 h-3.5" />
         </button>
@@ -278,9 +278,9 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
               <button
                 key={c.slotId}
                 onClick={() => setConchConfirms(prev => confirmed ? prev.filter(x => x !== c.slotId) : [...prev, c.slotId])}
-                className={`w-full p-2.5 rounded-xl border-2 text-left flex items-center gap-2 cursor-pointer ${confirmed ? 'border-[#58CC02] bg-[#58CC02]/5' : 'border-outline-variant'}`}
+                className={`w-full p-2.5 rounded-xl border-2 text-left flex items-center gap-2 cursor-pointer ${confirmed ? 'border-primary bg-primary/5' : 'border-outline-variant'}`}
               >
-                {confirmed ? <CheckCircle2 className="w-4 h-4 text-[#58CC02]" /> : <Circle className="w-4 h-4 text-slate-300" />}
+                {confirmed ? <CheckCircle2 className="w-4 h-4 text-primary" /> : <Circle className="w-4 h-4 text-slate-300" />}
                 <span className="text-[11px] font-black text-slate-700">{c.name}</span>
               </button>
             );
@@ -290,7 +290,7 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
             disabled={conchConfirms.length < Math.min(2, readCrew().length)}
             className={`w-full py-2.5 font-display font-black rounded-xl text-xs flex items-center justify-center gap-1 ${
               conchConfirms.length >= Math.min(2, readCrew().length)
-                ? 'bg-[#58CC02] text-white border-b-[3px] border-[#46A302] cursor-pointer'
+                ? 'bg-primary text-white border-b-[3px] border-primary-dark cursor-pointer'
                 : 'bg-slate-100 text-slate-300'
             }`}
           >
@@ -308,7 +308,7 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
           <p className="text-[11px] text-slate-500 leading-relaxed px-2">{active.instrument.why}</p>
           <button
             onClick={() => onOpenTool(active.instrument!.toolId)}
-            className="w-full py-2.5 bg-[#1CB0F6] text-white font-display font-black rounded-xl border-b-[3px] border-[#1899D6] text-xs cursor-pointer"
+            className="w-full py-2.5 bg-secondary text-white font-display font-black rounded-xl border-b-[3px] border-on-secondary-container text-xs cursor-pointer"
           >
             Open {active.instrument.toolName}
           </button>

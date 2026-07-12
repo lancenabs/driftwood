@@ -32,7 +32,7 @@ export default function DebriefScreen({ empathyScore, safetyScore, xpEarned, ses
       {/* Rewards Badges */}
       <div className="flex justify-center gap-3">
         <div className="group relative flex items-center gap-1.5 bg-white text-[#4B4B4B] px-4 py-1.5 rounded-full text-xs font-black font-display shadow-sm border-2 border-outline-variant cursor-help">
-          <Award className="w-4 h-4 text-[#58CC02]" />
+          <Award className="w-4 h-4 text-primary" />
           <span>+{xpEarned} XP</span>
           {/* Tooltip */}
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2.5 hidden group-hover:block bg-neutral-900 text-white text-[10px] font-sans font-medium rounded-xl p-2.5 shadow-lg w-56 text-center pointer-events-none z-50 border border-neutral-800 leading-normal">
@@ -171,7 +171,7 @@ export default function DebriefScreen({ empathyScore, safetyScore, xpEarned, ses
                 type="monotone" 
                 name="Empathy" 
                 dataKey="empathy" 
-                stroke="#58CC02" 
+                stroke="var(--color-primary)" 
                 strokeWidth={3} 
                 activeDot={{ r: 6 }} 
                 dot={{ r: 3 }}
@@ -180,7 +180,7 @@ export default function DebriefScreen({ empathyScore, safetyScore, xpEarned, ses
                 type="monotone" 
                 name="Safety" 
                 dataKey="safety" 
-                stroke="#1CB0F6" 
+                stroke="var(--color-secondary)" 
                 strokeWidth={3} 
                 activeDot={{ r: 6 }} 
                 dot={{ r: 3 }}
@@ -191,9 +191,9 @@ export default function DebriefScreen({ empathyScore, safetyScore, xpEarned, ses
       </div>
 
       {/* Therapist Coach Insights */}
-      <div className="bg-[#1CB0F6]/10 rounded-[2rem] p-5 border-2 border-[#1CB0F6]/20 shadow-sm flex gap-3 items-start relative overflow-hidden">
+      <div className="bg-secondary/10 rounded-[2rem] p-5 border-2 border-secondary/20 shadow-sm flex gap-3 items-start relative overflow-hidden">
         <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-bl-full pointer-events-none" />
-        <div className="w-10 h-10 rounded-full bg-[#1CB0F6] flex items-center justify-center shrink-0 shadow-sm text-white font-bold text-sm">
+        <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0 shadow-sm text-white font-bold text-sm">
           <Lightbulb className="w-5 h-5 text-white fill-white/20" />
         </div>
         <div className="flex-1 pt-0.5">
@@ -223,7 +223,7 @@ export default function DebriefScreen({ empathyScore, safetyScore, xpEarned, ses
         {/* Primary Done */}
         <button
           onClick={onDone}
-          className="flex-1 bg-[#58CC02] text-white font-display font-black py-3.5 px-6 rounded-xl border-b-[4px] border-[#46A302] shadow-3d-primary hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all flex justify-center items-center gap-2 cursor-pointer"
+          className="flex-1 bg-primary text-white font-display font-black py-3.5 px-6 rounded-xl border-b-[4px] border-primary-dark shadow-3d-primary hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all flex justify-center items-center gap-2 cursor-pointer"
         >
           <span>Done</span>
           <CheckCircle className="w-5 h-5" />
@@ -232,7 +232,7 @@ export default function DebriefScreen({ empathyScore, safetyScore, xpEarned, ses
         {/* Secondary Retry */}
         <button
           onClick={onRetry}
-          className="flex-1 bg-[#1CB0F6] text-white font-display font-black py-3.5 px-6 rounded-xl border-b-[4px] border-[#1899D6] shadow-3d-secondary hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all flex justify-center items-center gap-2 cursor-pointer"
+          className="flex-1 bg-secondary text-white font-display font-black py-3.5 px-6 rounded-xl border-b-[4px] border-on-secondary-container shadow-3d-secondary hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all flex justify-center items-center gap-2 cursor-pointer"
         >
           <RotateCcw className="w-4.5 h-4.5" />
           <span>Retry Session</span>

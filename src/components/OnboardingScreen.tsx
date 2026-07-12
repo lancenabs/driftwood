@@ -41,7 +41,7 @@ export default function OnboardingScreen({ onStart }: OnboardingScreenProps) {
           </p>
           <button
             onClick={() => setStep('claim')}
-            className="w-full bg-[#1CB0F6] text-white font-display font-black py-3 px-6 rounded-xl border-b-[4px] border-[#1899D6] hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all duration-100 text-sm cursor-pointer"
+            className="w-full bg-secondary text-white font-display font-black py-3 px-6 rounded-xl border-b-[4px] border-on-secondary-container hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all duration-100 text-sm cursor-pointer"
           >
             Continue to the shore
           </button>
@@ -87,7 +87,7 @@ export default function OnboardingScreen({ onStart }: OnboardingScreenProps) {
               setActiveCastaway(claimSlotId);
               onStart();
             }}
-            className="w-full bg-[#58CC02] text-white font-display font-black py-3 px-6 rounded-xl border-b-[4px] border-[#46A302] hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all duration-100 text-sm cursor-pointer"
+            className="w-full bg-primary text-white font-display font-black py-3 px-6 rounded-xl border-b-[4px] border-primary-dark hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all duration-100 text-sm cursor-pointer"
           >
             Make landfall
           </button>
@@ -100,8 +100,8 @@ export default function OnboardingScreen({ onStart }: OnboardingScreenProps) {
     <div className="flex flex-col items-center justify-between min-h-[550px] py-4 px-4 w-full max-w-md mx-auto text-on-background">
       {/* Brand Header */}
       <div className="text-center w-full mb-6 mt-2">
-        <div className="inline-flex items-center gap-2 bg-[#58CC02]/10 text-[#58CC02] px-4 py-1.5 rounded-full border border-[#58CC02]/20 mb-3 animate-bounce">
-          <Heart className="w-4 h-4 fill-[#58CC02]" />
+        <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/20 mb-3 animate-bounce">
+          <Heart className="w-4 h-4 fill-primary" />
           <span className="font-label-bold text-xs uppercase tracking-wider">Clinical Co-op Play</span>
         </div>
         <h1 className="font-display font-black text-4xl text-on-background tracking-tight">Driftwood</h1>
@@ -117,9 +117,10 @@ export default function OnboardingScreen({ onStart }: OnboardingScreenProps) {
           className="w-full aspect-[16/10] object-cover"
           onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
         <div className="px-6 py-4 flex flex-col items-center">
-          <p className="font-display font-black text-lg text-on-background text-center">Practice Safe Emotional Repair</p>
+          <p className="font-display font-black text-lg text-on-background text-center">Shipwrecked on the same shore</p>
           <p className="font-sans text-xs text-on-surface-variant text-center max-w-xs mt-1">
-            Learn, simulate, and resolve family tension in real-time, side-by-side or asynchronously.
+            A family survival island where nothing important works alone — the fire,
+            the shelter, the repairs all take two sets of hands. One small real thing a day.
           </p>
         </div>
       </div>
@@ -137,13 +138,13 @@ export default function OnboardingScreen({ onStart }: OnboardingScreenProps) {
         </p>
       </div>
 
-      {/* Duolingo style 3D button */}
+      {/* The one door in — wears the island's teal */}
       <div className="w-full mt-auto">
         <button
           onClick={() => setStep('private')}
-          className="w-full bg-[#1CB0F6] text-white font-display font-black py-3.5 px-6 rounded-xl border-b-[4px] border-[#1899D6] shadow-3d-secondary hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all duration-100 flex justify-center items-center gap-2 text-base cursor-pointer"
+          className="w-full bg-primary text-white font-display font-black py-3.5 px-6 rounded-xl border-b-[4px] border-primary-dark shadow-3d-primary hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all duration-100 flex justify-center items-center gap-2 text-base cursor-pointer"
         >
-          <span>Start Practicing</span>
+          <span>Begin the boarding</span>
           <ArrowRight className="w-5 h-5" />
         </button>
       </div>

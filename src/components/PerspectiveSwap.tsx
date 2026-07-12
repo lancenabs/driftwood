@@ -204,7 +204,7 @@ export default function PerspectiveSwap() {
               else finishSwap();
             }}
             disabled={!note.trim()}
-            className={`w-full py-2.5 font-display font-black rounded-xl text-xs ${note.trim() ? 'bg-[#58CC02] text-white border-b-[3px] border-[#46A302] cursor-pointer' : 'bg-slate-100 text-slate-300'}`}
+            className={`w-full py-2.5 font-display font-black rounded-xl text-xs ${note.trim() ? 'bg-primary text-white border-b-[3px] border-primary-dark cursor-pointer' : 'bg-slate-100 text-slate-300'}`}
           >
             {debriefIdx < DEBRIEF_PROMPTS.length - 1 ? 'Next' : 'Close the swap'}
           </button>

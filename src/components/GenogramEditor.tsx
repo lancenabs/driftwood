@@ -382,7 +382,7 @@ export default function GenogramEditor({ onBack }: GenogramEditorProps) {
 
             // Highlighting based on status
             const borderStyle = isSelected 
-              ? 'border-4 border-[#1CB0F6] scale-110 shadow-lg z-20' 
+              ? 'border-4 border-secondary scale-110 shadow-lg z-20' 
               : node.isIndexPatient 
                 ? 'border-3 border-amber-500 shadow-md' 
                 : 'border-2 border-slate-700 hover:scale-105';
