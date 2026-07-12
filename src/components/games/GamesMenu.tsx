@@ -106,21 +106,21 @@ const GAMES: GameDef[] = [
   //   the Ridgepole Vote, Naming the Undertow, … each a file + a line here.
 ];
 
-export default function GamesMenu({ onClose }: { onClose: () => void }) {
+export default function GamesMenu({ onClose, embedded = false }: { onClose: () => void; embedded?: boolean }) {
   const [active, setActive] = useState<GameDef | null>(null);
   if (active) return <>{active.render(() => setActive(null))}</>;
 
   return (
-    <div className="fixed inset-0 z-[65] flex flex-col" style={{ background: 'linear-gradient(#1E2A44, #33415E)' }}>
+    <div className={embedded ? 'h-full flex flex-col rounded-t-2xl overflow-hidden' : 'fixed inset-0 z-[65] flex flex-col'} style={{ background: 'linear-gradient(#1E2A44, #33415E)' }}>
       <div className="flex items-center gap-2 px-3 py-2.5 bg-black/25">
         <span className="text-lg">🏕️</span>
         <div className="flex-1">
           <p className="text-[12px] font-black text-white">Campfire Games</p>
           <p className="text-[8px] text-white/70">play together · warm the family · beat the cold, never each other</p>
         </div>
-        <button onClick={onClose} className="text-[10px] font-black uppercase rounded-full px-3 py-1.5 bg-white/85 text-slate-700">back</button>
+        {!embedded && <button onClick={onClose} className="text-[10px] font-black uppercase rounded-full px-3 py-1.5 bg-white/85 text-slate-700">back</button>}
       </div>
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 max-w-md mx-auto w-full">
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 max-w-md lg:max-w-2xl mx-auto w-full">
         {GAMES.map(g => (
           <button key={g.id} data-testid={`game-${g.id}`} onClick={() => setActive(g)}
             className="text-left bg-white/95 rounded-2xl p-4 shadow-lg hover:brightness-105 active:scale-[0.99] transition-all flex items-center gap-3">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, Moon, Sun, Settings, Home, PlusCircle, Anchor, BarChart2 } from 'lucide-react';
+import { Heart, Moon, Sun, Settings, Home, PlusCircle, Anchor, BarChart2, Flame } from 'lucide-react';
 import OnboardingScreen from './components/OnboardingScreen';
 import HomeScreen from './components/HomeScreen';
 import MicroLessonScreen from './components/MicroLessonScreen';
@@ -24,6 +24,7 @@ import PerspectiveSwap from './components/PerspectiveSwap';
 import { TOOL_COMPLETION, readSaveSignature } from './lance/components/LANCEGame/challengeCompletion';
 import { appendEvent } from './lib/world';
 import { activeCastaway } from './lib/castaways';
+import GamesMenu from './components/games/GamesMenu';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE DRIFTWOOD SHELL — the LANCE bones, whole (the house framework):
@@ -34,7 +35,7 @@ import { activeCastaway } from './lib/castaways';
 //  the app is the app.
 // ═════════════════════════════════════════════════════════════════════════════
 
-type Tab = 'driftwood' | 'checkin' | 'library' | 'insights';
+type Tab = 'driftwood' | 'checkin' | 'campfire' | 'library' | 'insights';
 
 export default function App() {
   return (
@@ -110,9 +111,17 @@ function DriftwoodShell() {
   const NAV: { id: Tab; icon: typeof Home; label: string }[] = [
     { id: 'driftwood', icon: Home,       label: 'Driftwood' },
     { id: 'checkin',   icon: PlusCircle, label: 'Check-in' },
+    { id: 'campfire',  icon: Flame,      label: 'Campfire' },
     { id: 'library',   icon: Anchor,     label: 'Library' },
     { id: 'insights',  icon: BarChart2,  label: 'Insights' },
   ];
+
+  // anything in the app can walk you to the fire (banners, the island's door)
+  React.useEffect(() => {
+    const toFire = () => setActiveTab('campfire');
+    window.addEventListener('driftwood:open-campfire', toFire);
+    return () => window.removeEventListener('driftwood:open-campfire', toFire);
+  }, []);
 
   return (
     <div className={`h-screen font-sans text-on-background flex flex-col overflow-hidden transition-colors duration-300 ${isCalmMode ? 'theme-calm bg-surface-container' : 'bg-slate-50'}`}>
@@ -189,6 +198,11 @@ function DriftwoodShell() {
         {activeTab === 'checkin' && (
           <div className="absolute inset-0 overflow-y-auto">
             <CheckInTab onOpenTool={openTool} />
+          </div>
+        )}
+        {activeTab === 'campfire' && (
+          <div className="absolute inset-0">
+            <GamesMenu embedded onClose={() => setActiveTab('driftwood')} />
           </div>
         )}
         {activeTab === 'library' && (

@@ -5,8 +5,10 @@
   --font-display: "Montserrat", sans-serif;
   --font-sans: "Inter", sans-serif;
   
-  --color-primary: #58CC02;
-  --color-primary-dark: #46A302;
+  /* the lighthouse teal — Driftwood's own colors (the LANCE green stays
+     ashore with LANCE; this island is sea-glass and driftwood) */
+  --color-primary: #0E7C7C;
+  --color-primary-dark: #0A5F5F;
   --color-secondary: #1CB0F6;
   --color-secondary-container: #CE9FFC;
   --color-on-secondary-container: #1899D6;

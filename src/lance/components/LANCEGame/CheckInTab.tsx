@@ -18,7 +18,7 @@ const BodyScan        = React.lazy(() => import('./tools/BodyScan'));
 function ToolLoader() {
   return (
     <div className="h-full flex items-center justify-center bg-white">
-      <div className="w-7 h-7 rounded-full border-2 animate-spin" style={{ borderColor: '#e5e7eb', borderTopColor: '#58CC02' }} />
+      <div className="w-7 h-7 rounded-full border-2 animate-spin" style={{ borderColor: '#e5e7eb', borderTopColor: '#0E7C7C' }} />
     </div>
   );
 }
@@ -210,7 +210,7 @@ export default function CheckInTab({ onOpenTool }: Props) {
         </div>
       </div>
 
-      <div className="px-5 pt-5 pb-28 space-y-6">
+      <div className="px-5 pt-5 pb-28 space-y-6 max-w-2xl mx-auto w-full">
 
         {/* ── LANCE Speech Bubble ── */}
         <motion.div
@@ -224,7 +224,7 @@ export default function CheckInTab({ onOpenTool }: Props) {
           <div className="flex-1">
             <div
               className="text-[9px] font-black uppercase tracking-widest mb-1 flex items-center justify-between"
-              style={{ color: '#1CB0F688' }}
+              style={{ color: '#0E7C7C88' }}
             >
               <span>{NARRATOR.name}</span>
               {!aiLoading && (
@@ -240,9 +240,9 @@ export default function CheckInTab({ onOpenTool }: Props) {
             <div
               className="px-4 py-3 rounded-2xl rounded-tl-sm text-xs font-medium leading-relaxed"
               style={{
-                background: '#EFF9FF',
-                border: '1px solid rgba(28,176,246,0.25)',
-                color: aiLoading ? '#93C5FD' : '#1E3A5F',
+                background: '#EAF7F6',
+                border: '1px solid rgba(14,124,124,0.25)',
+                color: aiLoading ? '#7FC8C4' : '#0E4F4F',
               }}
             >
               {aiLoading
@@ -263,8 +263,8 @@ export default function CheckInTab({ onOpenTool }: Props) {
           onClick={() => setActiveTool('checkin')}
           className="w-full text-left rounded-3xl overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, #58CC02 0%, #1CB0F6 100%)',
-            boxShadow: '0 6px 24px rgba(88,204,2,0.25)',
+            background: 'linear-gradient(135deg, #3ECFCF 0%, #0E7C7C 100%)',
+            boxShadow: '0 6px 24px rgba(14,124,124,0.28)',
           }}
         >
           <div className="px-6 py-5">
@@ -302,8 +302,8 @@ export default function CheckInTab({ onOpenTool }: Props) {
             onClick={() => window.dispatchEvent(new CustomEvent('driftwood:go-home'))}
             className="w-full text-left rounded-3xl overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, #FF9600 0%, #00CD9C 100%)',
-              boxShadow: '0 4px 18px rgba(255,150,0,0.25)',
+              background: 'linear-gradient(100deg, #F59E0B 0%, #F2683A 100%)',
+              boxShadow: '0 4px 18px rgba(242,104,58,0.3)',
             }}
           >
             <div className="px-5 py-4 flex items-center gap-4">
@@ -334,6 +334,24 @@ export default function CheckInTab({ onOpenTool }: Props) {
             </div>
           </motion.button>
         )}
+
+        {/* ── Campfire pointer — the games live one tab over ── */}
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.14 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => window.dispatchEvent(new CustomEvent('driftwood:open-campfire'))}
+          data-testid="checkin-campfire"
+          className="w-full text-left rounded-2xl bg-white border-2 border-outline-variant/50 hover:border-amber-400/60 transition-colors px-5 py-3.5 flex items-center gap-3 shadow-sm"
+        >
+          <span className="text-2xl shrink-0">🏕️</span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-[13px] font-black text-slate-800">Campfire Games</span>
+            <span className="block text-[11px] text-slate-500">twenty ways to warm the family — one round tonight counts</span>
+          </span>
+          <span className="text-amber-500 text-lg shrink-0">→</span>
+        </motion.button>
 
         {/* ── Intern banter ── */}
         {intern?.name && (
@@ -386,16 +404,15 @@ export default function CheckInTab({ onOpenTool }: Props) {
                   key={tool.id}
                   whileTap={{ scale: 0.93 }}
                   onClick={() => setActiveTool(tool.id as ActivTool)}
-                  className="flex flex-col items-center gap-2 p-4 rounded-3xl text-center"
-                  style={{ background: tool.bg }}
+                  className="flex flex-col items-center gap-2 p-4 rounded-2xl text-center bg-white border-2 border-outline-variant/50 hover:border-primary/40 transition-colors shadow-sm"
                 >
                   <div
                     className="w-11 h-11 rounded-2xl flex items-center justify-center"
-                    style={{ background: `${tool.color}22` }}
+                    style={{ background: tool.bg }}
                   >
                     <Icon className="w-5 h-5" style={{ color: tool.color }} />
                   </div>
-                  <span className="text-[11px] font-bold leading-tight" style={{ color: tool.color }}>
+                  <span className="text-[11px] font-bold leading-tight text-slate-600">
                     {tool.label}
                   </span>
                 </motion.button>
