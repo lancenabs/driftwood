@@ -151,7 +151,13 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-[#3ECFCF] to-[#7FD98C] text-white font-black text-sm cursor-pointer hover:brightness-105 active:brightness-95 transition-all border-t-2 border-outline-variant">
         <span className="text-lg">🏝</span>
         <span className="uppercase tracking-wide">Enter the Island</span>
-        <span className="text-[10px] font-bold opacity-90 normal-case">· walk it in 3D, meet the wood robots</span>
+        <span className="text-[10px] font-bold opacity-90 normal-case">· build, hop, explore — meet the wood robots</span>
+        {(() => { // the shell run rides the door — the family's treasure count
+          try {
+            const n = Object.keys(JSON.parse(localStorage.getItem('driftwood_shells_v1') || '{}')).length;
+            return n > 0 ? <span data-testid="shell-count" className="text-[10px] font-black bg-white/25 rounded-full px-2 py-0.5">🐚 {n}/40</span> : null;
+          } catch { return null; }
+        })()}
       </button>
 
       {/* 🏕️ CAMPFIRE GAMES — the reconnection mini-games. Build a shared fire by

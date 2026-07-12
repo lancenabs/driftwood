@@ -10,7 +10,7 @@ await page.waitForTimeout(4000);
 // open build → flag painter
 await page.click('#buildBtn');
 await page.waitForTimeout(200);
-await page.evaluate(() => { const b = document.querySelectorAll('#palette button'); b[b.length - 1].click(); });
+await page.evaluate(() => { [...document.querySelectorAll('#palette button')].find(b => b.textContent === '\ud83d\udea9').click(); });
 await page.waitForTimeout(300);
 // draw a stroke on the flag canvas
 const box = await page.locator('#flagCanvas').boundingBox();

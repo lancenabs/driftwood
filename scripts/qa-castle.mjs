@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+const errs = [];
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 900, height: 620 } });
+page.on('pageerror', e => errs.push(String(e)));
+await page.goto('http://localhost:3300/island3d/index.html', { waitUntil: 'networkidle' });
+await page.waitForTimeout(4000);
+await page.click('#buildBtn');
+await page.waitForTimeout(200);
+await page.evaluate(() => { [...document.querySelectorAll('#palette button')].find(b => b.textContent === '🏰').click(); });
+await page.waitForTimeout(400);
+const stamps = await page.evaluate(() => JSON.parse(localStorage.getItem('driftwood_stamps_v1') || '[]').length);
+console.log('castle stamp:', stamps === 1 ? '✓ stamped + persisted' : `✗ ${stamps}`);
+await page.screenshot({ path: '/tmp/castle.png' });
+console.log('errors:', errs.length ? errs.join(' | ') : 'none');
+await browser.close();

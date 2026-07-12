@@ -18,7 +18,7 @@ const placed = await page.evaluate(() => Object.keys(JSON.parse(localStorage.get
 console.log('placed:', placed >= 2 ? `✓ ${placed} blocks persisted` : `✗ only ${placed}`);
 await page.screenshot({ path: '/tmp/builder-placed.png' });
 // break one: toggle pick (last palette button), tap a block
-await page.evaluate(() => { const b = document.querySelectorAll('#palette button'); b[b.length - 1].click(); });
+await page.evaluate(() => { [...document.querySelectorAll('#palette button')].find(b => b.textContent === '\u26cf').click(); });
 await page.waitForTimeout(200);
 await page.mouse.click(450, 400);
 await page.waitForTimeout(300);

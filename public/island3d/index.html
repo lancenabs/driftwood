@@ -54,7 +54,7 @@
 <!-- THE BUILDER'S PALETTE — tap a material, tap the world; ⛏ breaks -->
 <div id="palette" style="display:none;position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:46;background:rgba(255,255,255,0.94);border-radius:20px;padding:8px 10px;box-shadow:0 4px 16px rgba(0,0,0,0.2);gap:6px;align-items:center"></div>
 <button id="jump" style="display:none;position:fixed;right:20px;bottom:150px;z-index:46;width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,0.6);background:rgba(255,255,255,0.35);font-size:24px;backdrop-filter:blur(2px)">⤴️</button>
-<div id="hint">drag to look · stick or WASD to walk · visit the wood robots</div>
+<div id="hint">drag to look · stick or WASD to walk · ⤴️ hop · 🔨 build anything · find the 40 shells</div>
 <div id="say"><b id="sayName"></b><span id="sayLine"></span></div>
 <div id="stick"><div id="nub"></div></div>
 <div id="fit">
@@ -162,9 +162,10 @@ terrainMat.onBeforeCompile = (shader) => {
 const terrain = new THREE.Mesh(terrainGeo, terrainMat);
 scene.add(terrain);
 
-// living water — a low-poly plane with gentle vertex swell (animated in the loop)
+// living water — Lance's real turquoise, drifting slowly, with vertex swell
 const waterGeo = new THREE.PlaneGeometry(900, 900, 48, 48);
-const water = new THREE.Mesh(waterGeo, new THREE.MeshLambertMaterial({ color: 0x3D98AC, transparent: true, opacity: 0.78 }));
+const texWater = tile('/island3d/tex/water.jpg', 26);
+const water = new THREE.Mesh(waterGeo, new THREE.MeshLambertMaterial({ map: texWater, transparent: true, opacity: 0.86 }));
 water.rotation.x = -Math.PI / 2; water.position.y = SEA_Y;
 scene.add(water);
 const waterBase = Float32Array.from(waterGeo.attributes.position.array);
@@ -186,17 +187,24 @@ scene.add(sky);
 // edge lands AT the dome's horizon (v=0.5), clamping below it; mirrored wrap
 // hides the 360° seam.
 const hourNow = new Date().getHours();
-const isDay = hourNow >= 7 && hourNow < 16;
-texLoader.load(isDay ? '/island3d/tex/sky-day.jpg' : '/island3d/tex/sky-sunset.jpg', t => {
+const skyPhase = (hourNow >= 7 && hourNow < 16) ? 'day' : (hourNow >= 16 && hourNow < 21) ? 'sunset' : 'night';
+const SKY_TEX = { day: '/island3d/tex/sky-day.jpg', sunset: '/island3d/tex/sky-sunset.jpg', night: '/island3d/tex/sky-night.jpg' };
+texLoader.load(SKY_TEX[skyPhase], t => {
   t.wrapS = THREE.MirroredRepeatWrapping; t.wrapT = THREE.ClampToEdgeWrapping;
   t.repeat.set(2, 2); t.offset.y = -1;
   // fog:false — the dome sits far past fog-far and would flatten to fog color
   sky.material = new THREE.MeshBasicMaterial({ map: t, side: THREE.BackSide, depthWrite: false, fog: false });
-  if (!isDay) {
+  if (skyPhase === 'sunset') {
     // golden-hour weather to match the sunset photograph
     scene.fog.color.set(0xEBD9C6);
     scene.background = new THREE.Color(0xF2DFC9);
     sun.color.set(0xFFD9A0);
+  } else if (skyPhase === 'night') {
+    // Lance's stars over a moonlit island: the fire becomes the hearth light
+    scene.fog.color.set(0x1A2430);
+    scene.background = new THREE.Color(0x141C28);
+    sun.color.set(0x9FB6D8); sun.intensity = 0.35;
+    fireBoost = 0.8; fireLight.distance += 6;
   }
 });
 
@@ -242,8 +250,11 @@ function instancedScatter(geo, material, spots, place) {
   return m;
 }
 // palm trunks + fronds (beach ring + scattered inland): two instanced meshes
+// — trunks wear Lance's real bark now
+const texBark = tile('/island3d/tex/bark.jpg', 1);
+const barkMat = new THREE.MeshLambertMaterial({ map: texBark });
 const palmSpots = scatterOn(90, h => h > 0.6 && h < 7);
-instancedScatter(new THREE.CylinderGeometry(0.16, 0.34, 7, 6), mat(0xA5805A), palmSpots, (d, s) => {
+instancedScatter(new THREE.CylinderGeometry(0.16, 0.34, 7, 6), barkMat, palmSpots, (d, s) => {
   d.position.set(s.x, s.h + 3.2, s.z);
   d.rotation.set(0, rand() * Math.PI * 2, (rand() - 0.5) * 0.3);
   d.scale.setScalar(0.8 + rand() * 0.5);
@@ -257,7 +268,7 @@ instancedScatter(new THREE.ConeGeometry(0.55, 3.6, 4), mat(0x3B8456), frondSpots
 });
 // jungle canopy trees (the deep interior): trunk + two-tone leaf blobs
 const treeSpots = scatterOn(160, h => h > 3.5 && h < 13);
-instancedScatter(new THREE.CylinderGeometry(0.3, 0.5, 5, 6), mat(0x7A5C3A), treeSpots, (d, s) => {
+instancedScatter(new THREE.CylinderGeometry(0.3, 0.5, 5, 6), barkMat, treeSpots, (d, s) => {
   d.position.set(s.x, s.h + 2.2, s.z);
   d.scale.setScalar(0.8 + rand() * 0.8);
 });
@@ -296,8 +307,8 @@ for (const b of ['bush1', 'bush2', 'bush3']) {
     d.scale.setScalar(0.7 + rand() * 0.9);
   });
 }
-// driftwood logs along the tide line
-instancedScatter(new THREE.CylinderGeometry(0.3, 0.4, 4.6, 7), mat(0xC9B08C), scatterOn(40, h => h > 0.5 && h < 1.6), (d, s) => {
+// driftwood logs along the tide line — wearing Lance's real driftwood grain
+instancedScatter(new THREE.CylinderGeometry(0.3, 0.4, 4.6, 7), new THREE.MeshLambertMaterial({ map: tile('/island3d/tex/grain.jpg', 1) }), scatterOn(40, h => h > 0.5 && h < 1.6), (d, s) => {
   d.position.set(s.x, s.h + 0.3, s.z);
   d.rotation.set(0, rand() * Math.PI, Math.PI / 2);
 });
@@ -324,6 +335,7 @@ const flameScale = 1 + warmth * 0.055;                 // the week grows the fla
 const flame = new THREE.Mesh(new THREE.ConeGeometry(0.34, 1.1, 7), new THREE.MeshBasicMaterial({ color: 0xFFA64D }));
 flame.position.y = 0.9;
 fire.add(flame);
+let fireBoost = 0; // night raises the hearth (set by the sky loader)
 const fireLight = new THREE.PointLight(0xFFA64D, 1.1 + warmth * 0.05, 12 + warmth * 0.8);
 fireLight.position.y = 1.4;
 fire.add(fireLight);
@@ -563,7 +575,7 @@ function swapPlayer(kind) {
 const BUILD_TYPES = [
   { id: 'planks', label: '🪵', tex: '/island3d/tex/planks.jpg' },
   { id: 'stone',  label: '🪨', tex: '/island3d/tex/path-stone.jpg' },
-  { id: 'sand',   label: '🏰', tex: '/island3d/tex/sand.jpg' },
+  { id: 'sand',   label: '🏖', tex: '/island3d/tex/sand.jpg' },
   { id: 'moss',   label: '🍀', tex: '/island3d/tex/moss.jpg' },
   { id: 'leaf',   label: '🌿', color: 0x3F8A56 },
 ];
@@ -600,9 +612,34 @@ function saveLocalBuild() {
 function setBlock(k, t, fromRemote) {
   if (t) blocks.set(k, t); else blocks.delete(k);
   rebuildBlocks(); saveLocalBuild();
+  if (t) cheerTallBuilds(k);
   if (!fromRemote && campCode) fetch(`/api/gathering/${campCode}/build`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ k, t: t ?? null }),
   }).catch(() => {});
+}
+// the build challenges — the island cheers real feats (once per feat per day)
+const FEATS = [
+  { at: 5,  line: '🏗 A LOOKOUT! Five high — race someone to the top for the view.' },
+  { at: 8,  line: '🗼 EIGHT HIGH?! The Jumble are telling stories about this tower already.' },
+  { at: 12, line: '🌋 TWELVE! You can see the whole island from up there. Legendary.' },
+];
+function cheerTallBuilds(k) {
+  const [kx, , kz] = k.split('|').map(Number);
+  let h = 0; for (let i = 0; i <= 30; i++) if (blocks.has(`${kx}|${i}|${kz}`)) h = i + 1;
+  const feat = FEATS.filter(f => f.at <= h).pop();
+  if (!feat) return;
+  const day = new Date().toISOString().slice(0, 10);
+  try {
+    const seen = JSON.parse(localStorage.getItem('driftwood_feats_v1') || '{}');
+    if (seen[feat.at] === day) return;
+    seen[feat.at] = day;
+    localStorage.setItem('driftwood_feats_v1', JSON.stringify(seen));
+  } catch { /* cheer anyway */ }
+  document.getElementById('sayName').textContent = 'the island';
+  document.getElementById('sayLine').textContent = feat.line;
+  say.style.display = 'block';
+  clearTimeout(say._t);
+  say._t = setTimeout(() => { say.style.display = 'none'; }, 5000);
 }
 rebuildBlocks();
 // the tallest solid under a walker's feet (terrain or the family's blocks) —
@@ -629,6 +666,9 @@ function renderPalette() {
   for (const t of BUILD_TYPES) paletteEl.appendChild(swBtn(t.label, build.type === t.id && !build.breaking, () => { build.type = t.id; build.breaking = false; renderPalette(); }));
   paletteEl.appendChild(swBtn('⛏', build.breaking, () => { build.breaking = !build.breaking; renderPalette(); }));
   paletteEl.appendChild(swBtn('🚩', false, () => { document.getElementById('painter').style.display = 'flex'; }));
+  paletteEl.appendChild(swBtn('🏰', false, () => {
+    raiseCastle(player.position.x + Math.sin(player.rotation.y) * 3.2, player.position.z + Math.cos(player.rotation.y) * 3.2);
+  }));
 }
 buildBtn.onclick = () => {
   build.on = !build.on;
@@ -641,6 +681,45 @@ let vy = 0, onGround = true, wantJump = false;
 addEventListener('keydown', e => { if (e.code === 'Space') wantJump = true; });
 jumpBtn.style.display = 'block';
 jumpBtn.addEventListener('pointerdown', () => { wantJump = true; });
+
+// ── THE SANDCASTLE STAMP — one tap, a castle (for the littlest builders) ────
+// Not everyone starts block by block. The 🏰 stamp drops a whole sandcastle
+// where you stand — keep, towers, cones — wearing Lance's sand. Same stamp
+// channel as the flags: the family sees it rise on every phone.
+function raiseCastle(x, z, fromRemote) {
+  const g = new THREE.Group();
+  const sandM = new THREE.MeshLambertMaterial({ map: tile('/island3d/tex/sand.jpg', 2) });
+  const keep = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.3, 1.6, 8), sandM);
+  keep.position.y = 0.8;
+  g.add(keep);
+  const kc = new THREE.Mesh(new THREE.ConeGeometry(1.25, 0.8, 8), sandM);
+  kc.position.y = 2.0;
+  g.add(kc);
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+    const tx = Math.cos(a) * 1.7, tz = Math.sin(a) * 1.7;
+    const tower = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.46, 1.2, 7), sandM);
+    tower.position.set(tx, 0.6, tz);
+    g.add(tower);
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.48, 0.55, 7), sandM);
+    cone.position.set(tx, 1.45, tz);
+    g.add(cone);
+  }
+  g.position.set(x, groundY(x, z), z);
+  scene.add(g);
+  if (!fromRemote) {
+    try {
+      const s = JSON.parse(localStorage.getItem('driftwood_stamps_v1') || '[]');
+      s.push({ type: 'castle', x, z });
+      localStorage.setItem('driftwood_stamps_v1', JSON.stringify(s.slice(-30)));
+    } catch { /* it stands in the scene */ }
+    if (campCode) fetch(`/api/gathering/${campCode}/build`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stamp: { type: 'castle', x, z, by: me.id } }),
+    }).catch(() => {});
+  }
+}
+try { for (const s of JSON.parse(localStorage.getItem('driftwood_stamps_v1') || '[]')) if (s.type === 'castle') raiseCastle(s.x, s.z, true); } catch { /* clear beach */ }
 
 // ── THE FLAG PAINTER — draw your family's colors, hoist them on the island ──
 // A kid draws a flag with a finger; it flies from a real flagpole at the spot
@@ -775,6 +854,10 @@ const JUMBLE = [
   { id: 'echo2', name: 'Echo-2', x: 12, z: -38, lines: ['You said— you SAID— something kind. I am keeping it.', 'Say the important ones twice.'] },
   { id: 'bailer', name: 'Bailer', x: 84, z: 38, lines: ['The boat is dry! I am keeping it that way.', 'Worry is water. I have a bucket. We will be fine.'] },
   { id: 'collier', name: 'the Collier', x: -40, z: -55, lines: ['Sit, sit. The forge remembers every mended thing.', 'The seam shows, little one. That is how you know it held.'] },
+  // the crate of 2026-07-11 night — Lance kept building the crew
+  { id: 'barnacle', name: 'Barnacle', x: 58, z: -18, lines: ['My feet were buoys! They kept a whole net afloat once. Now they keep ME afloat. Mostly.', 'The propeller? Decorative. The optimism? Structural.'] },
+  { id: 'teapot', name: 'Kettle', x: -62, z: 52, lines: ['I was a teapot in my first life. I still believe most storms end in something warm.', 'Sit. Steam rises, tempers settle. That is just physics.'] },
+  { id: 'wright', name: 'the Wright', x: 10, z: 70, lines: ['You BUILT that? Show me the corners. Corners are where the honesty lives.', 'Every fort starts as one brave block. Lay the next one.'] },
 ];
 const loader = new THREE.TextureLoader();
 const robots = [];
@@ -783,7 +866,21 @@ for (const r of JUMBLE) {
   const post = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 0.8, 6), mat(0xA5805A));
   post.position.y = 0.4;
   g.add(post);
-  loader.load(`/robots/${r.id}.webp`, tex => {
+  // THE JUMBLE STAND UP — Lance's full-body turnaround cutouts as billboard
+  // standees (transparent, ground-planted, camera-facing). The old portrait
+  // card is the honest fallback; both fall back to the bare post.
+  loader.load(`/island3d/robots3d/${r.id}.png`, tex => {
+    const h = r.id === 'collier' ? 2.5 : r.id === 'skip' ? 1.35 : 1.9;
+    const w = h * (tex.image.width / tex.image.height);
+    const card = new THREE.Mesh(
+      new THREE.PlaneGeometry(w, h),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.35 }),
+    );
+    card.position.y = h / 2 + 0.02;
+    post.visible = false;                  // real feet — the post stands down
+    g.add(card);
+    g.userData.card = card;
+  }, undefined, () => loader.load(`/robots/${r.id}.webp`, tex => {
     const size = r.id === 'collier' ? 2.0 : 1.55;
     const card = new THREE.Mesh(
       new THREE.PlaneGeometry(size, size),
@@ -792,7 +889,7 @@ for (const r of JUMBLE) {
     card.position.y = 0.8 + size / 2;
     g.add(card);
     g.userData.card = card;
-  }, undefined, () => { /* portrait missing → the post stands honest */ });
+  }, undefined, () => { /* both missing → the post stands honest */ }));
   g.add(nameTag(r.name, '#B8860B'));
   g.userData.tagY = r.id === 'collier' ? 3.1 : 2.7;
   g.children[g.children.length - 1].position.y = g.userData.tagY;
@@ -917,12 +1014,22 @@ if (campCode) {
   // the camp's build is the truth when gathered — pull it, then live-merge
   fetch(`/api/gathering/${campCode}/build`).then(r => r.json()).then(b => {
     if (b?.blocks) { for (const [k, t] of Object.entries(b.blocks)) blocks.set(k, t); rebuildBlocks(); }
-    if (b?.stamps) for (const s of b.stamps) if (s.type === 'flag' && s.png && s.by !== me.id) raiseFlag(s.png, s.x, s.z, true);
+    if (b?.stamps) for (const s of b.stamps) {
+      if (s.by === me.id) continue;
+      if (s.type === 'flag' && s.png) raiseFlag(s.png, s.x, s.z, true);
+      else if (s.type === 'castle') raiseCastle(s.x, s.z, true);
+    }
   }).catch(() => {});
   es.onmessage = ev => {
     let msg; try { msg = JSON.parse(ev.data); } catch { return; }
     if (msg.kind === 'block') return setBlock(msg.k, msg.t, true);
-    if (msg.kind === 'stamp') { const s = msg.stamp; if (s?.type === 'flag' && s.png && s.by !== me.id) raiseFlag(s.png, s.x, s.z, true); return; }
+    if (msg.kind === 'stamp') {
+      const s = msg.stamp;
+      if (!s || s.by === me.id) return;
+      if (s.type === 'flag' && s.png) raiseFlag(s.png, s.x, s.z, true);
+      else if (s.type === 'castle') raiseCastle(s.x, s.z, true);
+      return;
+    }
     if (msg.kind !== 'pos' || msg.pos.actor === me.id) return;
     const p = msg.pos;
     let o = others.get(p.actor);
@@ -1048,6 +1155,9 @@ renderer.setAnimationLoop(() => {
     if (near && (r.userData.lastNear ?? 0) < Date.now() - 16000) { r.userData.lastNear = Date.now(); speak(r); }
   }
 
+  // the sea drifts (Lance's water slides slowly under the swell)
+  texWater.offset.x = t * 0.004; texWater.offset.y = t * 0.0025;
+
   // living water — gentle vertex swell
   const wp = waterGeo.attributes.position;
   for (let i = 0; i < wp.count; i++) {
@@ -1061,7 +1171,7 @@ renderer.setAnimationLoop(() => {
 
   // fire flicker (around the warmth the week earned)
   flame.scale.setScalar(flameScale * (1 + Math.sin(t * 8) * 0.1));
-  fireLight.intensity = (1.0 + warmth * 0.05) + Math.sin(t * 7.3) * 0.15;
+  fireLight.intensity = (1.0 + warmth * 0.05 + fireBoost) + Math.sin(t * 7.3) * 0.15;
 
   // gather round: near the fire → the games prompt rises
   const wasNear = nearFire;

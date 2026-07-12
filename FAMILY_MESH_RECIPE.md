@@ -58,3 +58,22 @@ fallback for the rest until they get turnarounds.
 
 *Then tell Claude "the family is in" — a verification walk + commit follows,
 and the Seven's slot-claiming maps each family member to their real mesh.*
+
+## 🤖 THE JUMBLE TURNAROUNDS (2026-07-11 night — Lance delivered ALL the robots)
+Staged at `~/Downloads/driftwood-robot-sheets/`, transparent 3-view sheets
+(CapCut), ready for the same multi_image_to_3d cast (~38cr each, NO walk clip —
+cast rigged with an IDLE/breathing motion if offered, else unrigged; the island
+poses them as standing characters):
+
+| Robot | Sheet | Cast target |
+|---|---|---|
+| the Collier (tree-robot, ember chest) | `collier-3view.png` | `public/island3d/robot-collier.glb` |
+| Skip (robot dog) | `skip-poses.png` (pose grid) | `robot-skip.glb` |
+| Hollow (plank shell, one peeking eye) | `hollow-3view.png` | `robot-hollow.glb` |
+| Bailer (barrel + bailing buckets) | `bailer-3view.png` | `robot-bailer.glb` |
+| Echo-2 (gramophone horn) | `echo2-3view.png` | `robot-echo2.glb` |
+| 🆕 Mom (transparent 3-view, better than sheet #1) | `mom-3view.png` | `family-mom.glb` (preferred input) |
+
+Split any 3-view into thirds for the 3 role:"image" inputs (the dad recipe).
+**Until cast, the island already shows them as full-body standees** —
+`public/island3d/robots3d/<id>.png`, cut from these sheets, live now.
