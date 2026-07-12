@@ -139,11 +139,13 @@ function DriftwoodShell() {
   // The flagship's five rooms (LANCE: Home · Library · Check In · Challenges ·
   // Insights). Campfire games stay one tap away (home card + the ⚡ tab's door)
   // — they are the milestones' instruments, so they live WITH the challenges.
+  // THE FLAGSHIP ORDER (Lance 2026-07-12, fleet law): Home · Library ·
+  // Check-in (the thumb's center) · Challenges · Insights.
   const NAV: { id: Tab; icon: typeof Home; label: string }[] = [
-    { id: 'driftwood',  icon: Home,       label: 'Driftwood' },
+    { id: 'driftwood',  icon: Home,       label: 'Home' },
+    { id: 'library',    icon: Anchor,     label: 'Library' },
     { id: 'checkin',    icon: PlusCircle, label: 'Check-in' },
     { id: 'challenges', icon: Zap,        label: 'Challenges' },
-    { id: 'library',    icon: Anchor,     label: 'Library' },
     { id: 'insights',   icon: BarChart2,  label: 'Insights' },
   ];
 

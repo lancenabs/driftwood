@@ -8,9 +8,17 @@
 //   · no shame: an unfinished milestone is simply unfinished
 // ═════════════════════════════════════════════════════════════════════════════
 
+// THE BRANCHING SPINE (ported from the Voyager's season engine, 2026-07-12):
+// `choice` beats let the family decide and the story remember (flags in
+// driftwood_story_choices_v1); `when` renders a beat only on a matching flag.
+// The full story rewrite (THE_DRIFTWOOD_STORY_BIBLE.md) builds on this.
+export interface BeatCondition { flag: string; is: string }
+
 export type Beat =
-  | { kind: 'narration'; text: string }
-  | { kind: 'robot'; who: 'skip' | 'hollow' | 'echo2' | 'bailer' | 'collier'; text: string };
+  | { kind: 'narration'; text: string; when?: BeatCondition }
+  | { kind: 'robot'; who: 'skip' | 'hollow' | 'echo2' | 'bailer' | 'collier'; text: string; when?: BeatCondition }
+  | { kind: 'choice'; id: string; prompt: string; when?: BeatCondition;
+      options: { id: string; label: string }[] };
 
 export interface Milestone {
   id: string;

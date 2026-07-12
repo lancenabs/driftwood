@@ -26,6 +26,15 @@ interface LogState {
 }
 const STATE_KEY = 'driftwood_milestone_log_v1';
 
+// THE BRANCHING SPINE — the story remembers the family's choices.
+const CHOICES_KEY = 'driftwood_story_choices_v1';
+function readStoryChoices(): Record<string, string> {
+  try { const r = JSON.parse(localStorage.getItem(CHOICES_KEY) || '{}'); return r && typeof r === 'object' ? r : {}; } catch { return {}; }
+}
+function writeStoryChoice(id: string, option: string) {
+  try { const all = readStoryChoices(); all[id] = option; localStorage.setItem(CHOICES_KEY, JSON.stringify(all)); } catch { /* best-effort */ }
+}
+
 function loadState(): LogState {
   try {
     const s = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
@@ -109,6 +118,12 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Every beat/phase change starts at the top (the Rehabit casebook lesson,
+  // 2026-07-12): taller beats must not inherit the previous scroll position.
+  React.useEffect(() => {
+    document.querySelector('.absolute.inset-0.overflow-y-auto')?.scrollTo({ top: 0 });
+  }, [phase, beatIdx]);
+
   const openMilestone = (m: Milestone) => {
     tideCreak();
     setActive(m); setBeatIdx(0); setConchConfirms([]);
@@ -178,14 +193,24 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
 
   // ── Beat renderer ──────────────────────────────────────────────────────────
   const Beats = ({ beats, onDone, doneLabel }: { beats: Beat[]; onDone: () => void; doneLabel: string }) => {
-    const visible = beats.slice(0, beatIdx + 1);
-    const atEnd = beatIdx >= beats.length - 1;
+    const [flags, setFlags] = React.useState(() => readStoryChoices());
+    const activeBeats = beats.filter(b => !b.when || flags[b.when.flag] === b.when.is);
+    const visible = activeBeats.slice(0, beatIdx + 1);
+    const atEnd = beatIdx >= activeBeats.length - 1;
+    const current = visible[visible.length - 1];
+    const pendingChoice = current?.kind === 'choice' && !flags[current.id] ? current : null;
     return (
       <div className="flex flex-col gap-2">
         {visible.map((b, i) => (
           <div key={i}>
             {b.kind === 'narration' && (
               <p className="font-serif italic text-[12px] leading-relaxed text-slate-600 px-1">{b.text}</p>
+            )}
+            {b.kind === 'choice' && flags[b.id] && (
+              <p className="text-[10.5px] text-teal-700 italic px-1 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                {b.options.find(o => o.id === flags[b.id])?.label}
+              </p>
             )}
             {b.kind === 'robot' && (
               <div className="p-2.5 bg-surface-container-lowest border-2 border-outline-variant rounded-2xl flex items-start gap-2">
@@ -198,12 +223,25 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
             )}
           </div>
         ))}
+        {pendingChoice ? (
+          <div className="flex flex-col gap-1.5">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-teal-700 text-center">{pendingChoice.prompt}</p>
+            {pendingChoice.options.map(opt => (
+              <button key={opt.id}
+                onClick={() => { writeStoryChoice(pendingChoice.id, opt.id); setFlags(readStoryChoices()); }}
+                className="w-full py-2.5 px-3 bg-white border-2 border-teal-600/40 hover:bg-teal-50 text-slate-700 font-bold rounded-2xl text-[12px] cursor-pointer transition-colors text-left">
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        ) : (
         <button
           onClick={() => (atEnd ? onDone() : setBeatIdx(beatIdx + 1))}
           className="w-full py-2.5 bg-primary text-white font-display font-black rounded-xl border-b-[3px] border-primary-dark text-xs cursor-pointer hover:brightness-105 active:translate-y-[1px] flex items-center justify-center gap-1"
         >
           {atEnd ? doneLabel : 'Continue'} <ChevronRight className="w-3.5 h-3.5" />
         </button>
+        )}
       </div>
     );
   };
