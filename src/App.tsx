@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Heart, Moon, Sun, Settings, Home, PlusCircle, Anchor, BarChart2, Flame } from 'lucide-react';
-import OnboardingScreen from './components/OnboardingScreen';
+import BoardingStory from './components/BoardingStory';
 import HomeScreen from './components/HomeScreen';
 import MicroLessonScreen from './components/MicroLessonScreen';
 import CharacterSelectScreen from './components/CharacterSelectScreen';
@@ -51,7 +51,11 @@ function DriftwoodShell() {
   const [boarded, setBoarded] = useState<boolean>(() => {
     try { return localStorage.getItem('driftwood_boarded_v1') === '1'; } catch { return false; }
   });
-  const [activeTab, setActiveTab] = useState<Tab>('driftwood');
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    // the boarding's choice: story mode lands on the shore (the milestone log
+    // lives there); check-in mode goes straight to the daily check-in
+    try { return localStorage.getItem('driftwood_mode') === 'checkin' ? 'checkin' : 'driftwood'; } catch { return 'driftwood'; }
+  });
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [isCalmMode, setIsCalmMode] = useState(false);
@@ -92,15 +96,26 @@ function DriftwoodShell() {
   const openTool = (toolId: string) =>
     window.dispatchEvent(new CustomEvent('driftwood:open-tool', { detail: { toolId } }));
 
+  // anything in the app can walk you to the fire (banners, the island's door).
+  // Registered BEFORE the boarding early-return — hooks must run in the same
+  // order on every render (finishing the boarding in-session broke this).
+  React.useEffect(() => {
+    const toFire = () => setActiveTab('campfire');
+    window.addEventListener('driftwood:open-campfire', toFire);
+    return () => window.removeEventListener('driftwood:open-campfire', toFire);
+  }, []);
+
   // THE BOARDING — full-screen until complete. The private DV page lives
-  // inside OnboardingScreen (traceless; only the fact of boarding is stored).
+  // inside BoardingStory (traceless; only the fact of boarding is stored).
   if (!boarded) {
     return (
       <div className={`min-h-screen font-sans text-on-background flex flex-col ${isCalmMode ? 'theme-calm bg-surface-container' : 'bg-slate-50'}`}>
         <CrisisStrip />
         <div className="flex-1 overflow-y-auto">
-          <OnboardingScreen onStart={() => {
+          <BoardingStory onStart={() => {
             try { localStorage.setItem('driftwood_boarded_v1', '1'); } catch { /* ignore */ }
+            // honor the choice made a moment ago (state initialized pre-boarding)
+            try { setActiveTab(localStorage.getItem('driftwood_mode') === 'checkin' ? 'checkin' : 'driftwood'); } catch { /* shore */ }
             setBoarded(true);
           }} />
         </div>
@@ -116,12 +131,6 @@ function DriftwoodShell() {
     { id: 'insights',  icon: BarChart2,  label: 'Insights' },
   ];
 
-  // anything in the app can walk you to the fire (banners, the island's door)
-  React.useEffect(() => {
-    const toFire = () => setActiveTab('campfire');
-    window.addEventListener('driftwood:open-campfire', toFire);
-    return () => window.removeEventListener('driftwood:open-campfire', toFire);
-  }, []);
 
   return (
     <div className={`h-screen font-sans text-on-background flex flex-col overflow-hidden transition-colors duration-300 ${isCalmMode ? 'theme-calm bg-surface-container' : 'bg-slate-50'}`}>

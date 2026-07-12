@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Users, VolumeX, Volume2, RotateCcw, Shield } from 'lucide-react';
+import { ArrowLeft, Users, VolumeX, Volume2, RotateCcw, Shield, Zap, Heart } from 'lucide-react';
 import { THE_SEVEN, readCrew, claimSlot, setActiveCastaway, activeCastaway } from '../lib/castaways';
 import { loadCartridge } from '../lib/cartridge';
 
@@ -99,6 +99,32 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
           multi-device Gatherings arrive with the bridge transport — this page will say so
           plainly when that is real.
         </p>
+      </section>
+
+      {/* THE MODE SWITCH — the boarding's promise, kept (the Bible's law) */}
+      <section className="bg-white rounded-[2rem] border-2 border-outline-variant p-4">
+        <h3 className="font-display font-black text-xs text-on-surface mb-2">How you begin each day</h3>
+        <div className="grid grid-cols-2 gap-2">
+          {([
+            { id: 'story', label: 'Story Mode', desc: 'the 31 milestones lead', icon: Zap, grad: 'linear-gradient(135deg,#F2683A,#D14545)' },
+            { id: 'checkin', label: 'Check-In Mode', desc: 'daily check-in leads', icon: Heart, grad: 'linear-gradient(135deg,#0E7C7C,#2E96B5)' },
+          ] as const).map(m => {
+            const current = (() => { try { return localStorage.getItem('driftwood_mode') === 'checkin' ? 'checkin' : 'story'; } catch { return 'story'; } })();
+            const active = current === m.id;
+            const Icon = m.icon;
+            return (
+              <button key={m.id}
+                onClick={() => { try { localStorage.setItem('driftwood_mode', m.id); } catch { /* session */ } force(x => x + 1); }}
+                className={`text-left rounded-2xl p-3 border-2 transition-all cursor-pointer ${active ? 'border-transparent text-white' : 'border-outline-variant bg-slate-50 text-slate-600'}`}
+                style={active ? { background: m.grad } : undefined}>
+                <Icon className={`w-4 h-4 mb-1 ${active ? 'text-white' : 'text-slate-400'}`} />
+                <p className="text-[11px] font-black leading-tight">{m.label}</p>
+                <p className={`text-[8.5px] mt-0.5 ${active ? 'text-white/80' : 'text-slate-400'}`}>{m.desc}</p>
+              </button>
+            );
+          })}
+        </div>
+        <p className="text-[9px] text-slate-400 italic mt-2">Either mode keeps every tool open — this only picks which room greets you.</p>
       </section>
 
       {/* THE QUIET TOGGLE — real (shoreSounds reads it) */}
