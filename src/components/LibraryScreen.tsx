@@ -53,8 +53,8 @@ const THERAPY_MODELS: TherapyModel[] = [
     tagline: 'Empirical ratios and the antidote to the Four Horsemen.',
     category: 'couples',
     icon: '❤️',
-    color: '#58CC02',
-    bgLight: 'rgba(88, 204, 2, 0.1)',
+    color: '#0E7C7C',
+    bgLight: 'rgba(14, 124, 124, 0.1)',
     summary: 'Based on 40+ years of longitudinal research, this model focuses on increasing intimacy, respect, and affection while removing barriers that create feeling stagnated in conflict.',
     concepts: ['The Magic 5:1 Ratio', 'The Four Horsemen', 'Love Maps', 'Softened Start-up'],
     toolName: '5:1 Interaction Calculator & Horsemen Shield',
@@ -81,8 +81,8 @@ const THERAPY_MODELS: TherapyModel[] = [
     tagline: 'Deconstruct negative attachment cycles and build secure bonds.',
     category: 'couples',
     icon: '🤝',
-    color: '#1CB0F6',
-    bgLight: 'rgba(28, 176, 246, 0.1)',
+    color: '#2E96B5',
+    bgLight: 'rgba(46, 150, 181, 0.1)',
     summary: 'Recognizes that relationship distress stems from the threat of abandonment. It maps reactive arguments to vulnerable emotional needs.',
     concepts: ['Pursuer-Distancer Loops', 'Primary vs. Secondary Emotion', 'Secure Attachment Bonds'],
     toolName: 'Attachment Loop Mapper',
@@ -165,8 +165,8 @@ const THERAPY_MODELS: TherapyModel[] = [
     tagline: 'Connect vulnerably via Observations, Feelings, Needs, and Requests.',
     category: 'couples',
     icon: '🗣️',
-    color: '#1CB0F6',
-    bgLight: 'rgba(28, 176, 246, 0.1)',
+    color: '#2E96B5',
+    bgLight: 'rgba(46, 150, 181, 0.1)',
     summary: 'A structured "communication lab" framework that translates defensive blame loops into pure universal needs and clear actionable requests.',
     concepts: ['Observations over Evaluations', 'Primary Feelings', 'Universal Needs', 'Actionable Requests'],
     toolName: '4-Step Connection Builder & Needs Translator',
@@ -179,8 +179,8 @@ const THERAPY_MODELS: TherapyModel[] = [
     tagline: 'Deconstruct money scripts and balance safety with autonomy.',
     category: 'couples',
     icon: '💵',
-    color: '#58CC02',
-    bgLight: 'rgba(88, 204, 2, 0.1)',
+    color: '#0E7C7C',
+    bgLight: 'rgba(14, 124, 124, 0.1)',
     summary: 'Unpacks subconscious money scripts (Saver vs Spender) to create transparent financial intimacy and cooperative budgeting covenants.',
     concepts: ['Money Scripts', 'Financial Intimacy', 'No-Permission Budgets', 'Co-op Resource Pooling'],
     toolName: 'Money Scripts Analyzer & Shared Worth Planner',
@@ -277,8 +277,8 @@ const THERAPY_MODELS: TherapyModel[] = [
     tagline: 'Downloadable PDF guides and audio meditations for secure, offline-ready use.',
     category: 'general',
     icon: '📁',
-    color: '#1CB0F6',
-    bgLight: 'rgba(28, 176, 246, 0.1)',
+    color: '#2E96B5',
+    bgLight: 'rgba(46, 150, 181, 0.1)',
     summary: 'An interactive repository hosting evidence-based reading worksheets and audio guides. Sync files to local storage for persistent offline access.',
     concepts: ['Worksheet Downloads', 'Audio Meditations', 'Offline Access', 'Clinical Materials'],
     toolName: 'Clinical Resource Vault & Media Player',
@@ -558,7 +558,7 @@ const FEELINGS_DATA: CoreFeeling[] = [
   },
   {
     name: 'Sadness',
-    color: '#1CB0F6',
+    color: '#2E96B5',
     bgClass: 'bg-blue-50',
     borderClass: 'border-blue-200',
     secondary: [
@@ -658,7 +658,7 @@ const FEELINGS_DATA: CoreFeeling[] = [
   },
   {
     name: 'Joy',
-    color: '#58CC02',
+    color: '#0E7C7C',
     bgClass: 'bg-green-50',
     borderClass: 'border-green-200',
     secondary: [
@@ -1014,7 +1014,7 @@ export default function LibraryScreen() {
             <span className="font-sans text-[10px] text-on-surface-variant font-semibold">{THERAPY_MODELS.length} Clinical Frameworks & Toolsets</span>
           </div>
         </div>
-        <div className="bg-[#1CB0F6]/10 text-[#1CB0F6] border border-[#1CB0F6]/20 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider">
+        <div className="bg-secondary/10 text-secondary border border-secondary/20 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider">
           Library
         </div>
       </div>
@@ -1171,7 +1171,7 @@ export default function LibraryScreen() {
                   setLoggedAnswers(false);
                   setShowPDFReport(false);
                 }}
-                className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1.5 ${activeSubSection === 'tool' ? 'bg-[#1CB0F6] text-white border-b-4 border-[#1899D6]' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+                className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1.5 ${activeSubSection === 'tool' ? 'bg-secondary text-white border-b-4 border-on-secondary-container' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
               >
                 <Wrench className="w-3.5 h-3.5" />
                 <span>Interactive Tool</span>
@@ -1182,7 +1182,7 @@ export default function LibraryScreen() {
                   setLoggedAnswers(false);
                   setShowPDFReport(false);
                 }}
-                className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1.5 ${activeSubSection === 'education' ? 'bg-[#58CC02] text-white border-b-4 border-[#46A302]' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+                className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1.5 ${activeSubSection === 'education' ? 'bg-primary text-white border-b-4 border-primary-dark' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
               >
                 <GraduationCap className="w-3.5 h-3.5" />
                 <span>Clinical Ed</span>
@@ -1205,7 +1205,7 @@ export default function LibraryScreen() {
           {activeSubSection === 'tool' && activeToolId !== 'relationship_roadmap' && activeToolId !== 'repair_toolkit' && activeToolId !== 'resource_vault' && activeToolId !== 'coach_chat' && activeToolId !== 'resonance_orb' && (
             <div className="bg-surface-container-lowest p-5 rounded-[2rem] border-2 border-outline-variant shadow-sm flex flex-col gap-4 animate-fade-in">
             <div className="border-b border-outline-variant/60 pb-3">
-              <span className="text-[9px] font-black uppercase tracking-widest text-[#1CB0F6]">Interactive Intimacy Tool</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-secondary">Interactive Intimacy Tool</span>
               <h4 className="font-display font-black text-sm text-on-surface mt-0.5">{activeModel?.toolName}</h4>
             </div>
 
@@ -1398,19 +1398,19 @@ export default function LibraryScreen() {
                         {/* Reframed Output Displays */}
                         <div className="flex flex-col gap-2.5 mt-1 border-t border-outline-variant/40 pt-3 animate-fade-in">
                           {/* Reframed A */}
-                          <div className="bg-[#1CB0F6]/5 border border-[#1CB0F6]/20 p-2.5 rounded-xl text-[10px] leading-relaxed text-on-surface">
+                          <div className="bg-secondary/5 border border-secondary/20 p-2.5 rounded-xl text-[10px] leading-relaxed text-on-surface">
                             <div className="flex justify-between items-center mb-1">
-                              <span className="font-bold text-[#1899D6] uppercase tracking-wider text-[8px]">{modelAObj?.name} reframe</span>
-                              <span className="text-[7px] font-black bg-[#1CB0F6]/10 text-[#1CB0F6] px-1.5 py-0.25 rounded border border-[#1CB0F6]/20">REFRAMED</span>
+                              <span className="font-bold text-on-secondary-container uppercase tracking-wider text-[8px]">{modelAObj?.name} reframe</span>
+                              <span className="text-[7px] font-black bg-secondary/10 text-secondary px-1.5 py-0.25 rounded border border-secondary/20">REFRAMED</span>
                             </div>
                             <p className="font-sans text-[#4B4B4B] italic">{dataA.dialogueResponse}</p>
                           </div>
 
                           {/* Reframed B */}
-                          <div className="bg-[#58CC02]/5 border border-[#58CC02]/20 p-2.5 rounded-xl text-[10px] leading-relaxed text-on-surface">
+                          <div className="bg-primary/5 border border-primary/20 p-2.5 rounded-xl text-[10px] leading-relaxed text-on-surface">
                             <div className="flex justify-between items-center mb-1">
-                              <span className="font-bold text-[#46A302] uppercase tracking-wider text-[8px]">{modelBObj?.name} reframe</span>
-                              <span className="text-[7px] font-black bg-[#58CC02]/10 text-[#58CC02] px-1.5 py-0.25 rounded border border-[#58CC02]/20">REFRAMED</span>
+                              <span className="font-bold text-primary-dark uppercase tracking-wider text-[8px]">{modelBObj?.name} reframe</span>
+                              <span className="text-[7px] font-black bg-primary/10 text-primary px-1.5 py-0.25 rounded border border-primary/20">REFRAMED</span>
                             </div>
                             <p className="font-sans text-[#4B4B4B] italic">{dataB.dialogueResponse}</p>
                           </div>
@@ -1430,14 +1430,14 @@ export default function LibraryScreen() {
                   <button
                     type="button"
                     onClick={() => setGottmanSubTool('calculator')}
-                    className={`flex-1 text-center font-display font-black text-[9px] uppercase tracking-wider py-2 px-1 rounded-xl transition-all cursor-pointer ${gottmanSubTool === 'calculator' ? 'bg-[#58CC02] text-white border-b-4 border-[#46A302]' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+                    className={`flex-1 text-center font-display font-black text-[9px] uppercase tracking-wider py-2 px-1 rounded-xl transition-all cursor-pointer ${gottmanSubTool === 'calculator' ? 'bg-primary text-white border-b-4 border-primary-dark' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
                   >
                     📊 5:1 Calculator
                   </button>
                   <button
                     type="button"
                     onClick={() => setGottmanSubTool('quiz')}
-                    className={`flex-1 text-center font-display font-black text-[9px] uppercase tracking-wider py-2 px-1 rounded-xl transition-all cursor-pointer ${gottmanSubTool === 'quiz' ? 'bg-[#1CB0F6] text-white border-b-4 border-[#1899D6]' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+                    className={`flex-1 text-center font-display font-black text-[9px] uppercase tracking-wider py-2 px-1 rounded-xl transition-all cursor-pointer ${gottmanSubTool === 'quiz' ? 'bg-secondary text-white border-b-4 border-on-secondary-container' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
                   >
                     🏠 Relationship House Quiz
                   </button>
@@ -1445,7 +1445,7 @@ export default function LibraryScreen() {
 
                 {gottmanSubTool === 'calculator' ? (
                   <div className="flex flex-col gap-4 animate-fade-in">
-                    <div className="bg-primary/5 p-3.5 rounded-xl border-2 border-[#58CC02]/20 text-[11px] leading-relaxed text-[#4B4B4B]">
+                    <div className="bg-primary/5 p-3.5 rounded-xl border-2 border-primary/20 text-[11px] leading-relaxed text-[#4B4B4B]">
                       <strong>The Magic 5:1 Calculator:</strong> Input positive interactions (e.g., validations, hugs, compliments) vs. negative ones (criticism, defensiveness) to test your clinical intimacy ratio.
                     </div>
 
@@ -1457,7 +1457,7 @@ export default function LibraryScreen() {
                       </div>
                       <div className="h-2.5 w-full bg-slate-200 rounded-full mt-3 overflow-hidden border border-outline-variant/50">
                         <div 
-                          className={`h-full rounded-full transition-all duration-500 ${calculateGottmanRatio() >= 5 ? 'bg-[#58CC02]' : 'bg-rose-500'}`}
+                          className={`h-full rounded-full transition-all duration-500 ${calculateGottmanRatio() >= 5 ? 'bg-primary' : 'bg-rose-500'}`}
                           style={{ width: `${Math.min((calculateGottmanRatio() / 8) * 100, 100)}%` }}
                         />
                       </div>
@@ -1501,7 +1501,7 @@ export default function LibraryScreen() {
                         </select>
                         <button
                           onClick={handleAddGottman}
-                          className="bg-[#58CC02] text-white px-2.5 rounded-xl border-b-[3px] border-[#46A302] hover:brightness-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+                          className="bg-primary text-white px-2.5 rounded-xl border-b-[3px] border-primary-dark hover:brightness-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
                         >
                           <Plus className="w-4 h-4" />
                         </button>
@@ -1524,7 +1524,7 @@ export default function LibraryScreen() {
                         />
                         <button
                           onClick={handleCheckHorseman}
-                          className="bg-[#1CB0F6] text-white px-3.5 py-2 rounded-xl border-b-[3px] border-[#1899D6] font-display font-black text-xs hover:brightness-105 active:scale-95 transition-all cursor-pointer"
+                          className="bg-secondary text-white px-3.5 py-2 rounded-xl border-b-[3px] border-on-secondary-container font-display font-black text-xs hover:brightness-105 active:scale-95 transition-all cursor-pointer"
                         >
                           Shield!
                         </button>
@@ -1633,7 +1633,7 @@ export default function LibraryScreen() {
                     />
                     <button
                       onClick={handleNextImago}
-                      className="bg-[#58CC02] text-white font-display font-black py-2 rounded-xl border-b-[3px] border-[#46A302] text-xs hover:brightness-105 transition-all"
+                      className="bg-primary text-white font-display font-black py-2 rounded-xl border-b-[3px] border-primary-dark text-xs hover:brightness-105 transition-all"
                     >
                       Construct Mirror Step →
                     </button>
@@ -1648,7 +1648,7 @@ export default function LibraryScreen() {
                     </div>
                     <button
                       onClick={handleNextImago}
-                      className="bg-[#1CB0F6] text-white font-display font-black py-2 rounded-xl border-b-[3px] border-[#1899D6] text-xs hover:brightness-105 transition-all"
+                      className="bg-secondary text-white font-display font-black py-2 rounded-xl border-b-[3px] border-on-secondary-container text-xs hover:brightness-105 transition-all"
                     >
                       Construct Validation Step →
                     </button>
@@ -1718,7 +1718,7 @@ export default function LibraryScreen() {
 
                 <button
                   onClick={handleCbctReframer}
-                  className="w-full bg-[#58CC02] text-white font-display font-black py-2.5 rounded-xl border-b-[4px] border-[#46A302] hover:brightness-105 active:translate-y-[2px] transition-all cursor-pointer text-xs"
+                  className="w-full bg-primary text-white font-display font-black py-2.5 rounded-xl border-b-[4px] border-primary-dark hover:brightness-105 active:translate-y-[2px] transition-all cursor-pointer text-xs"
                 >
                   Analyze & Restructure Assumption
                 </button>
@@ -1801,7 +1801,7 @@ export default function LibraryScreen() {
                     </select>
                     <button
                       onClick={handleAddFamilyMember}
-                      className="bg-[#58CC02] text-white px-3 py-1.5 rounded-xl font-display font-black text-xs border-b-[3px] border-[#46A302] hover:brightness-105 cursor-pointer shrink-0"
+                      className="bg-primary text-white px-3 py-1.5 rounded-xl font-display font-black text-xs border-b-[3px] border-primary-dark hover:brightness-105 cursor-pointer shrink-0"
                     >
                       Insert
                     </button>
@@ -1830,7 +1830,7 @@ export default function LibraryScreen() {
 
                 <button
                   onClick={handleExternalize}
-                  className="w-full bg-[#1CB0F6] text-white font-display font-black py-2.5 rounded-xl border-b-[4px] border-[#1899D6] hover:brightness-105 active:translate-y-[2px] transition-all cursor-pointer text-xs"
+                  className="w-full bg-secondary text-white font-display font-black py-2.5 rounded-xl border-b-[4px] border-on-secondary-container hover:brightness-105 active:translate-y-[2px] transition-all cursor-pointer text-xs"
                 >
                   Externalize & Rename the Blame Loop
                 </button>
@@ -1908,7 +1908,7 @@ export default function LibraryScreen() {
             {/* NONVIOLENT COMMUNICATION (NVC) TOOL */}
             {activeToolId === 'nvc' && (
               <div className="flex flex-col gap-4">
-                <div className="bg-[#1CB0F6]/10 p-3.5 rounded-xl border-2 border-[#1CB0F6]/20 text-[11px] leading-relaxed text-[#4B4B4B]">
+                <div className="bg-secondary/10 p-3.5 rounded-xl border-2 border-secondary/20 text-[11px] leading-relaxed text-[#4B4B4B]">
                   <strong>Marshall Rosenberg's 4-Step Connection Builder:</strong> Deconstruct blame loops into observations, physical sensations, universal attachment needs, and actionable, non-demanding requests.
                 </div>
 
@@ -1960,7 +1960,7 @@ export default function LibraryScreen() {
 
                 <button
                   onClick={handleCompileNvc}
-                  className="w-full bg-[#1CB0F6] text-white font-display font-black py-2.5 rounded-xl border-b-[4px] border-[#1899D6] hover:brightness-105 active:translate-y-[2px] transition-all cursor-pointer text-xs mt-1"
+                  className="w-full bg-secondary text-white font-display font-black py-2.5 rounded-xl border-b-[4px] border-on-secondary-container hover:brightness-105 active:translate-y-[2px] transition-all cursor-pointer text-xs mt-1"
                 >
                   Compile NVC Alignment Statement
                 </button>
@@ -1982,7 +1982,7 @@ export default function LibraryScreen() {
             {/* FINANCIAL HARMONY BUDGET TOOL */}
             {activeToolId === 'financial' && (
               <div className="flex flex-col gap-4">
-                <div className="bg-[#58CC02]/10 p-3.5 rounded-xl border-2 border-[#58CC02]/20 text-[11px] leading-relaxed text-[#4B4B4B]">
+                <div className="bg-primary/10 p-3.5 rounded-xl border-2 border-primary/20 text-[11px] leading-relaxed text-[#4B4B4B]">
                   <strong>Money Scripts Autonomy & Security Allocator:</strong> Formulate a collaborative budgeting covenant. This tool models division of joint income, guaranteeing both relationship security and individual discretionary freedom.
                 </div>
 
@@ -2042,7 +2042,7 @@ export default function LibraryScreen() {
 
                 <button
                   onClick={handleCalculateFinancial}
-                  className="w-full bg-[#58CC02] text-white font-display font-black py-2.5 rounded-xl border-b-[4px] border-[#46A302] hover:brightness-105 active:translate-y-[2px] transition-all cursor-pointer text-xs mt-1"
+                  className="w-full bg-primary text-white font-display font-black py-2.5 rounded-xl border-b-[4px] border-primary-dark hover:brightness-105 active:translate-y-[2px] transition-all cursor-pointer text-xs mt-1"
                 >
                   Generate Money Autonomy Alliance
                 </button>
@@ -2166,7 +2166,7 @@ export default function LibraryScreen() {
                       <div key={card.id} className="bg-surface-container-low p-2.5 rounded-xl border border-outline-variant/60 flex flex-col gap-1 shadow-2xs">
                         <div className="flex justify-between items-center">
                           <span className="font-display font-black text-[10.5px] text-[#4B4B4B]">{card.name}</span>
-                          <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${card.owner === 'Partner A' ? 'bg-[#1CB0F6]/10 text-blue-700 border border-blue-200' : card.owner === 'Partner B' ? 'bg-[#58CC02]/10 text-green-700 border border-green-200' : 'bg-amber-100 text-amber-700 border border-amber-200'}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${card.owner === 'Partner A' ? 'bg-secondary/10 text-blue-700 border border-blue-200' : card.owner === 'Partner B' ? 'bg-primary/10 text-green-700 border border-green-200' : 'bg-amber-100 text-amber-700 border border-amber-200'}`}>
                             {card.owner}
                           </span>
                         </div>
@@ -2463,7 +2463,7 @@ export default function LibraryScreen() {
 
                         {/* In Between Session Action Step */}
                         <div className="bg-green-50/50 p-3 rounded-xl border border-green-200/50 flex flex-col gap-1">
-                          <span className="font-bold text-[9px] text-[#58CC02] uppercase tracking-wider flex items-center gap-1">
+                          <span className="font-bold text-[9px] text-primary uppercase tracking-wider flex items-center gap-1">
                             <Activity size={10} /> "Do the Work" Action Step (Between-Session Exercise)
                           </span>
                           <p className="text-[11px] text-stone-700 leading-relaxed font-sans">{selectedTertiaryFeeling.action}</p>
@@ -2583,8 +2583,8 @@ export default function LibraryScreen() {
             </div>
 
             {/* Metrics Tracked */}
-            <div className="flex flex-col gap-2 bg-[#58CC02]/5 border-2 border-[#58CC02]/20 p-4 rounded-[1.5rem]">
-              <h5 className="font-display font-black text-[10px] text-[#58CC02] uppercase tracking-wider flex items-center gap-1.5">
+            <div className="flex flex-col gap-2 bg-primary/5 border-2 border-primary/20 p-4 rounded-[1.5rem]">
+              <h5 className="font-display font-black text-[10px] text-primary uppercase tracking-wider flex items-center gap-1.5">
                 <span>📈</span> Active Clinical Metrics Tracked
               </h5>
               <p className="font-sans text-[10px] text-on-surface-variant leading-relaxed mb-1">
@@ -2593,7 +2593,7 @@ export default function LibraryScreen() {
               <div className="flex flex-wrap gap-1.5">
                 {details.metricsTracked.map((m, i) => (
                   <span key={i} className="text-[9px] font-bold bg-white text-[#4B4B4B] border border-outline-variant px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-[#58CC02] rounded-full"></span>
+                    <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                     {m}
                   </span>
                 ))}
@@ -2678,14 +2678,14 @@ export default function LibraryScreen() {
                     setLoggedAnswers(true);
                     setTimeout(() => setLoggedAnswers(false), 3000);
                   }}
-                  className="flex-1 bg-[#58CC02] text-white font-display font-black py-2 rounded-xl border-b-[3px] border-[#46A302] text-[11px] hover:brightness-105 active:scale-95 transition-all cursor-pointer text-center"
+                  className="flex-1 bg-primary text-white font-display font-black py-2 rounded-xl border-b-[3px] border-primary-dark text-[11px] hover:brightness-105 active:scale-95 transition-all cursor-pointer text-center"
                 >
                   {loggedAnswers ? "✓ Session Logged!" : "💾 Log Worksheet Answers"}
                 </button>
 
                 <button
                   onClick={() => setShowPDFReport(!showPDFReport)}
-                  className="bg-[#1CB0F6] text-white px-3 py-2 rounded-xl border-b-[3px] border-[#1899D6] hover:brightness-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+                  className="bg-secondary text-white px-3 py-2 rounded-xl border-b-[3px] border-on-secondary-container hover:brightness-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center"
                   title="Print / Share PDF Report"
                 >
                   <FileText className="w-4 h-4" />
@@ -2706,7 +2706,7 @@ export default function LibraryScreen() {
                       const key = `${activeToolId}-q-${idx}`;
                       return (
                         <div key={idx}>
-                          <p className="text-[#1CB0F6]">Q{idx + 1}: {q}</p>
+                          <p className="text-secondary">Q{idx + 1}: {q}</p>
                           <p className="text-neutral-400 italic">Ans: {worksheetAnswers[key] || "[No answer recorded]"}</p>
                         </div>
                       );

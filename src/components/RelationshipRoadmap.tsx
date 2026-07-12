@@ -329,7 +329,7 @@ export default function RelationshipRoadmap() {
       {/* Top Progress bar and summary widget */}
       <div className="bg-gradient-to-r from-stone-900 to-stone-800 text-white p-5 rounded-[2.2rem] shadow-md relative overflow-hidden">
         <div className="absolute right-0 top-0 w-32 h-32 bg-[#FF6EA7]/10 rounded-full blur-2xl pointer-events-none"></div>
-        <div className="absolute left-1/4 bottom-0 w-24 h-24 bg-[#1CB0F6]/10 rounded-full blur-xl pointer-events-none"></div>
+        <div className="absolute left-1/4 bottom-0 w-24 h-24 bg-secondary/10 rounded-full blur-xl pointer-events-none"></div>
         
         <div className="flex justify-between items-start">
           <div>
@@ -342,7 +342,7 @@ export default function RelationshipRoadmap() {
           <div className="flex flex-col items-end">
             <span className="text-[9px] font-mono text-stone-400">SECURE BOND LEVEL</span>
             <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-xl font-black text-[#58CC02]">{secureBondRating}%</span>
+              <span className="text-xl font-black text-primary">{secureBondRating}%</span>
               <span className="text-[9px] text-stone-300">Secure</span>
             </div>
           </div>
@@ -356,7 +356,7 @@ export default function RelationshipRoadmap() {
           </div>
           <div className="w-full h-3 bg-stone-700/60 rounded-full overflow-hidden p-0.5 border border-stone-600/30">
             <div 
-              className="h-full bg-gradient-to-r from-[#FF6EA7] via-[#CE9FFC] to-[#1CB0F6] rounded-full transition-all duration-700 ease-out"
+              className="h-full bg-gradient-to-r from-[#FF6EA7] via-[#CE9FFC] to-secondary rounded-full transition-all duration-700 ease-out"
               style={{ width: `${progressPercent}%` }}
             ></div>
           </div>
@@ -374,7 +374,7 @@ export default function RelationshipRoadmap() {
           </div>
           <div className="flex flex-col">
             <span className="text-[8px] font-mono text-stone-400">RECOVERY SCORE</span>
-            <span className="text-xs font-black text-[#58CC02]">{totalPoints} <span className="text-[8px] text-stone-400">pts</span></span>
+            <span className="text-xs font-black text-primary">{totalPoints} <span className="text-[8px] text-stone-400">pts</span></span>
           </div>
         </div>
       </div>
@@ -436,13 +436,13 @@ export default function RelationshipRoadmap() {
               {filteredMilestones.map((milestone, idx) => {
                 const isSelected = selectedMilestoneId === milestone.id;
                 const statusColor = 
-                  milestone.status === 'completed' ? 'border-[#58CC02] bg-[#58CC02]/5' : 
+                  milestone.status === 'completed' ? 'border-primary bg-primary/5' : 
                   milestone.status === 'in_progress' ? 'border-[#CE9FFC] bg-[#CE9FFC]/5 animate-pulse' : 
                   'border-stone-200 bg-stone-50/50 opacity-70';
                 
                 const badgeColor = 
-                  milestone.framework === 'Gottman' ? 'bg-[#58CC02]/10 text-[#58CC02] border-[#58CC02]/20' :
-                  milestone.framework === 'EFT' ? 'bg-[#1CB0F6]/10 text-[#1CB0F6] border-[#1CB0F6]/20' :
+                  milestone.framework === 'Gottman' ? 'bg-primary/10 text-primary border-primary/20' :
+                  milestone.framework === 'EFT' ? 'bg-secondary/10 text-secondary border-secondary/20' :
                   milestone.framework === 'PACT' ? 'bg-[#FF8A00]/10 text-[#FF8A00] border-[#FF8A00]/20' :
                   'bg-[#FF6EA7]/10 text-[#FF6EA7] border-[#FF6EA7]/20';
 
@@ -461,7 +461,7 @@ export default function RelationshipRoadmap() {
                         milestone.status === 'in_progress' ? 'completed' : 'locked'
                       )}
                       className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 border-2 z-10 font-bold text-xs transition cursor-pointer hover:scale-110 ${
-                        milestone.status === 'completed' ? 'bg-[#58CC02] border-[#58CC02] text-white' :
+                        milestone.status === 'completed' ? 'bg-primary border-primary text-white' :
                         milestone.status === 'in_progress' ? 'bg-white border-[#CE9FFC] text-[#CE9FFC]' :
                         'bg-white border-stone-300 text-stone-400'
                       }`}
@@ -501,7 +501,7 @@ export default function RelationshipRoadmap() {
                             <Sparkles size={9} className="text-[#FF6EA7]" /> {milestone.points} PTS
                           </span>
                           {milestone.status === 'completed' && (
-                            <span className="text-[#58CC02] flex items-center gap-1 font-bold">
+                            <span className="text-primary flex items-center gap-1 font-bold">
                               ✓ Completed {milestone.completedDate ? `(${milestone.completedDate})` : ''}
                             </span>
                           )}
@@ -631,13 +631,13 @@ export default function RelationshipRoadmap() {
             let icon = '';
             let summaryDesc = '';
             if (framework === 'Gottman') {
-              colorTheme = 'bg-[#58CC02]/10 text-[#58CC02] border-[#58CC02]/20';
-              textTheme = 'text-[#58CC02]';
+              colorTheme = 'bg-primary/10 text-primary border-primary/20';
+              textTheme = 'text-primary';
               icon = '❤️';
               summaryDesc = 'Ratios of repair, soft start-ups, and building high-detail Love Maps.';
             } else if (framework === 'EFT') {
-              colorTheme = 'bg-[#1CB0F6]/10 text-[#1CB0F6] border-[#1CB0F6]/20';
-              textTheme = 'text-[#1CB0F6]';
+              colorTheme = 'bg-secondary/10 text-secondary border-secondary/20';
+              textTheme = 'text-secondary';
               icon = '🤝';
               summaryDesc = 'Attachment security, cycle de-escalation, and vulnerable primary feelings.';
             } else if (framework === 'PACT') {
@@ -679,7 +679,7 @@ export default function RelationshipRoadmap() {
                       className={`h-full bg-stone-900 rounded-full transition-all duration-700 ease-out`}
                       style={{ 
                         width: `${progress}%`,
-                        backgroundColor: framework === 'Gottman' ? '#58CC02' : framework === 'EFT' ? '#1CB0F6' : framework === 'PACT' ? '#FF8A00' : '#FF6EA7'
+                        backgroundColor: framework === 'Gottman' ? '#0E7C7C' : framework === 'EFT' ? '#2E96B5' : framework === 'PACT' ? '#FF8A00' : '#FF6EA7'
                       }}
                     ></div>
                   </div>
@@ -723,8 +723,8 @@ export default function RelationshipRoadmap() {
             {milestones.filter(m => exerciseSavedLogs[m.id]).map((milestone) => {
               const log = exerciseSavedLogs[milestone.id];
               const badgeColor = 
-                milestone.framework === 'Gottman' ? 'bg-[#58CC02]/10 text-[#58CC02] border-[#58CC02]/20' :
-                milestone.framework === 'EFT' ? 'bg-[#1CB0F6]/10 text-[#1CB0F6] border-[#1CB0F6]/20' :
+                milestone.framework === 'Gottman' ? 'bg-primary/10 text-primary border-primary/20' :
+                milestone.framework === 'EFT' ? 'bg-secondary/10 text-secondary border-secondary/20' :
                 milestone.framework === 'PACT' ? 'bg-[#FF8A00]/10 text-[#FF8A00] border-[#FF8A00]/20' :
                 'bg-[#FF6EA7]/10 text-[#FF6EA7] border-[#FF6EA7]/20';
 

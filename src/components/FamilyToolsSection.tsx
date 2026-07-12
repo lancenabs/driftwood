@@ -878,7 +878,7 @@ Clinical Feedback:
             className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 p-3 px-5 rounded-2xl shadow-xl border text-[11.5px] font-sans font-extrabold uppercase tracking-wide flex items-center gap-2 ${
               toastMessage.includes('❌') 
                 ? 'bg-red-50 text-red-700 border-red-200' 
-                : 'bg-[#58CC02] text-white border-green-400'
+                : 'bg-primary text-white border-green-400'
             }`}
           >
             <Sparkles className="w-4 h-4 text-amber-300 animate-bounce" />
@@ -931,14 +931,14 @@ Clinical Feedback:
         </button>
         <button
           onClick={() => setActiveTab('chart')}
-          className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1 min-w-[80px] ${activeTab === 'chart' ? 'bg-[#58CC02] text-white border-b-4 border-[#46A302]' : 'text-[#4B4B4B] hover:bg-surface-container-high'}`}
+          className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1 min-w-[80px] ${activeTab === 'chart' ? 'bg-primary text-white border-b-4 border-primary-dark' : 'text-[#4B4B4B] hover:bg-surface-container-high'}`}
         >
           <Coins className="w-3.5 h-3.5" />
           <span>Point Chart</span>
         </button>
         <button
           onClick={() => setActiveTab('guides')}
-          className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1 min-w-[80px] ${activeTab === 'guides' ? 'bg-[#1CB0F6] text-white border-b-4 border-[#1899D6]' : 'text-[#4B4B4B] hover:bg-surface-container-high'}`}
+          className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1 min-w-[80px] ${activeTab === 'guides' ? 'bg-secondary text-white border-b-4 border-on-secondary-container' : 'text-[#4B4B4B] hover:bg-surface-container-high'}`}
         >
           <BookOpen className="w-3.5 h-3.5" />
           <span>Parent Guides</span>
@@ -1398,7 +1398,7 @@ Clinical Feedback:
 
                 <button
                   type="submit"
-                  className="bg-[#1CB0F6] text-white text-[9px] font-black uppercase py-2 px-3 rounded-xl border-b-[3px] border-[#1899D6] transition-all hover:brightness-105"
+                  className="bg-secondary text-white text-[9px] font-black uppercase py-2 px-3 rounded-xl border-b-[3px] border-on-secondary-container transition-all hover:brightness-105"
                 >
                   Construct & Evaluate Startup Draft
                 </button>
@@ -1786,7 +1786,7 @@ Clinical Feedback:
                       </button>
                       <button
                         onClick={handleCompleteWeeklyMeeting}
-                        className="text-[9px] font-black bg-[#58CC02] text-white border-b-4 border-[#46A302] hover:brightness-105 px-5 py-2.5 rounded-xl uppercase tracking-wider cursor-pointer shadow-md animate-pulse"
+                        className="text-[9px] font-black bg-primary text-white border-b-4 border-primary-dark hover:brightness-105 px-5 py-2.5 rounded-xl uppercase tracking-wider cursor-pointer shadow-md animate-pulse"
                       >
                         Conclude Meeting & Distribute points! 🏆
                       </button>
@@ -2156,7 +2156,7 @@ Clinical Feedback:
                   </div>
                   <button
                     type="submit"
-                    className="bg-[#58CC02] text-white text-[9px] font-black uppercase px-3 py-2 rounded-xl border-b-[3px] border-[#46A302]"
+                    className="bg-primary text-white text-[9px] font-black uppercase px-3 py-2 rounded-xl border-b-[3px] border-primary-dark"
                   >
                     Save Member
                   </button>
@@ -2176,7 +2176,7 @@ Clinical Feedback:
                     </div>
                   </div>
                   <div className="flex flex-col items-end shrink-0">
-                    <span className="font-display font-black text-sm text-[#58CC02] leading-none">{m.points}</span>
+                    <span className="font-display font-black text-sm text-primary leading-none">{m.points}</span>
                     <span className="text-[7.5px] font-bold text-on-surface-variant uppercase tracking-wide mt-1">PTS</span>
                   </div>
 
@@ -2260,7 +2260,7 @@ Clinical Feedback:
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-[#1CB0F6] text-white text-[9px] font-black uppercase py-2 rounded-xl border-b-[3px] border-[#1899D6] mt-1"
+                  className="w-full bg-secondary text-white text-[9px] font-black uppercase py-2 rounded-xl border-b-[3px] border-on-secondary-container mt-1"
                 >
                   Create Reinforcement Habit
                 </button>
@@ -2278,8 +2278,8 @@ Clinical Feedback:
                         {task.name}
                       </p>
                       <span className={`text-[6.5px] font-black uppercase tracking-widest px-1 py-0.25 rounded border block w-fit mt-1.5 ${
-                        task.category === 'cbt' ? 'bg-[#1CB0F6]/5 text-sky-700 border-[#1CB0F6]/15' :
-                        task.category === 'cooperative' ? 'bg-[#58CC02]/5 text-green-700 border-[#58CC02]/15' :
+                        task.category === 'cbt' ? 'bg-secondary/5 text-sky-700 border-secondary/15' :
+                        task.category === 'cooperative' ? 'bg-primary/5 text-green-700 border-primary/15' :
                         'bg-purple-50 text-purple-700 border-purple-150'
                       }`}>
                         {task.category === 'cbt' ? 'Clinical CBT Tool' : task.category === 'cooperative' ? 'Cooperative Bond' : 'Household Routine'}
@@ -2289,14 +2289,14 @@ Clinical Feedback:
 
                   {/* Award selector */}
                   <div className="flex flex-col items-end gap-1 shrink-0">
-                    <span className="text-[10px] font-mono font-black text-[#58CC02] shrink-0">+{task.points} pts</span>
+                    <span className="text-[10px] font-mono font-black text-primary shrink-0">+{task.points} pts</span>
                     
                     <div className="flex gap-1 mt-1">
                       {familyMembers.map(m => (
                         <button
                           key={m.id}
                           onClick={() => handleAwardPoints(m.id, task)}
-                          className="bg-white hover:bg-emerald-50 text-[9px] font-black text-on-surface border border-outline-variant/80 hover:border-[#58CC02] px-1.5 py-0.75 rounded-md transition-all active:scale-95 cursor-pointer shrink-0"
+                          className="bg-white hover:bg-emerald-50 text-[9px] font-black text-on-surface border border-outline-variant/80 hover:border-primary px-1.5 py-0.75 rounded-md transition-all active:scale-95 cursor-pointer shrink-0"
                           title={`Award to ${m.name}`}
                         >
                           {m.name}
@@ -2437,7 +2437,7 @@ Clinical Feedback:
                       <span className="text-[7.5px] text-on-surface-variant/80 font-mono font-semibold">{log.timestamp}</span>
                     </div>
                   </div>
-                  <span className={`font-mono font-black text-[9.5px] shrink-0 ${log.points > 0 ? 'text-[#58CC02]' : 'text-red-500'}`}>
+                  <span className={`font-mono font-black text-[9.5px] shrink-0 ${log.points > 0 ? 'text-primary' : 'text-red-500'}`}>
                     {log.points > 0 ? `+${log.points}` : log.points}
                   </span>
                 </div>

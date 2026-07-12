@@ -305,12 +305,12 @@ export default function ResourceVault() {
       
       {/* Immersive Top Hero Panel */}
       <div className="bg-gradient-to-r from-stone-900 to-stone-800 text-white p-5 rounded-[2.2rem] shadow-sm relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-36 h-36 bg-[#1CB0F6]/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div className="absolute right-0 top-0 w-36 h-36 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
         <div className="absolute left-1/3 bottom-0 w-24 h-24 bg-[#FF6EA7]/10 rounded-full blur-xl pointer-events-none"></div>
         
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <span className="text-[9px] font-black uppercase tracking-widest text-[#1CB0F6]">FamilyFrame Clinical Cloud</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-secondary">FamilyFrame Clinical Cloud</span>
             <h4 className="font-display font-black text-base text-white leading-tight mt-0.5">Clinical Resource Vault</h4>
             <p className="text-[10px] text-stone-300 font-sans mt-1 leading-relaxed max-w-[320px]">
               Access structured worksheets, cheat-sheets, audio meditations, and co-regulation scripts. Download items to keep them fully accessible offline.
@@ -333,7 +333,7 @@ export default function ResourceVault() {
               </>
             ) : (
               <>
-                <Wifi size={11} className="text-[#58CC02]" /> Online Cloud Enabled
+                <Wifi size={11} className="text-primary" /> Online Cloud Enabled
               </>
             )}
           </button>
@@ -355,7 +355,7 @@ export default function ResourceVault() {
           </div>
           <div className="flex flex-col">
             <span className="text-[8px] font-mono text-stone-400 uppercase">Offline Cached</span>
-            <span className="text-xs font-black text-[#58CC02]">{downloadedIds.length}</span>
+            <span className="text-xs font-black text-primary">{downloadedIds.length}</span>
           </div>
           <div className="flex flex-col">
             <span className="text-[8px] font-mono text-stone-400 uppercase">Bookmarked</span>
@@ -383,13 +383,13 @@ export default function ResourceVault() {
             </button>
           </div>
 
-          <div className="w-10 h-10 rounded-xl bg-stone-900 text-[#1CB0F6] flex items-center justify-center shrink-0 text-lg">
+          <div className="w-10 h-10 rounded-xl bg-stone-900 text-secondary flex items-center justify-center shrink-0 text-lg">
             🔊
           </div>
 
           <div className="flex-1 text-center md:text-left min-w-0">
             <div className="flex items-center gap-1.5 justify-center md:justify-start">
-              <span className="text-[8px] font-mono bg-[#1CB0F6]/15 text-[#1CB0F6] border border-[#1CB0F6]/20 px-2 py-0.5 rounded font-black uppercase">
+              <span className="text-[8px] font-mono bg-secondary/15 text-secondary border border-secondary/20 px-2 py-0.5 rounded font-black uppercase">
                 {activePlayingResource.framework} AUDIO
               </span>
               <span className="text-[9px] text-stone-400 font-mono">{activePlayingResource.durationOrPages}</span>
@@ -506,8 +506,8 @@ export default function ResourceVault() {
               const isFavorited = favoritedIds.includes(resource.id);
 
               const badgeColor = 
-                resource.framework === 'Gottman' ? 'bg-[#58CC02]/15 text-[#58CC02] border-[#58CC02]/20' :
-                resource.framework === 'EFT' ? 'bg-[#1CB0F6]/15 text-[#1CB0F6] border-[#1CB0F6]/20' :
+                resource.framework === 'Gottman' ? 'bg-primary/15 text-primary border-primary/20' :
+                resource.framework === 'EFT' ? 'bg-secondary/15 text-secondary border-secondary/20' :
                 resource.framework === 'PACT' ? 'bg-[#FF8A00]/15 text-[#FF8A00] border-[#FF8A00]/20' :
                 'bg-[#FF6EA7]/15 text-[#FF6EA7] border-[#FF6EA7]/20';
 
@@ -568,7 +568,7 @@ export default function ResourceVault() {
                           className="bg-stone-50 hover:bg-red-50 text-stone-600 hover:text-red-600 border border-stone-200/80 text-[8.5px] font-bold px-2 py-1 rounded-md flex items-center gap-1 transition"
                           title="Click to delete resource from offline cache"
                         >
-                          <CheckCircle size={9} className="text-[#58CC02]" /> Offline Cached
+                          <CheckCircle size={9} className="text-primary" /> Offline Cached
                         </button>
                       ) : (
                         <button

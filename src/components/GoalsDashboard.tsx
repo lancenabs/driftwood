@@ -489,9 +489,9 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
       {/* Segmented Filter Tab Bar */}
       <div className="flex bg-surface-container rounded-2xl p-1 gap-1 border-2 border-outline-variant">
         {[
-          { id: 'all', label: 'All Goals', activeBg: 'bg-[#1CB0F6] border-[#1899D6] text-white shadow-sm' },
+          { id: 'all', label: 'All Goals', activeBg: 'bg-secondary border-on-secondary-container text-white shadow-sm' },
           { id: 'husband', label: '👨 Husband', activeBg: 'bg-[#FF5A5F] border-[#d83c41] text-white shadow-sm' },
-          { id: 'children', label: '🧒 Kids Chores', activeBg: 'bg-[#58CC02] border-[#46A302] text-white shadow-sm' },
+          { id: 'children', label: '🧒 Kids Chores', activeBg: 'bg-primary border-primary-dark text-white shadow-sm' },
           { id: 'couple', label: '💑 Couples', activeBg: 'bg-[#CE9FFC] border-[#b784f9] text-white shadow-sm' },
           { id: 'clinical', label: '📚 Models', activeBg: 'bg-amber-500 border-amber-600 text-white shadow-sm' }
         ].map((tab) => (
@@ -719,14 +719,14 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
               const pct = Math.round((g.current / g.target) * 100);
               
               // Define distinct themes per category
-              let themeColor = 'bg-[#1CB0F6]'; 
+              let themeColor = 'bg-secondary'; 
               let badgeColor = 'bg-slate-100 text-slate-700';
 
               if (g.assignee === 'Husband' || g.category === 'Acts of Love') {
                 themeColor = 'bg-[#FF5A5F]';
                 badgeColor = 'bg-rose-50 text-[#FF5A5F] border-rose-100';
               } else if (g.assignee === 'Kids' || g.category === 'Chore' || g.category === 'Follow Directions') {
-                themeColor = 'bg-[#58CC02]';
+                themeColor = 'bg-primary';
                 badgeColor = 'bg-green-50 text-green-700 border-green-100';
               } else {
                 themeColor = 'bg-[#CE9FFC]';
@@ -826,7 +826,7 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
                       onClick={() => handleToggleGoalComplete(g.id)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-sans font-black text-[9px] uppercase tracking-wider transition-all cursor-pointer ${
                         g.completed
-                          ? 'bg-[#58CC02] border-[#46A302] text-white shadow-3d-secondary'
+                          ? 'bg-primary border-primary-dark text-white shadow-3d-secondary'
                           : 'bg-white border-outline-variant hover:border-primary text-on-surface-variant'
                       }`}
                     >
@@ -884,7 +884,7 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
               className="bg-white border-4 border-primary rounded-[2.5rem] shadow-2xl p-6 max-w-xs w-full text-center relative overflow-hidden flex flex-col gap-4.5"
             >
               {/* Confetti canvas backdrop */}
-              <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(#1CB0F6_1px,transparent_1px)] [background-size:16px_16px]" />
+              <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(#2E96B5_1px,transparent_1px)] [background-size:16px_16px]" />
 
               {/* Bouncy Big Emoji & Sparkles */}
               <div className="relative inline-block mx-auto mt-2">

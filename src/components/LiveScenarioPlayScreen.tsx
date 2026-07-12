@@ -100,10 +100,10 @@ export default function LiveScenarioPlayScreen({ character, onBack, onFinishSimu
         <div className="text-center col-span-2">
           <span className="font-display font-black text-xs text-primary leading-none block">{character.scenario || 'Relational Simulation'}</span>
           <span className="font-sans text-[10px] text-on-surface-variant">
-            Beat {currentBeatIdx + 1} of {totalBeats} • <span className={`font-black ${difficultyTier === 'Mild' ? 'text-emerald-600' : difficultyTier === 'Moderate' ? 'text-[#1CB0F6]' : 'text-rose-600'}`}>{difficultyTier}</span>
+            Beat {currentBeatIdx + 1} of {totalBeats} • <span className={`font-black ${difficultyTier === 'Mild' ? 'text-emerald-600' : difficultyTier === 'Moderate' ? 'text-secondary' : 'text-rose-600'}`}>{difficultyTier}</span>
           </span>
         </div>
-        <div className="flex items-center gap-1.5 bg-[#58CC02]/10 text-[#58CC02] border border-[#58CC02]/20 px-3 py-1 rounded-full text-xs font-black font-display">
+        <div className="flex items-center gap-1.5 bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs font-black font-display">
           <span>{totalXp} XP</span>
         </div>
       </div>
@@ -120,10 +120,10 @@ export default function LiveScenarioPlayScreen({ character, onBack, onFinishSimu
       <div className="bg-white rounded-[1.5rem] p-3.5 border-2 border-outline-variant flex flex-col gap-2 shadow-sm text-[11px] animate-fade-in-up">
         <div className="flex items-center justify-between border-b border-outline-variant pb-1.5">
           <div className="flex items-center gap-1 text-[#4B4B4B]">
-            <Sparkles className="w-3.5 h-3.5 text-[#1CB0F6] animate-pulse" />
+            <Sparkles className="w-3.5 h-3.5 text-secondary animate-pulse" />
             <span className="font-display font-black uppercase tracking-wider text-[10px]">Adaptive Difficulty Engine (DDA)</span>
           </div>
-          <span className="text-[9px] font-mono font-bold bg-[#1CB0F6]/10 text-[#1CB0F6] px-1.5 py-0.5 rounded-md border border-[#1CB0F6]/20">
+          <span className="text-[9px] font-mono font-bold bg-secondary/10 text-secondary px-1.5 py-0.5 rounded-md border border-secondary/20">
             Active
           </span>
         </div>
@@ -158,7 +158,7 @@ export default function LiveScenarioPlayScreen({ character, onBack, onFinishSimu
                   ? tier === 'Mild'
                     ? 'bg-emerald-500 text-white border-b-2 border-emerald-700 shadow-sm'
                     : tier === 'Moderate'
-                      ? 'bg-[#1CB0F6] text-white border-b-2 border-[#1899D6] shadow-sm'
+                      ? 'bg-secondary text-white border-b-2 border-on-secondary-container shadow-sm'
                       : 'bg-rose-500 text-white border-b-2 border-rose-700 shadow-sm'
                   : 'text-[#4B4B4B] hover:bg-surface-container-high'
               }`}
@@ -218,7 +218,7 @@ export default function LiveScenarioPlayScreen({ character, onBack, onFinishSimu
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-[10px] uppercase font-black font-display tracking-widest text-[#1CB0F6]">
+                    <span className="text-[10px] uppercase font-black font-display tracking-widest text-secondary">
                       {option.type === 'criticism' || option.type === 'defensiveness' || option.type === 'stonewalling' || option.type === 'ineffective' ? 'Ineffective' : 'Effective'}
                     </span>
                     <span className="text-[10px] text-on-surface-variant font-black">+{option.xpReward} XP</span>
@@ -272,7 +272,7 @@ export default function LiveScenarioPlayScreen({ character, onBack, onFinishSimu
             {/* Continue flow button */}
             <button
               onClick={handleNextBeat}
-              className="w-full bg-[#58CC02] text-white font-display font-black py-3 px-5 rounded-xl border-b-[4px] border-[#46A302] shadow-3d-primary hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all flex justify-center items-center gap-2 cursor-pointer"
+              className="w-full bg-primary text-white font-display font-black py-3 px-5 rounded-xl border-b-[4px] border-primary-dark shadow-3d-primary hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all flex justify-center items-center gap-2 cursor-pointer"
             >
               <span>{currentBeatIdx + 1 < totalBeats ? 'Continue' : 'Finish & See Debrief'}</span>
               <ArrowRight className="w-4 h-4" />

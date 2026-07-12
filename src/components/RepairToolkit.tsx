@@ -60,7 +60,7 @@ const DEFAULT_REPAIRS: RepairAttempt[] = [
     categoryLabel: 'Self-Soothe & Timeouts',
     phrase: "I'm too escalated to listen. Let's take a 20-minute break to calm down, and I promise we will finish this tonight.",
     context: "Crucial for preventing stonewalling. Always give a promise of return so your partner doesn't feel abandoned.",
-    color: '#1CB0F6'
+    color: '#2E96B5'
   },
   {
     id: 'rep-4',
@@ -68,7 +68,7 @@ const DEFAULT_REPAIRS: RepairAttempt[] = [
     categoryLabel: 'Self-Soothe & Timeouts',
     phrase: "Can we sit in silence for a minute and hold hands before we keep talking?",
     context: "Physical touch combined with silence helps down-regulate highly reactive fight/flight nervous systems.",
-    color: '#1CB0F6'
+    color: '#2E96B5'
   },
   // APOLOGY
   {
@@ -77,7 +77,7 @@ const DEFAULT_REPAIRS: RepairAttempt[] = [
     categoryLabel: 'Apology & Ownership',
     phrase: "You're right, I was being defensive. Let me try again to hear what you are saying.",
     context: "A powerful, instantaneous repair that cuts through competitive arguing.",
-    color: '#58CC02'
+    color: '#0E7C7C'
   },
   {
     id: 'rep-6',
@@ -85,7 +85,7 @@ const DEFAULT_REPAIRS: RepairAttempt[] = [
     categoryLabel: 'Apology & Ownership',
     phrase: "I am really sorry for my tone just now. I want to talk about this, but I lost my cool.",
     context: "Acknowledge the packaging of your message rather than debating the core content.",
-    color: '#58CC02'
+    color: '#0E7C7C'
   },
   // STOP ACTION
   {
@@ -205,10 +205,10 @@ export default function RepairToolkit() {
     if (!newPhrase.trim()) return;
 
     let catLabel = 'Custom Statement';
-    let col = '#1CB0F6';
+    let col = '#2E96B5';
     if (newCategory === 'ifeel') { catLabel = 'I Feel Statements'; col = '#FF6EA7'; }
-    if (newCategory === 'timeout') { catLabel = 'Self-Soothe & Timeouts'; col = '#1CB0F6'; }
-    if (newCategory === 'sorry') { catLabel = 'Apology & Ownership'; col = '#58CC02'; }
+    if (newCategory === 'timeout') { catLabel = 'Self-Soothe & Timeouts'; col = '#2E96B5'; }
+    if (newCategory === 'sorry') { catLabel = 'Apology & Ownership'; col = '#0E7C7C'; }
     if (newCategory === 'stop') { catLabel = 'Stop Action / Reset'; col = '#CE9FFC'; }
     if (newCategory === 'compromise') { catLabel = 'Get to Yes'; col = '#FF8A00'; }
     if (newCategory === 'appreciation') { catLabel = 'Appreciation & Love'; col = '#E01563'; }
@@ -338,7 +338,7 @@ export default function RepairToolkit() {
 
             <button
               onClick={() => setIsAddingCustom(!isAddingCustom)}
-              className="bg-[#58CC02] text-white text-[9.5px] font-black uppercase tracking-wider py-1.5 px-3 rounded-full flex items-center gap-1 hover:scale-102 border-b-2 border-green-700 transition"
+              className="bg-primary text-white text-[9.5px] font-black uppercase tracking-wider py-1.5 px-3 rounded-full flex items-center gap-1 hover:scale-102 border-b-2 border-green-700 transition"
             >
               <Plus size={11} /> Custom Repair
             </button>
@@ -445,7 +445,7 @@ export default function RepairToolkit() {
                     onClick={() => setLoggingStatus('successful')}
                     className={`px-3 py-1 text-[9px] rounded-lg font-black uppercase tracking-wider transition ${
                       loggingStatus === 'successful' 
-                        ? 'bg-[#58CC02] text-white' 
+                        ? 'bg-primary text-white' 
                         : 'bg-stone-800 text-stone-300 hover:bg-stone-700'
                     }`}
                   >

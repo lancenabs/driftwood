@@ -821,7 +821,7 @@ export default function EftCycleMapper({ onBack }: { onBack?: () => void }) {
             <button
               onClick={handleSaveCycle}
               disabled={!partnerSecondary || !partnerPrimary}
-              className="bg-[#58CC02] text-white font-display font-black px-4 py-2.5 rounded-xl text-[10px] uppercase tracking-wider border-b-[4px] border-[#46A302] hover:brightness-105 active:translate-y-[2px] transition-all cursor-pointer flex items-center gap-1.5"
+              className="bg-primary text-white font-display font-black px-4 py-2.5 rounded-xl text-[10px] uppercase tracking-wider border-b-[4px] border-primary-dark hover:brightness-105 active:translate-y-[2px] transition-all cursor-pointer flex items-center gap-1.5"
             >
               <span>Map & Save Loop</span>
               <CheckCircle2 className="w-3.5 h-3.5" />
