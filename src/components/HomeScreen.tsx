@@ -475,7 +475,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
       <div className="flex bg-surface-container rounded-2xl p-1 gap-1 border-2 border-outline-variant">
         <button
           onClick={() => setActiveSubTab('dashboard')}
-          className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1 ${activeSubTab === 'dashboard' ? 'bg-[#1CB0F6] text-white border-b-4 border-[#1899D6]' : 'text-[#4B4B4B] hover:bg-surface-container-high'}`}
+          className={`flex-1 font-display font-black text-[9px] py-2 px-1 rounded-xl text-center transition-all cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1 ${activeSubTab === 'dashboard' ? 'bg-primary text-white border-b-4 border-primary-dark' : 'text-[#4B4B4B] hover:bg-surface-container-high'}`}
         >
           <span>🏡 Home</span>
         </button>
@@ -552,9 +552,10 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
           <FamilyStressMeter />
 
           {/* Practice Space (Co-op Simulations gateway) Card */}
-          <section 
+          <section
             onClick={onEnterPractice}
-            className="bg-secondary text-white rounded-[2rem] p-5 border-2 border-outline-variant shadow-3d-secondary hover:brightness-105 active:translate-y-[2px] active:shadow-none transition-all cursor-pointer group relative overflow-hidden"
+            className="text-white rounded-[2rem] p-5 border-2 border-outline-variant hover:brightness-110 active:translate-y-[2px] transition-all cursor-pointer group relative overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #1E2A44, #33415E)', boxShadow: '0 6px 20px rgba(30,42,68,0.35)' }}
           >
             <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -570,7 +571,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
 
             <button 
               onClick={(e) => { e.stopPropagation(); onEnterPractice(); }}
-              className="relative z-10 w-full bg-white text-secondary font-display font-black py-3 rounded-xl border-b-[4px] border-[#E5E5E5] hover:bg-slate-50 active:translate-y-[2px] active:border-b-[2px] transition-all flex items-center justify-center gap-2 mt-5 shadow-sm cursor-pointer"
+              className="relative z-10 w-full bg-amber-500 text-white font-display font-black py-3 rounded-xl border-b-[4px] border-amber-600 hover:brightness-105 active:translate-y-[2px] active:border-b-[2px] transition-all flex items-center justify-center gap-2 mt-5 shadow-sm cursor-pointer"
             >
               <span>Take the stage</span>
               <ArrowRight className="w-4 h-4" />
@@ -608,7 +609,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
                   }}
                   className={`flex-1 text-[8px] font-black py-1.5 px-0.5 rounded-lg uppercase tracking-wider transition-all cursor-pointer text-center ${
                     selectedNudgeModel === model
-                      ? 'bg-rose-500 text-white shadow-sm'
+                      ? 'bg-primary text-white shadow-sm'
                       : 'text-[#4B4B4B] hover:bg-slate-100'
                   }`}
                 >
@@ -682,7 +683,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
                               setNudgeTimerSeconds(60);
                               setNudgeTimerActive(true);
                             }}
-                            className="flex-1 bg-indigo-600 text-white border-b-4 border-indigo-800 text-[10px] font-black uppercase py-2.5 rounded-xl transition-all hover:brightness-105 active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
+                            className="flex-1 bg-primary text-white border-b-4 border-primary-dark text-[10px] font-black uppercase py-2.5 rounded-xl transition-all hover:brightness-105 active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
                           >
                             <Timer className="w-3.5 h-3.5" />
                             <span>Start 1-Min Drill</span>
@@ -730,9 +731,9 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
                             }, 3500);
                           }}
                           className={`flex-1 text-white border-b-4 text-[10px] font-black uppercase py-2.5 rounded-xl transition-all hover:brightness-105 active:scale-98 cursor-pointer flex items-center justify-center gap-1.5 ${
-                            nudgeCompleted 
-                              ? 'bg-[#58CC02] border-[#46A302]' 
-                              : 'bg-rose-500 border-rose-700'
+                            nudgeCompleted
+                              ? 'bg-emerald-600 border-emerald-800'
+                              : 'bg-amber-500 border-amber-700'
                           }`}
                         >
                           <Check className="w-4 h-4" />
@@ -910,7 +911,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
                   <button
                     type="button"
                     onClick={onViewGoals}
-                    className="w-full bg-[#1CB0F6] hover:bg-[#1899D6] text-white font-display font-black py-2.5 rounded-xl border-b-[4px] border-[#1899D6] active:translate-y-[2px] active:border-b-[2px] transition-all flex items-center justify-center gap-2 mt-2 text-[10px] uppercase tracking-wider cursor-pointer shadow-sm"
+                    className="w-full bg-primary hover:brightness-105 text-white font-display font-black py-2.5 rounded-xl border-b-[4px] border-primary-dark active:translate-y-[2px] active:border-b-[2px] transition-all flex items-center justify-center gap-2 mt-2 text-[10px] uppercase tracking-wider cursor-pointer shadow-sm"
                   >
                     <span>🎯 View Household Goals Dashboard</span>
                     <ArrowRight className="w-3.5 h-3.5" />
