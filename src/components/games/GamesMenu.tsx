@@ -132,7 +132,7 @@ export default function GamesMenu({ onClose, embedded = false }: { onClose: () =
         </div>
         {!embedded && <button onClick={onClose} className="text-[10px] font-black uppercase rounded-full px-3 py-1.5 bg-white/85 text-slate-700">back</button>}
       </div>
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 max-w-md lg:max-w-2xl mx-auto w-full">
+      <div className="flex-1 overflow-y-auto p-4 grid grid-cols-1 lg:grid-cols-2 gap-3 content-start w-full">
         {GAMES.map(g => (
           <button key={g.id} data-testid={`game-${g.id}`} onClick={() => setActive(g)}
             className="text-left bg-white/95 rounded-2xl p-4 shadow-lg hover:brightness-105 active:scale-[0.99] transition-all flex items-center gap-3">

@@ -84,6 +84,9 @@ interface GameActions {
   deleteGoal: (goalId: string) => void;
   addXp: (amount: number) => void;
   addGems: (amount: number) => void;
+  // THE FLAGSHIP GATING LAW (Lance 2026-07-12): completing a story unit
+  // (case/milestone) unlocks its instrument tool — the LANCE unlock model.
+  unlockTool: (toolId: string) => void;
   purchaseReward: (id: string, cost: number) => boolean;
   equipReward: (category: 'title' | 'accent', id: string) => void;
   claimMilestoneGems: (milestoneCount: number, reward: number) => void;
@@ -278,6 +281,10 @@ export function LANCEGameProvider({ children }: { children: React.ReactNode }) {
   }, []);
   completeChallengeRef.current = completeChallenge;
 
+  const unlockTool = useCallback((toolId: string) => {
+    setState(s => s.unlockedTools.includes(toolId) ? s : { ...s, unlockedTools: [...s.unlockedTools, toolId] });
+  }, []);
+
   const logMood = useCallback((entry: MoodEntry) => {
     setState(s => {
       const today = new Date().toISOString().split('T')[0];
@@ -429,6 +436,7 @@ export function LANCEGameProvider({ children }: { children: React.ReactNode }) {
     deleteGoal,
     addXp,
     addGems,
+    unlockTool,
     purchaseReward,
     equipReward,
     claimMilestoneGems,

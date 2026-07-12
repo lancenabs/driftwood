@@ -27,7 +27,7 @@ await page.goto(BASE + '/', { waitUntil: 'load', timeout: 20000 });
 await page.waitForTimeout(1600);
 
 // ── The four rooms ───────────────────────────────────────────────────────────
-for (const room of ['Check-in', 'Library', 'Insights', 'Driftwood']) {
+for (const room of ['Check-in', 'Challenges', 'Library', 'Insights', 'Driftwood']) {
   current = `room:${room}`;
   await page.locator('nav:visible').getByText(room, { exact: true }).click()
     .catch(() => findings.push({ where: current, kind: 'nav-fail', msg: 'room not clickable' }));
@@ -36,7 +36,7 @@ for (const room of ['Check-in', 'Library', 'Insights', 'Driftwood']) {
 
 // ── No crisis info on any room (the 2026-07-12 law: Settings-only) ───────────
 current = 'law:clean-surfaces';
-for (const room of ['Check-in', 'Library', 'Insights', 'Driftwood']) {
+for (const room of ['Check-in', 'Challenges', 'Library', 'Insights', 'Driftwood']) {
   await page.locator('nav:visible').getByText(room, { exact: true }).click().catch(() => {});
   await page.waitForTimeout(500);
   const body = await page.evaluate(() => document.body.innerText);
@@ -55,13 +55,17 @@ for (const id of [...DECK, ...ISLAND_SAMPLE]) {
   await page.waitForTimeout(350);
 }
 
-// ── The Milestone Log + the swap card render ─────────────────────────────────
+// ── The Milestone Log lives on the Challenges tab (flagship law) ─────────────
 current = 'room:milestones';
+await page.locator('nav:visible').getByText('Challenges', { exact: true }).click().catch(() => {});
+await page.waitForTimeout(700);
+if (!(await page.getByText('The Milestone Log').first().isVisible().catch(() => false)))
+  findings.push({ where: current, kind: 'log-fail', msg: 'milestone log missing from the Challenges tab' });
+// ── The swap card stays on the shore ─────────────────────────────────────────
+current = 'room:swap';
 await page.locator('nav:visible').getByText('Driftwood', { exact: true }).click().catch(() => {});
 await page.locator('nav:visible').getByText('Driftwood', { exact: true }).click().catch(() => {});
 await page.waitForTimeout(700);
-if (!(await page.getByText('The Milestone Log').first().isVisible().catch(() => false)))
-  findings.push({ where: current, kind: 'log-fail', msg: 'milestone log missing from the shore' });
 if (!(await page.getByText('Walk a Day in Their Boots').first().isVisible().catch(() => false)))
   findings.push({ where: current, kind: 'swap-fail', msg: 'perspective swap card missing' });
 

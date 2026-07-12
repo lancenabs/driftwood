@@ -210,7 +210,7 @@ export default function CheckInTab({ onOpenTool }: Props) {
         </div>
       </div>
 
-      <div className="px-5 pt-5 pb-28 space-y-6 max-w-2xl mx-auto w-full">
+      <div className="px-5 pt-5 pb-28 space-y-6">
 
         {/* ── LANCE Speech Bubble ── */}
         <motion.div
@@ -299,7 +299,7 @@ export default function CheckInTab({ onOpenTool }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => window.dispatchEvent(new CustomEvent('driftwood:go-home'))}
+            onClick={() => window.dispatchEvent(new CustomEvent('driftwood:open-challenges'))}
             className="w-full text-left rounded-3xl overflow-hidden"
             style={{
               background: 'linear-gradient(100deg, #F59E0B 0%, #F2683A 100%)',
@@ -327,7 +327,7 @@ export default function CheckInTab({ onOpenTool }: Props) {
                   className="text-[11px] mt-0.5 leading-snug line-clamp-1"
                   style={{ color: 'rgba(255,255,255,0.75)' }}
                 >
-                  Open the log on the shore — the crew is waiting at the next first.
+                  Open the Challenges tab — the crew is waiting at the next first.
                 </div>
               </div>
               <div className="shrink-0 text-white opacity-70">›</div>

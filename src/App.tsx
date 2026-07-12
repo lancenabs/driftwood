@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, Moon, Sun, Settings, Home, PlusCircle, Anchor, BarChart2, Flame } from 'lucide-react';
+import { Heart, Moon, Sun, Settings, Home, PlusCircle, Anchor, BarChart2, Zap } from 'lucide-react';
 import BoardingStory from './components/BoardingStory';
 import HomeScreen from './components/HomeScreen';
 import MicroLessonScreen from './components/MicroLessonScreen';
@@ -11,14 +11,14 @@ import GoalsDashboard from './components/GoalsDashboard';
 import GenogramEditor from './components/GenogramEditor';
 import { ScreenType, Character } from './types';
 import { MotionConfig } from 'motion/react';
-import { LANCEGameProvider } from './lance/components/LANCEGame/LANCEGameContext';
+import { LANCEGameProvider, useGame } from './lance/components/LANCEGame/LANCEGameContext';
+import ChallengesTab from './components/ChallengesTab';
 import GameToolOverlay from './lance/components/LANCEGame/GameToolOverlay';
 import LibraryTab from './lance/components/LANCEGame/LibraryTab';
 import CheckInTab from './lance/components/LANCEGame/CheckInTab';
 import LANCEInsights from './lance/components/LANCEGame/LANCEInsights';
 import TheShore from './components/TheShore';
 import GatheringBar from './components/GatheringBar';
-import MilestoneLog from './components/MilestoneLog';
 import PerspectiveSwap from './components/PerspectiveSwap';
 import { TOOL_COMPLETION, readSaveSignature } from './lance/components/LANCEGame/challengeCompletion';
 import { appendEvent } from './lib/world';
@@ -34,7 +34,7 @@ import GamesMenu from './components/games/GamesMenu';
 //  the app is the app.
 // ═════════════════════════════════════════════════════════════════════════════
 
-type Tab = 'driftwood' | 'checkin' | 'campfire' | 'library' | 'insights';
+type Tab = 'driftwood' | 'checkin' | 'challenges' | 'library' | 'insights';
 
 export default function App() {
   return (
@@ -57,7 +57,9 @@ function DriftwoodShell() {
   });
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showGames, setShowGames] = useState(false); // campfire games overlay (the games are challenge instruments)
   const [isCalmMode, setIsCalmMode] = useState(false);
+  const { xp } = useGame(); // the flagship's gold chip — one economy across the fleet
 
   // The tool treaty — anything can open any instrument over any tab; closing
   // lands you exactly where you stood.
@@ -103,13 +105,18 @@ function DriftwoodShell() {
     return () => window.removeEventListener('app:open-safety-settings', openSafety);
   }, []);
 
-  // anything in the app can walk you to the fire (banners, the island's door).
-  // Registered BEFORE the boarding early-return — hooks must run in the same
-  // order on every render (finishing the boarding in-session broke this).
+  // anything in the app can walk you to the fire (banners, the island's door)
+  // or to the Challenges tab. Registered BEFORE the boarding early-return —
+  // hooks must run in the same order on every render.
   React.useEffect(() => {
-    const toFire = () => setActiveTab('campfire');
+    const toFire = () => setShowGames(true);
+    const toChallenges = () => setActiveTab('challenges');
     window.addEventListener('driftwood:open-campfire', toFire);
-    return () => window.removeEventListener('driftwood:open-campfire', toFire);
+    window.addEventListener('driftwood:open-challenges', toChallenges);
+    return () => {
+      window.removeEventListener('driftwood:open-campfire', toFire);
+      window.removeEventListener('driftwood:open-challenges', toChallenges);
+    };
   }, []);
 
   // THE BOARDING — full-screen until complete. Safety/crisis onboarding lives
@@ -129,12 +136,15 @@ function DriftwoodShell() {
     );
   }
 
+  // The flagship's five rooms (LANCE: Home · Library · Check In · Challenges ·
+  // Insights). Campfire games stay one tap away (home card + the ⚡ tab's door)
+  // — they are the milestones' instruments, so they live WITH the challenges.
   const NAV: { id: Tab; icon: typeof Home; label: string }[] = [
-    { id: 'driftwood', icon: Home,       label: 'Driftwood' },
-    { id: 'checkin',   icon: PlusCircle, label: 'Check-in' },
-    { id: 'campfire',  icon: Flame,      label: 'Campfire' },
-    { id: 'library',   icon: Anchor,     label: 'Library' },
-    { id: 'insights',  icon: BarChart2,  label: 'Insights' },
+    { id: 'driftwood',  icon: Home,       label: 'Driftwood' },
+    { id: 'checkin',    icon: PlusCircle, label: 'Check-in' },
+    { id: 'challenges', icon: Zap,        label: 'Challenges' },
+    { id: 'library',    icon: Anchor,     label: 'Library' },
+    { id: 'insights',   icon: BarChart2,  label: 'Insights' },
   ];
 
 
@@ -145,7 +155,7 @@ function DriftwoodShell() {
 
       {/* Header — honest brand, no borrowed badges */}
       <header className="w-full bg-white border-b border-outline-variant/30 py-2.5 px-4 shrink-0 z-30">
-        <div className="max-w-2xl lg:max-w-5xl mx-auto flex justify-between items-center">
+        <div className="w-full flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-white shadow-sm">
               <Heart className="w-4 h-4 fill-white" />
@@ -156,6 +166,15 @@ function DriftwoodShell() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
+            {/* The flagship's gold chip — XP earned on the crossing */}
+            <div
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full"
+              style={{ background: '#FFFAE8', border: '1.5px solid #FFE566' }}
+              title="XP — earned by real milestone work"
+            >
+              <Zap className="w-3 h-3" style={{ color: '#FFD700' }} />
+              <span className="text-[11px] font-black" style={{ color: '#CCA000' }}>{xp.toLocaleString()}</span>
+            </div>
             <button
               onClick={() => setIsCalmMode(!isCalmMode)}
               className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container cursor-pointer"
@@ -177,9 +196,11 @@ function DriftwoodShell() {
       </header>
 
       {/* The adaptive body: ≥lg the nav is a left RAIL and the content column
-          widens; <lg the nav is the bottom tab bar. One shell, both worlds —
-          the app was stuck at max-w-2xl with phone chrome on every screen. */}
-      <div className="flex-1 min-h-0 flex flex-row max-w-2xl lg:max-w-5xl w-full mx-auto">
+          widens; <lg the nav is the bottom tab bar. FLAGSHIP LAW (Lance,
+          2026-07-12): NO max-width on the shell — LANCE fills the screen edge
+          to edge, so Driftwood does too. The earlier max-w-5xl cap was the
+          "stuck on mobile" culprit on wide monitors. */}
+      <div className="flex-1 min-h-0 flex flex-row w-full">
       {/* Desktop nav rail (hidden on phones) */}
       <nav className="hidden lg:flex flex-col gap-1 py-4 pr-3 pl-1 w-44 shrink-0">
         {NAV.map(tab => {
@@ -215,9 +236,9 @@ function DriftwoodShell() {
             <CheckInTab onOpenTool={openTool} />
           </div>
         )}
-        {activeTab === 'campfire' && (
-          <div className="absolute inset-0">
-            <GamesMenu embedded onClose={() => setActiveTab('driftwood')} />
+        {activeTab === 'challenges' && (
+          <div className="absolute inset-0 overflow-y-auto px-3 pb-4">
+            <ChallengesTab onOpenTool={openTool} onOpenGames={() => setShowGames(true)} />
           </div>
         )}
         {activeTab === 'library' && (
@@ -242,6 +263,13 @@ function DriftwoodShell() {
               onBack={closeTool}
               onOpenTool={(next: string) => setActiveTool(next)}
             />
+          </div>
+        )}
+
+        {/* Campfire games — an overlay from anywhere (the instruments' room) */}
+        {showGames && (
+          <div className="absolute inset-0 z-40 bg-slate-50">
+            <GamesMenu embedded onClose={() => setShowGames(false)} />
           </div>
         )}
 
@@ -320,9 +348,10 @@ function FamilyScreens({ onOpenTool }: { onOpenTool: (id: string) => void }) {
 
   return (
     <div className="pt-3">
+      {/* The Milestone Log moved to its own Challenges tab (flagship law) —
+          the home keeps the shore, the Gathering, and the swap card. */}
       {activeScreen === 'home' && <TheShore onOpenTool={onOpenTool} />}
       {activeScreen === 'home' && <GatheringBar />}
-      {activeScreen === 'home' && <MilestoneLog onOpenTool={onOpenTool} />}
       {activeScreen === 'home' && <PerspectiveSwap />}
       {activeScreen === 'home' && (
         <HomeScreen

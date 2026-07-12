@@ -441,7 +441,7 @@ export default function HomeScreen({ onStartLesson, onEnterPractice, onViewGoals
   };
 
   return (
-    <div className="flex flex-col gap-5 py-2 w-full max-w-md mx-auto text-on-background animate-fade-in-up">
+    <div className="flex flex-col gap-5 py-2 w-full text-on-background animate-fade-in-up">
       {/* Header section with Flame & Stats */}
       <div className="flex justify-between items-center bg-surface-container-lowest p-4 rounded-[2rem] border-2 border-outline-variant shadow-sm">
         <div className="flex items-center gap-2">

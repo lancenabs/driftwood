@@ -6,16 +6,18 @@ import { TOOL_COMPLETION, readSaveSignature } from '../lance/components/LANCEGam
 import { appendEvent } from '../lib/world';
 import { driftBell, tideCreak, emberPop } from '../lib/shoreSounds';
 import { activeCastaway, readCrew } from '../lib/castaways';
+import { useGame } from '../lance/components/LANCEGame/LANCEGameContext';
 
 // ═════════════════════════════════════════════════════════════════════════════
-//  THE MILESTONE LOG — the 31 survival firsts on the proven loop:
-//  scene beats → the conjoint step (the conch passes; every present member
-//  confirms) → the REAL tool via the treaty → honest save-signature
-//  completion → planks + embers → season curtains.
+//  THE MILESTONE LOG — the 31 survival firsts on the flagship loop (LANCE law,
+//  2026-07-12): scene beats → the conjoint step (the conch passes) → the REAL
+//  tool via the treaty → honest save-signature completion → XP + gems +
+//  planks + embers → THE INSTRUMENT UNLOCKS (challenges teach the library,
+//  app by app; production gates by therapist/paywall, dev trial stays open
+//  via FREE_ACCESS_ALL) → season curtains.
 //
-//  LAWS (same engine, fourth world): the log is optional and exitable at
-//  every beat · tools are NEVER gated · crisis surfaces are never
-//  instruments · an unfinished milestone is simply unfinished.
+//  LAWS: the log is optional and exitable at every beat · safety surfaces are
+//  never instruments · an unfinished milestone is simply unfinished.
 // ═════════════════════════════════════════════════════════════════════════════
 
 interface LogState {
@@ -54,6 +56,7 @@ const ROBOT_NAMES: Record<string, { name: string; emoji: string }> = {
 type Phase = 'log' | 'scene' | 'conch' | 'working' | 'closing' | 'closed';
 
 export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) => void }) {
+  const { addXp, addGems, unlockTool } = useGame();
   const [state, setState] = useState<LogState>(loadState);
   const [active, setActive] = useState<Milestone | null>(null);
   const [phase, setPhase] = useState<Phase>('log');
@@ -150,6 +153,13 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
       driftBell();
       setTimeout(emberPop, 800);
       const me = activeCastaway();
+      // THE FLAGSHIP ECONOMY: XP + gems into the one vendored economy (the
+      // Rewards Store spends them), and the instrument UNLOCKS — each
+      // milestone teaches one library app, the LANCE way.
+      const keystone = isSeasonEnd(m);
+      addXp(m.planks * (keystone ? 30 : 15));
+      addGems(keystone ? 25 : 5);
+      if (m.instrument) unlockTool(m.instrument.toolId);
       appendEvent(me.id, 'milestone_closed', { milestoneId: m.id, n: m.n });
       for (let i = 0; i < m.planks; i++) appendEvent(me.id, 'plank_earned', { milestoneId: m.id });
       appendEvent(me.id, 'ember_earned', { milestoneId: m.id });

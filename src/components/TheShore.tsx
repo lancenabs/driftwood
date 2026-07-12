@@ -42,7 +42,9 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
       // a story circle on the island: come ashore and open that milestone
       if (e.data?.type === 'driftwood:open-milestone' && e.data.id) {
         setWalking(false);
-        setTimeout(() => window.dispatchEvent(new CustomEvent('driftwood:open-milestone', { detail: { id: e.data.id } })), 250);
+        // the log lives on the Challenges tab now (flagship law) — walk there first
+        window.dispatchEvent(new CustomEvent('driftwood:open-challenges'));
+        setTimeout(() => window.dispatchEvent(new CustomEvent('driftwood:open-milestone', { detail: { id: e.data.id } })), 350);
       }
     };
     // ANY door into the island (the shore button OR the Gathering bar) opens
