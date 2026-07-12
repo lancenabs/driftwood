@@ -131,8 +131,10 @@ export const MILESTONES: Milestone[] = [
     title: 'Fresh Water',
     first: 'The spring is found. The first rule of rationing: needs before wants, said out loud.',
     opening: [
-      { kind: 'narration', text: 'A spring above the rocks — cold, clean, real. The crew\'s first council is short: what does each of us NEED today, and what merely wants? The island rations honesty before it rations water.' },
-      { kind: 'robot', who: 'echo2', text: 'Needs before… wants before… needs? I always mix it up. Say yours slowly so I get it right when I repeat it wrong.' },
+      { kind: 'narration', text: 'Skip appears at dawn with his bandaged hand and an enormous secret he is terrible at keeping. "I know where water is. I am NOT showing you. Follow me while I don\'t show you."' },
+      { kind: 'robot', who: 'skip', text: 'Rules say I can\'t bring you INTO Jumble country. But the spring is on the EDGE of Jumble country. I checked the map. I made the map. It\'s a good map.' },
+      { kind: 'narration', text: 'A spring above the rocks — cold, clean, real. And around it, half-hidden in the green: little wooden markers, carved with care. Cups sized for branch-hands. Someone taught the robots to share a spring long ago. The family\'s first council is short: what does each of us NEED today, and what merely wants? The island rations honesty before it rations water.' },
+      { kind: 'robot', who: 'bailer', text: '(from behind a rock, pretending not to be there) Tell them needs go FIRST. Wants go in the... the second bucket. The man taught us that. (a pause, then, horrified at himself) NOBODY said "the man." Nobody heard "the man."' },
     ],
     instrument: {
       toolId: 'family_manifest', toolName: 'The Manifest',
@@ -146,8 +148,16 @@ export const MILESTONES: Milestone[] = [
     title: 'The Salvage',
     first: 'The wreck washed in more than wreckage: the crew inventories what it still HAS.',
     opening: [
-      { kind: 'narration', text: 'All morning the tide delivers pieces of the old boat. And something turns when the counting starts: this crew is not empty-handed. It never was. Salvage first, grief later — the inventory of what you still have is the inventory of what you\'ll build with.' },
-      { kind: 'robot', who: 'collier', text: '…Mm. Wreck-wood is not dead wood, small ones. Everything that floats ashore can hold a nail again. Same for crews.' },
+      { kind: 'narration', text: 'All morning the tide delivers pieces of the old boat. And something turns when the counting starts: this family is not empty-handed. It never was. Salvage first, grief later — the inventory of what SURVIVED.' },
+      { kind: 'narration', text: 'Then the youngest finds it, wedged under a hull plank: Mr. Bauer\'s tackle box. Latched, dry inside. Fishing line, hooks, a fire-steel, a folded photograph gone soft with salt — a family, but not YOUR family. Four faces, sun-squinting, on a boat. On the back, one word in pencil: "us."' },
+      { kind: 'choice', id: 's1_tackle_box', prompt: 'Mr. Bauer\'s tackle box, and someone else\'s family in a photograph. What does yours do with it?',
+        options: [
+          { id: 'use', label: 'Use the tools — he\'d want them keeping you alive' },
+          { id: 'cairn', label: 'Build a cairn for the box — tools borrowed, photo kept safe' },
+        ] },
+      { kind: 'narration', when: { flag: 's1_tackle_box', is: 'use' }, text: 'The vote is quiet and unanimous: Bauer lashed your hands to a line so you\'d live. The tools go to work — the line to the fishing rocks, the fire-steel to the pit keeper. The photograph gets a dry pocket and a promise: whoever "us" is, the box goes back to him. Somehow.' },
+      { kind: 'narration', when: { flag: 's1_tackle_box', is: 'cairn' }, text: 'You build the cairn above the tide line, borrow the tools one at a time like library books, and set the photograph inside facing the sea. The youngest asks who they are. Nobody knows. "Somebody\'s us," says the oldest, and that answer holds all season.' },
+      { kind: 'robot', who: 'hollow', text: '(the tall quiet one, first words to the family, from a distance) …He kept that box on his knee, crossings back. Log what washed in. All of it. What survives a wreck is never random. It\'s what was HELD tightest.' },
     ],
     instrument: {
       toolId: 'bottle_post', toolName: 'The Bottle Post',
@@ -161,8 +171,9 @@ export const MILESTONES: Milestone[] = [
     title: 'First Night Watch',
     first: 'The first dark. The worries come out with the stars — so the watch writes them down.',
     opening: [
-      { kind: 'narration', text: 'Night one. Every worry the day was too busy for arrives at once. The watch-keeper\'s trick, taught by a robot who bails dry boats: write each worry on a leaf, set it in the WATCH PILE, and stand relieved until morning. The pile keeps the watch so you can sleep.' },
-      { kind: 'robot', who: 'bailer', text: 'You can\'t bail worries at midnight! Believe me! I\'ve TRIED! You park them. Parked worries wait. Bailed worries splash.' },
+      { kind: 'narration', text: 'Night one of real watches. Every worry the day was too busy for arrives at once, the way worries do — in a crowd, after dark. The watch-keeper\'s trick, taught by a robot who bails dry boats: write each worry on a leaf, set it in the WATCH PILE, and stand the watch on what is actually in front of you.' },
+      { kind: 'robot', who: 'bailer', text: 'I stood four thousand watches before I learned it. The water you\'re bailing is usually TOMORROW\'S water. Tonight\'s boat is dry. Look — dry! Bail tomorrow tomorrow.' },
+      { kind: 'narration', text: 'Past midnight, the watch-keeper sees them: small lights in the treeline, paired like eyes, keeping their own vigil. The Jumble stands watch over the family that is standing watch. Nobody official announces this. It is simply true from now on, the way the best protections are.' },
     ],
     instrument: {
       toolId: 'worry_parking', toolName: 'The Watch Pile',
@@ -178,8 +189,10 @@ export const MILESTONES: Milestone[] = [
     title: 'Who Builds What',
     first: 'The camp needs hands. The crew deals out real jobs — by choice, not by habit.',
     opening: [
-      { kind: 'narration', text: 'Shelter, water-carry, firewood, the cook-pit. The island\'s second law surfaces at the job-dealing: roles chosen out loud hold; roles assumed silently breed splinters. Who has been carrying what WITHOUT ever being asked?' },
-      { kind: 'robot', who: 'hollow', text: '…I always take the wall-building. Nobody asked. Nobody ever asks. That\'s not the same as choosing it. (…is it?)' },
+      { kind: 'narration', text: 'Season two opens with an invitation nobody expected: Skip, scrubbed and standing at attention, flanked by a robot built like a furnace with hands like anvils. The Collier. He looks at the family the way a master builder looks at warped lumber — skeptically, but already planning.' },
+      { kind: 'robot', who: 'collier', text: 'The little one vouches for you. The little one also once vouched for a seagull. So. The Elders say: one hut of the village opens for every trust you earn. Today you earn the FIRST — by showing us a family that deals its work OUT LOUD. Shelter, water-carry, firewood, cook-pit. Silent assumptions breed splinters. I have pulled enough splinters.' },
+      { kind: 'robot', who: 'skip', text: '(whispering, thrilled) That\'s the nicest thing he\'s said about anyone since the seagull.' },
+      { kind: 'narration', text: 'Who has been carrying what without ever being asked? The job-dealing goes on the driftwood table, face up. And when it\'s done — dealt, spoken, agreed — the Collier walks the family up the jungle path to a clearing where little driftwood houses stand in a ring, and pushes open the first door.' },
     ],
     instrument: {
       toolId: 'family_manifest', toolName: 'The Manifest',
@@ -193,8 +206,9 @@ export const MILESTONES: Milestone[] = [
     title: 'The Walls and the Door',
     first: 'The shelter rises: walls keep weather out — and the door is built ON PURPOSE.',
     opening: [
-      { kind: 'narration', text: 'A shelter is two lessons in one build. The walls: what this family keeps OUT (the phone at dinner, the third-party opinions, the old fight scripts). The door: what gets let IN, and who decides. Every wall names its builder.' },
-      { kind: 'robot', who: 'hollow', text: 'I\'m good at walls. Too good. I built one with no door once. It\'s… it\'s very quiet in there. Build the door FIRST, that\'s my advice.' },
+      { kind: 'narration', text: 'In the village ring, the family meets Echo-2 — a slender robot with a radio-dish face who repeats what you say back to you, half a shade kinder. The Jumble\'s rules live on a post in the ring\'s center, burned into a plank. Rule one: NEVER LIE BY THE FIRE. Rule two: WHOEVER HOLDS THE CONCH IS HEARD TO THE END. Rule three: REPAIRS BEFORE VERDICTS.' },
+      { kind: 'robot', who: 'echo2', text: 'The walls of a shelter and the walls of a family are the same build. What do you keep OUT? (she waits) …Phones at dinner. Old fight scripts. Other people\'s opinions of your people. And the DOOR — who decides what comes in? Build it out loud, and the hut is yours tonight.' },
+      { kind: 'narration', text: 'Every plank spoken for. The walls: what this family keeps out. The door: what gets let in, and who decides. Echo-2 listens to the whole negotiation and repeats back only the kindest sentence anyone said, which turns out to be a whole education in what to say more of.' },
     ],
     instrument: {
       toolId: 'boundary_hoop', toolName: 'The Walls & the Door',
@@ -208,8 +222,9 @@ export const MILESTONES: Milestone[] = [
     title: 'The Larder Rules',
     first: 'Food stores need rules everyone made — the first real family meeting.',
     opening: [
-      { kind: 'narration', text: 'The larder is stocked; now it needs LAW. The first family meeting convenes at the driftwood table: short, structured, everyone speaks, everything decided gets written. Meetings that work are a technology — most families were never handed it.' },
-      { kind: 'robot', who: 'echo2', text: 'I\'ll take minutes! I repeat everything slightly wrong, which is EXACTLY why you should write it down properly yourselves.' },
+      { kind: 'narration', text: 'The larder hut opens — and Bailer is ALREADY IN IT, mid-count, surrounded by the most organized shelves on the island. He has counted everything. He has counted things that cannot be counted. There is a shelf labeled "MISC. DREAD (4)."' },
+      { kind: 'robot', who: 'bailer', text: 'RULES OF THE LARDER. One: needs before wants — the man taught— A ROBOT taught us that, an anonymous robot. Two: nobody eats the last of anything alone; last-of-anything is a FAMILY food. Three: whoever is hungriest gets believed. We learned rule three the hard way. There is a song about it. There will not be a performance.' },
+      { kind: 'narration', text: 'The family writes its own larder rules under the Jumble\'s — needs and wants, out loud, and the discovery every stocked shelf makes possible: this family has ENOUGH, when the counting is honest. Enough was never the problem. The counting was.' },
     ],
     instrument: {
       toolId: 'ships_calendar', toolName: 'The Ship\'s Calendar',
@@ -223,8 +238,16 @@ export const MILESTONES: Milestone[] = [
     title: 'Two Huts or One',
     first: 'The camp layout argument — and the honest map of closeness and distance underneath it.',
     opening: [
-      { kind: 'narration', text: 'Where does each person sleep? Together, apart, near, far — the camp layout is the family\'s closeness map drawn in sand. There is no right answer; there is only the HONEST one, and it\'s allowed to be different per person, per season.' },
-      { kind: 'robot', who: 'hollow', text: 'Close is warm and loud. Far is quiet and cold. I keep choosing far and wishing someone would visit. …Put THAT on your map.' },
+      { kind: 'narration', text: 'Where does each person sleep? Together, apart, near, far — the camp layout is the family\'s closeness map drawn in sand. There is no right answer; there is only the HONEST one, and it\'s allowed to change.' },
+      { kind: 'robot', who: 'skip', text: 'Want to see ours? (he does not wait for an answer) The Jumble bunks in a spiral — closest to the fire is whoever had the hardest day, farthest is whoever needs the quiet, and we re-draw it EVERY night at gong. Nobody\'s spot means anything about being loved. The spiral is about TODAY. Hollow slept fire-side nine nights straight once and nobody said a word about it.' },
+      { kind: 'robot', who: 'hollow', text: '…Ten nights. And they left shells by my bunk. Every morning. Nobody ever admitted it.' },
+      { kind: 'choice', id: 's2_spiral', prompt: 'The Jumble re-draws their closeness every night. Does the family adopt the spiral?',
+        options: [
+          { id: 'adopt', label: 'Adopt it — hardest day sleeps nearest the fire' },
+          { id: 'own', label: 'Draw your own map — honest, in your family\'s shape' },
+        ] },
+      { kind: 'narration', when: { flag: 's2_spiral', is: 'adopt' }, text: 'The spiral comes to camp. The first night, nobody will admit to the hardest day — so the youngest assigns it, with terrifying accuracy, and the right person sleeps warm. The spiral knows. The spiral always knows.' },
+      { kind: 'narration', when: { flag: 's2_spiral', is: 'own' }, text: 'Your family draws its own shape in the sand — not the Jumble\'s spiral, yours — and Skip studies it for a long time and then copies it into his charcoal log under the heading OTHER GOOD SHAPES. The village has been collecting family-shapes for years, it turns out. All of them count.' },
     ],
     instrument: {
       toolId: 'mooring_lines', toolName: 'The Mooring Lines',
@@ -238,8 +261,9 @@ export const MILESTONES: Milestone[] = [
     title: 'The Second Language',
     first: 'Half the crew\'s signals were missing their targets. The island teaches signal-reading.',
     opening: [
-      { kind: 'narration', text: 'Skip waves flags nobody reads. Hollow leaves gifts nobody notices. The camp discovers its oldest problem: everyone is SENDING love; not everyone is receiving on that channel. Time to learn each other\'s actual frequencies — the bids, the small reaches, the "watch this."' },
-      { kind: 'robot', who: 'skip', text: 'I chase because I MISS people! It never once worked! What if — okay wild idea — what if I just SAID that part?' },
+      { kind: 'narration', text: 'It starts with a squeak. Skip\'s elbow, dry as a hinge in a drought — and the Collier, without a word, crossing the whole ring to oil it. Skip lights up like a lantern.' },
+      { kind: 'robot', who: 'skip', text: 'The Jumble has five oils! Everybody runs best on a different one. The Collier\'s is FIXING things for you — he never says a nice word, he just re-shingles your roof at dawn. Bailer\'s is counted time — sit with him while he counts and he\'s HAPPY. Echo-2 needs the words out loud. Hollow needs the shells — little gifts, no note. And mine is— (he goes shy) —mine\'s when somebody just… stays nearby. That\'s the whole oil. Nearby.' },
+      { kind: 'narration', text: 'The question lands on the family like a dropped conch: which oil does each of YOU run on? Wrong-oiling is the loneliest maintenance there is — years of faithful effort, poured into the wrong hinge. Today the family learns each other\'s.' },
     ],
     instrument: {
       toolId: 'assertiveness', toolName: 'The Signal Book',
@@ -253,8 +277,17 @@ export const MILESTONES: Milestone[] = [
     title: 'Storm-Proofing',
     first: 'The ridgepole gets set: the values this camp will NOT trade, whatever the weather.',
     opening: [
-      { kind: 'narration', text: 'Any wind can take a tent. What holds a camp through real weather is the ridgepole — the two or three things this family is FOR, chosen together, said out loud, lashed tight. Everything else can flex. The ridgepole doesn\'t.' },
-      { kind: 'robot', who: 'collier', text: 'Forge-truth, small ones: metal bends where it isn\'t sure what it\'s for. Same with crews. Decide your iron.' },
+      { kind: 'narration', text: 'The Collier calls it weather-sense: the village storm-proofs on the CALM days, because lashing a roof in the wind is just expensive praying. The family works the camp — extra lashings, deeper stakes, the fire\'s dry-store — and it\'s the oldest who finds it, scouting deadfall up the north path.' },
+      { kind: 'narration', text: 'A campsite. Old. Cold. A stone ring gone green, a lean-to collapsed into its own bones — and driven into the log beside the fire ring, waiting years for a hand its size: a knife. Bone-handled, sea-rusted, and along the flat of the blade, scratched deep and deliberate: M. BAUER.' },
+      { kind: 'robot', who: 'skip', text: '(gone very still, both hands around his bandaged one) …That\'s the quiet camp. We don\'t play there. The Elders say it belongs to the Before. (a long pause) I don\'t know what the Before is. Whenever I ask, the Collier oils something that isn\'t squeaking.' },
+      { kind: 'choice', id: 's2_knife', prompt: 'Mr. Bauer\'s knife — YEARS old, in an island campsite. He has been here before. What now?',
+        options: [
+          { id: 'follow', label: 'Follow the overgrown trail past the camp — now' },
+          { id: 'mark', label: 'Mark it on the map, storm-proof first — the island keeps its secrets one more night' },
+        ] },
+      { kind: 'narration', when: { flag: 's2_knife', is: 'follow' }, text: 'The trail runs inland, toward the falls — and dies at a rockslide older than the trail. Whatever Bauer walked toward, the island closed the road years ago. The compass in camp, when you check it that night, still points the same way. Patient as a held breath.' },
+      { kind: 'narration', when: { flag: 's2_knife', is: 'mark' }, text: 'The knife goes on the map — a careful X and the words THE QUIET CAMP — and the family finishes the storm-proofing by dusk, which matters more than anyone knows yet. Some doors keep. The compass points at this one all night, like it approves of the patience.' },
+      { kind: 'narration', text: 'That night, the fire burns with the tackle box\'s fire-steel and the storm-lashings hold in the first hard gusts of the season. Bauer\'s tools keeping Bauer\'s tour alive. Wherever the trail goes, it goes THROUGH this family now.' },
     ],
     instrument: {
       toolId: 'values_act', toolName: 'The Ridgepole',
@@ -268,8 +301,10 @@ export const MILESTONES: Milestone[] = [
     title: 'The Map of Us',
     first: 'The camp is standing. The crew maps where it came from — every branch, every knot.',
     opening: [
-      { kind: 'narration', text: 'Season II closes at the driftwood table with the biggest chart yet: the family across generations. Who taught whom to argue like that? Where did the silence pattern sail in from? Patterns travel by bloodline until somebody maps them — and a mapped current is a swimmable one.' },
-      { kind: 'robot', who: 'echo2', text: 'Your grandmother\'s sayings live in YOUR mouth. I know because I repeat you both. Slightly wrong. But the MATCH is unmistakable.' },
+      { kind: 'narration', text: 'Season two closes in the village\'s longest hut — the one the Jumble calls the Remembering House. The family is invited in for the first time. The walls are carved, floor to eave: robot history, panel by panel, in patient knife-work.' },
+      { kind: 'narration', text: 'And in every early panel: a MAN. Broad hands. A tackle box. Carving robots out of storm-wreck driftwood, one by one — teaching them fire, teaching them the spiral, teaching them the five oils. In the last panel of the row he stands with seven small figures around him, and the carver has worked the wood so the man\'s face is turned away. Toward the sea.' },
+      { kind: 'robot', who: 'echo2', text: '(quietly, watching the family look) Every family has panels like these. Who taught whom to argue like that? Where did the silence pattern sail in from? Patterns travel bloodlines like currents travel water. Tonight you carve YOUR panels — the family across generations — and you get to mark which patterns land with you, and which ones you leave in the water.' },
+      { kind: 'narration', text: 'Nobody asks the Jumble who the man is. Not yet. Some questions you carry until they\'re ripe. But the youngest, on the way out, stops at the turned-away face and — very gently, when the robots aren\'t looking — touches the carved tackle box with one finger. It is exactly the same box. Down to the latch.' },
     ],
     instrument: {
       toolId: 'family_map', toolName: 'The Family Map',
