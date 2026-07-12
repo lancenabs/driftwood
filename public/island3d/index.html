@@ -858,6 +858,8 @@ const JUMBLE = [
   { id: 'barnacle', name: 'Barnacle', x: 58, z: -18, lines: ['My feet were buoys! They kept a whole net afloat once. Now they keep ME afloat. Mostly.', 'The propeller? Decorative. The optimism? Structural.'] },
   { id: 'teapot', name: 'Kettle', x: -62, z: 52, lines: ['I was a teapot in my first life. I still believe most storms end in something warm.', 'Sit. Steam rises, tempers settle. That is just physics.'] },
   { id: 'wright', name: 'the Wright', x: 10, z: 70, lines: ['You BUILT that? Show me the corners. Corners are where the honesty lives.', 'Every fort starts as one brave block. Lay the next one.'] },
+  { id: 'lookout', name: 'the Lookout', x: -58, z: -32, lines: ['I watch the horizon so the little ones don\'t have to. That is the whole job.', 'No ships today. But the stars are ALL still there — I counted.'] },
+  { id: 'hoist', name: 'Hoist', x: 42, z: 62, lines: ['Heavy things are just light things that need two of us.', 'I lifted the whole bow of the wreck once. Then I put it down. Knowing when to put it down is the skill.'] },
 ];
 const loader = new THREE.TextureLoader();
 const robots = [];
@@ -870,7 +872,8 @@ for (const r of JUMBLE) {
   // standees (transparent, ground-planted, camera-facing). The old portrait
   // card is the honest fallback; both fall back to the bare post.
   loader.load(`/island3d/robots3d/${r.id}.png`, tex => {
-    const h = r.id === 'collier' ? 2.5 : r.id === 'skip' ? 1.35 : 1.9;
+    const HEIGHTS = { collier: 2.5, skip: 1.35, lookout: 2.7, hoist: 1.7, teapot: 1.6, barnacle: 1.5 };
+    const h = HEIGHTS[r.id] ?? 1.9;
     const w = h * (tex.image.width / tex.image.height);
     const card = new THREE.Mesh(
       new THREE.PlaneGeometry(w, h),
