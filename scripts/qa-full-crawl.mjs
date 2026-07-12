@@ -26,8 +26,9 @@ await page.addInitScript(() => {
 await page.goto(BASE + '/', { waitUntil: 'load', timeout: 20000 });
 await page.waitForTimeout(1600);
 
-// ── The four rooms ───────────────────────────────────────────────────────────
-for (const room of ['Check-in', 'Challenges', 'Library', 'Insights', 'Home']) {
+// ── The five rooms (island-only law, 2026-07-12: the fourth is "Island" now,
+//    not "Challenges" — the 3D world itself, not a list about it) ────────────
+for (const room of ['Check-in', 'Island', 'Library', 'Insights', 'Home']) {
   current = `room:${room}`;
   await page.locator('nav:visible').getByText(room, { exact: true }).click()
     .catch(() => findings.push({ where: current, kind: 'nav-fail', msg: 'room not clickable' }));
@@ -36,7 +37,7 @@ for (const room of ['Check-in', 'Challenges', 'Library', 'Insights', 'Home']) {
 
 // ── No crisis info on any room (the 2026-07-12 law: Settings-only) ───────────
 current = 'law:clean-surfaces';
-for (const room of ['Check-in', 'Challenges', 'Library', 'Insights', 'Home']) {
+for (const room of ['Check-in', 'Island', 'Library', 'Insights', 'Home']) {
   await page.locator('nav:visible').getByText(room, { exact: true }).click().catch(() => {});
   await page.waitForTimeout(500);
   const body = await page.evaluate(() => document.body.innerText);
@@ -55,12 +56,21 @@ for (const id of [...DECK, ...ISLAND_SAMPLE]) {
   await page.waitForTimeout(350);
 }
 
-// ── The Milestone Log lives on the Challenges tab (flagship law) ─────────────
-current = 'room:milestones';
-await page.locator('nav:visible').getByText('Challenges', { exact: true }).click().catch(() => {});
-await page.waitForTimeout(700);
-if (!(await page.getByText('The Milestone Log').first().isVisible().catch(() => false)))
-  findings.push({ where: current, kind: 'log-fail', msg: 'milestone log missing from the Challenges tab' });
+// ── The Island tab IS the 3D world — island-only law (2026-07-12): no
+//    off-island list of milestones exists to check for anymore. The Milestone
+//    Log mounts invisibly (hideShelf) and only proves itself when a story
+//    circle triggers it — the crawl instead asserts the room's real content:
+//    the world renders, and the read-only Trail stays reachable. ────────────
+current = 'room:island';
+await page.locator('nav:visible').getByText('Island', { exact: true }).click().catch(() => {});
+await page.waitForTimeout(1200);
+if (!(await page.locator('iframe[title="The Island in three dimensions"]').first().isVisible().catch(() => false)))
+  findings.push({ where: current, kind: 'island-fail', msg: 'the 3D island did not mount in the Island tab' });
+if (!(await page.locator('[data-testid="challenges-tidechart"]').first().isVisible().catch(() => false)))
+  findings.push({ where: current, kind: 'trail-fail', msg: 'the Trail (read-only progress) button is missing from the island' });
+// the shelf must NOT be browsable off the island — the law's other half
+if (await page.getByText('The Milestone Log').first().isVisible().catch(() => false))
+  findings.push({ where: current, kind: 'law-violation', msg: 'a browsable milestone shelf rendered on the Island tab — challenges must only open by walking to them' });
 // ── The swap card stays on the shore ─────────────────────────────────────────
 current = 'room:swap';
 await page.locator('nav:visible').getByText('Home', { exact: true }).click().catch(() => {});

@@ -17,39 +17,24 @@ await page.addInitScript(() => {
 });
 await page.goto('http://localhost:3300/', { waitUntil: 'networkidle' });
 await page.waitForTimeout(1500);
-// rail has the flagship's 5 rooms incl Challenges
+// rail has the flagship's 5 rooms — island-only law (2026-07-12): the 4th is
+// "Island" now, the 3D world itself, not a browsable "Challenges" list.
 const rail = await page.locator('nav.hidden button').allTextContents();
 console.log('desktop rail:', rail.join(' · '));
-check('rail carries Challenges', rail.some(t => /Challenges/.test(t)));
+check('rail carries Island', rail.some(t => /Island/.test(t)));
+check('rail does NOT carry a bare Challenges room', !rail.some(t => /^Challenges$/.test(t.trim())));
 // FLAGSHIP WIDTH LAW: the shell fills the screen (no centered max-w cap)
 const mainBox = await page.locator('main').boundingBox();
 check('main fills the width (≥ 1400px at 1690)', !!mainBox && mainBox.width >= 1400, `${Math.round(mainBox?.width ?? 0)}px`);
-// the Challenges tab: header + trail + the two doors
-await page.locator('nav.hidden button', { hasText: 'Challenges' }).click();
-await page.waitForTimeout(800);
-const body = await page.evaluate(() => document.body.innerText);
-check('challenge header (Survival first N of 31)', /Survival first \d+ of 31/.test(body));
-check('the trail renders (Milestone Log)', body.includes('The Milestone Log'));
-check('campfire door on the tab', await page.getByTestId('challenges-campfire').isVisible());
-check('shop door on the tab', await page.getByTestId('challenges-shop').isVisible());
-// the campfire door opens the games overlay
-await page.getByTestId('challenges-campfire').click();
-await page.waitForTimeout(700);
-const games = await page.locator('[data-testid^="game-"]').count();
-check('campfire overlay games', games >= 20, String(games));
-await page.screenshot({ path: '/tmp/shell-challenges-desktop.png' });
-// fresh page — the games overlay covers the viewport until closed
-await page.reload({ waitUntil: 'networkidle' });
-await page.waitForTimeout(1200);
-// check-in banner routes to the campfire overlay
-await page.locator('nav.hidden button', { hasText: 'Check-in' }).click();
-await page.waitForTimeout(800);
-if (await page.getByTestId('checkin-campfire').isVisible().catch(() => false)) {
-  await page.getByTestId('checkin-campfire').click();
-  await page.waitForTimeout(600);
-  const overlayGames = await page.locator('[data-testid^="game-"]').count();
-  check('checkin → campfire pointer', overlayGames >= 20, String(overlayGames));
-}
+// the Home shore's hero door also lands on the island (one consolidated path)
+check('Enter the Island hero on Home', await page.getByTestId('walk-island').isVisible());
+check('Campfire Games is NOT a direct door off-island', !(await page.getByTestId('fire-quiz').isVisible().catch(() => false)));
+await page.getByTestId('walk-island').click();
+await page.waitForTimeout(2200);
+check('the 3D island mounted', await page.locator('iframe[title="The Island in three dimensions"]').isVisible());
+check('the Trail (read-only progress) stays reachable', await page.getByTestId('challenges-tidechart').isVisible());
+check('no browsable milestone shelf floats over the island', !(await page.getByText('The Milestone Log').first().isVisible().catch(() => false)));
+await page.screenshot({ path: '/tmp/shell-island-desktop.png' });
 // mobile
 const m = await browser.newPage({ viewport: { width: 390, height: 760 } });
 m.on('pageerror', e => errs.push(String(e)));
@@ -61,11 +46,10 @@ await m.goto('http://localhost:3300/', { waitUntil: 'networkidle' });
 await m.waitForTimeout(1200);
 const bottomTabs = await m.locator('nav.lg\\:hidden button').count();
 check('mobile bottom tabs', bottomTabs === 5, String(bottomTabs));
-await m.locator('nav.lg\\:hidden button', { hasText: 'Challenges' }).click();
-await m.waitForTimeout(600);
-const mBody = await m.evaluate(() => document.body.innerText);
-check('mobile Challenges tab renders', /Survival first \d+ of 31/.test(mBody));
-await m.screenshot({ path: '/tmp/shell-challenges-mobile.png' });
+await m.locator('nav.lg\\:hidden button', { hasText: 'Island' }).click();
+await m.waitForTimeout(2200);
+check('mobile Island tab mounts the 3D world', await m.locator('iframe[title="The Island in three dimensions"]').isVisible());
+await m.screenshot({ path: '/tmp/shell-island-mobile.png' });
 console.log('errors:', errs.length ? errs.join(' | ') : 'none');
 await browser.close();
 if (fails.length || errs.length) { console.error(`SHELL GATE: ${fails.length} fail(s), ${errs.length} error(s)`); process.exit(1); }

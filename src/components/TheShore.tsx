@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { readNeeds, planksEarned, embersHeld, lanternLit, appendEvent } from '../lib/world';
 import { THE_SEVEN, readCrew, aiCastaways, activeCastaway, setActiveCastaway } from '../lib/castaways';
-import GamesMenu from './games/GamesMenu';
-// (the 2D seek map remains the Gathering bar's game; the shore door now opens
-// the REAL island — public/island3d/, third person, the Horizon-mobile shape)
+// The island itself — its 3D world, its postMessage handling, its Campfire
+// Games trigger — now lives entirely in the Island tab (ChallengesTab.tsx,
+// island-only law, 2026-07-12). This scene just opens the door.
+const enterIsland = () => window.dispatchEvent(new CustomEvent('driftwood:walk-island'));
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE SHORE — the living scene at the top of the Driftwood tab.
@@ -30,37 +31,15 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
   // When the Foundry's painting loads, the CSS-painted layers stand down —
   // one scene, never two fighting. Missing art = the painted layers hold.
   const [artLoaded, setArtLoaded] = useState(false);
-  const [walking, setWalking] = useState(false);   // 🏝 the one-click island door
-  const [firing, setFiring] = useState(false);     // 🔥 the Fire Quiz
   useEffect(() => {
     const bump = () => force(x => x + 1);
-    // the 3D island's "← the shore" button lands here; the campfire's
-    // "gather round" opens the games right over the island
-    const leave = (e: MessageEvent) => {
-      if (e.data?.type === 'driftwood:leave-island') setWalking(false);
-      if (e.data?.type === 'driftwood:open-games') setFiring(true);
-      // a story circle on the island: come ashore and open that milestone
-      if (e.data?.type === 'driftwood:open-milestone' && e.data.id) {
-        setWalking(false);
-        // the log lives on the Challenges tab now (flagship law) — walk there first
-        window.dispatchEvent(new CustomEvent('driftwood:open-challenges'));
-        setTimeout(() => window.dispatchEvent(new CustomEvent('driftwood:open-milestone', { detail: { id: e.data.id } })), 350);
-      }
-    };
-    // ANY door into the island (the shore button OR the Gathering bar) opens
-    // the same 3D world — one island, no confusion.
-    const enter = () => setWalking(true);
     window.addEventListener('driftwood:world-event', bump);
     window.addEventListener('driftwood:castaway-changed', bump);
     window.addEventListener('focus', bump);
-    window.addEventListener('message', leave);
-    window.addEventListener('driftwood:walk-island', enter);
     return () => {
       window.removeEventListener('driftwood:world-event', bump);
       window.removeEventListener('driftwood:castaway-changed', bump);
       window.removeEventListener('focus', bump);
-      window.removeEventListener('message', leave);
-      window.removeEventListener('driftwood:walk-island', enter);
     };
   }, []);
 
@@ -151,48 +130,37 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         </div>
       </div>
 
-      {/* THE DOORS — the LANCE quick-suite language (2026-07-12 home cleanup):
-          clean white cards, icon tiles, quiet labels. Same four doors. */}
+      {/* THE ONE DOOR — the 2026-07-12 island law: every challenge, every
+          game, lives ON the island now. This is the hero action of the whole
+          app, not one of a row of equals — so it reads like one. */}
       <div className="bg-white p-3 border-t-2 border-outline-variant">
-        <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2 px-1">⚡ On the island today</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <button onClick={() => setWalking(true)} data-testid="walk-island"
-            className="flex items-center gap-3 p-3 rounded-2xl border border-outline-variant/60 bg-slate-50 hover:bg-slate-100 active:scale-[0.99] transition-all text-left cursor-pointer">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-lg shrink-0">🏝</div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-black text-slate-800">Enter the Island</div>
-              <div className="text-[10px] font-bold text-primary uppercase tracking-wide">Launch ›</div>
-            </div>
-            {(() => { // the shell run rides the door — the family's treasure count
-              try {
-                const n = Object.keys(JSON.parse(localStorage.getItem('driftwood_shells_v1') || '{}')).length;
-                return n > 0 ? <span data-testid="shell-count" className="text-[10px] font-black text-slate-500 bg-slate-200 rounded-full px-2 py-0.5">🐚 {n}/40</span> : null;
-              } catch { return null; }
-            })()}
-          </button>
-          <button onClick={() => setFiring(true)} data-testid="fire-quiz"
-            className="flex items-center gap-3 p-3 rounded-2xl border border-outline-variant/60 bg-slate-50 hover:bg-slate-100 active:scale-[0.99] transition-all text-left cursor-pointer">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-lg shrink-0">🏕️</div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-black text-slate-800">Campfire Games</div>
-              <div className="text-[10px] font-bold text-amber-600 uppercase tracking-wide">Launch ›</div>
-            </div>
-          </button>
+        <button onClick={enterIsland} data-testid="walk-island"
+          className="w-full flex items-center gap-3 p-4 rounded-[1.75rem] text-left cursor-pointer active:scale-[0.99] transition-all"
+          style={{ background: 'linear-gradient(120deg,#0E7C7C,#2E96B5)', boxShadow: '0 10px 28px rgba(14,124,124,0.35)' }}>
+          <div className="w-12 h-12 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center text-2xl shrink-0">🏝</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-base font-display font-black text-white">Enter the Island</div>
+            <div className="text-[10.5px] font-bold text-white/80">every challenge, every game — walk to it, live</div>
+          </div>
+          {(() => { // the shell run rides the door — the family's treasure count
+            try {
+              const n = Object.keys(JSON.parse(localStorage.getItem('driftwood_shells_v1') || '{}')).length;
+              return n > 0 ? <span data-testid="shell-count" className="shrink-0 text-[10px] font-black text-white bg-white/20 rounded-full px-2.5 py-1">🐚 {n}/40</span> : null;
+            } catch { return null; }
+          })()}
+        </button>
+        {/* Same island, alternate bodies — headset and mixed-reality doors stay
+            one tap away, quiet and secondary; they are NOT a bypass. */}
+        <div className="flex gap-2 mt-2">
           <a href="/vr/index.html" data-testid="vr-door"
-            className="flex items-center gap-3 p-3 rounded-2xl border border-outline-variant/60 bg-slate-50 hover:bg-slate-100 active:scale-[0.99] transition-all text-left cursor-pointer">
-            <div className="w-10 h-10 rounded-xl bg-slate-800/10 flex items-center justify-center text-lg shrink-0">🥽</div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-black text-slate-800">Stand on the Island</div>
-              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">VR headset ›</div>
-            </div>
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-outline-variant/60 bg-slate-50 hover:bg-slate-100 active:scale-[0.99] transition-all cursor-pointer">
+            <span className="text-sm">🥽</span>
+            <span className="text-[9.5px] font-black text-slate-600 uppercase tracking-wide">VR headset</span>
           </a>
           <a href="/mr/index.html" data-testid="mr-door"
-            className="flex items-center gap-3 p-3 rounded-2xl border border-outline-variant/60 bg-slate-50 hover:bg-slate-100 active:scale-[0.99] transition-all text-left cursor-pointer">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-lg shrink-0">🔥</div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-black text-slate-800">The Fire in Your Room</div>
-              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Mixed reality ›</div>
-            </div>
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border border-outline-variant/60 bg-slate-50 hover:bg-slate-100 active:scale-[0.99] transition-all cursor-pointer">
+            <span className="text-sm">🔥</span>
+            <span className="text-[9.5px] font-black text-slate-600 uppercase tracking-wide">Mixed reality</span>
           </a>
         </div>
       </div>
@@ -227,16 +195,6 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         )}
       </div>
 
-      {/* the campfire games menu — Fire Quiz, Two Truths, and the growing rest */}
-      {firing && <GamesMenu onClose={() => setFiring(false)} />}
-
-      {/* the island itself, one click deep — 3D, third person, same origin so
-          your castaway, your fit, and the live camp all carry over */}
-      {walking && (
-        <div className="fixed inset-0 z-[60] bg-[#BEE3F0]">
-          <iframe src="/island3d/index.html" title="The Island in three dimensions" className="w-full h-full border-0" allow="fullscreen" />
-        </div>
-      )}
     </div>
   );
 }

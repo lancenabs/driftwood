@@ -288,7 +288,7 @@ export default function GenogramEditor({ onBack }: GenogramEditorProps) {
   const selectedNode = nodes.find(n => n.id === selectedNodeId);
 
   return (
-    <div className="flex flex-col gap-4 py-2 w-full max-w-md mx-auto text-on-background animate-fade-in-up">
+    <div className="flex flex-col gap-4 py-2 w-full max-w-3xl mx-auto text-on-background animate-fade-in-up">
       
       {/* Top Navigation Row */}
       <div className="flex items-center gap-3 bg-surface-container-lowest p-3 rounded-[2rem] border-2 border-outline-variant shadow-sm relative overflow-hidden">
@@ -363,7 +363,7 @@ export default function GenogramEditor({ onBack }: GenogramEditorProps) {
           ref={canvasRef}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          className="h-[300px] w-full bg-slate-50 border-2 border-outline-variant rounded-[2.5rem] relative overflow-hidden shadow-inner cursor-crosshair select-none bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px]"
+          className="h-[380px] w-full bg-slate-50 border-2 border-outline-variant rounded-[2.5rem] relative overflow-hidden shadow-inner cursor-crosshair select-none bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px]"
         >
           {/* SVG layer for relationship lines */}
           <svg className="absolute inset-0 pointer-events-auto w-full h-full">

@@ -1,17 +1,19 @@
 import React from 'react';
-import { Zap, Flame, ShoppingBag, Lock } from 'lucide-react';
+import { Map as MapIcon } from 'lucide-react';
 import { MILESTONES, SEASONS } from '../data/milestones';
 import { useGame } from '../lance/components/LANCEGame/LANCEGameContext';
 import MilestoneLog from './MilestoneLog';
 import TideChart from './TideChart';
 
 // ═════════════════════════════════════════════════════════════════════════════
-//  THE CHALLENGES TAB — Driftwood's dedicated challenge room on the flagship
-//  design (LANCE law, 2026-07-12): a progress header (season arc + XP + gems),
-//  the 31-milestone trail (locked → active → complete), the campfire-games
-//  door (the instruments' room), and the Rewards Store door (spend what the
-//  crossing paid). Completing a milestone unlocks its instrument — the
-//  challenges teach the library, app by app.
+//  THE ISLAND TAB — island-only law (2026-07-12): "the island IS the
+//  challenge." This tab no longer lists milestones to tap open from a couch —
+//  it IS the 3D island, full-bleed, the moment you land on it. Walking into a
+//  season's story circle is the only way a milestone opens (MilestoneLog is
+//  mounted invisibly — hideShelf — and surfaces its own overlay only once the
+//  island actually triggers one). Campfire Games open the same way: walk to
+//  the fire. A quiet Trail button stays for the read-only progress view
+//  (that's "insight data," which the fleet's law explicitly allows off-island).
 // ═════════════════════════════════════════════════════════════════════════════
 
 function readClosed(): string[] {
@@ -21,13 +23,15 @@ function readClosed(): string[] {
   } catch { return []; }
 }
 
-export default function ChallengesTab({ onOpenTool, onOpenGames }: {
+export default function ChallengesTab({ onOpenTool, onOpenGames, onLeaveIsland }: {
   onOpenTool: (id: string) => void;
   onOpenGames: () => void;
+  onLeaveIsland: () => void;
 }) {
-  const { xp, gems, unlockedTools } = useGame();
+  const { xp, gems } = useGame();
   const [tideOpen, setTideOpen] = React.useState(false);
   const [, force] = React.useState(0);
+
   React.useEffect(() => {
     const bump = () => force(x => x + 1);
     window.addEventListener('driftwood:world-event', bump);
@@ -38,87 +42,54 @@ export default function ChallengesTab({ onOpenTool, onOpenGames }: {
     };
   }, []);
 
+  // The 3D world talks to its host through postMessage — the same three
+  // signals it always sent; only the host changed (this tab, not a modal).
+  React.useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'driftwood:leave-island') onLeaveIsland();
+      if (e.data?.type === 'driftwood:open-games') onOpenGames();
+      if (e.data?.type === 'driftwood:open-milestone' && e.data.id) {
+        window.dispatchEvent(new CustomEvent('driftwood:open-milestone', { detail: { id: e.data.id } }));
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [onOpenGames, onLeaveIsland]);
+
   const closed = readClosed();
   const next = MILESTONES.find(m => !closed.includes(m.id)) ?? null;
   const season = next ? SEASONS.find(s => s.n === next.season)! : SEASONS[SEASONS.length - 1];
   const pct = Math.round((closed.length / MILESTONES.length) * 100);
 
   return (
-    <div className="w-full pt-3 pb-4">
-      {/* ── The flagship progress header ── */}
-      <div className="rounded-[2rem] overflow-hidden border-2 border-outline-variant mb-4"
-        style={{ background: 'linear-gradient(120deg,#0E7C7C,#2E96B5)' }}>
-        <div className="px-5 py-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-white/70">
-                Season {season.n} · {season.name}
-              </p>
-              <h2 className="font-display font-black text-lg text-white leading-tight mt-0.5">
-                {next ? `Survival first ${next.n} of ${MILESTONES.length}` : 'Every first is behind you'}
-              </h2>
-              <p className="text-[11px] text-white/75 mt-0.5 italic truncate">{season.arc}</p>
-            </div>
-            <div className="shrink-0 flex flex-col items-end gap-1.5">
-              <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/15 border border-white/25"
-                title="XP — earned by real milestone work">
-                <Zap className="w-3 h-3 text-yellow-300" />
-                <span className="text-[11px] font-black text-white">{xp.toLocaleString()}</span>
-              </span>
-              <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/15 border border-white/25"
-                title="Gems — spend them in the Rewards Store">
-                <span className="text-[11px]">💎</span>
-                <span className="text-[11px] font-black text-white">{gems.toLocaleString()}</span>
-              </span>
-            </div>
-          </div>
-          {/* progress bar */}
-          <div className="mt-3 h-2 rounded-full bg-white/20 overflow-hidden">
-            <div className="h-full rounded-full bg-amber-300 transition-all duration-700" style={{ width: `${pct}%` }} />
-          </div>
-          <p className="text-[10px] font-black text-white/80 mt-1.5">{closed.length}/{MILESTONES.length} closed · {unlockedTools.length} apps unlocked</p>
-        </div>
+    <div className="absolute inset-0 bg-[#BEE3F0]">
+      <iframe src="/island3d/index.html" title="The Island in three dimensions" className="w-full h-full border-0" allow="fullscreen" />
+
+      {/* Quiet progress pill — insight, not a shortcut; nothing here opens anything */}
+      <div className="absolute left-3 z-10 flex items-center gap-2 rounded-full pointer-events-none"
+        style={{ top: 'max(12px, env(safe-area-inset-top))', background: 'rgba(0,0,0,0.32)', backdropFilter: 'blur(6px)', padding: '6px 12px' }}>
+        <span className="text-[10px] font-black text-white/90">Season {season.n} · {season.name}</span>
+        <span className="text-[10px] font-black text-amber-300">{closed.length}/{MILESTONES.length}</span>
+        <span className="text-[10px] font-black text-yellow-300">⚡ {xp.toLocaleString()}</span>
+        <span className="text-[10px] font-black text-white/90">💎 {gems.toLocaleString()}</span>
       </div>
 
-      {/* ── The two doors: instruments + the shop (LANCE pattern) ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-        <button onClick={onOpenGames} data-testid="challenges-campfire"
-          className="flex items-center gap-3 p-3 rounded-2xl bg-white border-2 border-outline-variant hover:border-amber-400/60 active:scale-[0.99] transition-all text-left cursor-pointer">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
-            <Flame className="w-5 h-5 text-amber-500" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-black text-slate-800">Campfire Games</div>
-            <div className="text-[10px] text-slate-500">the milestones' instruments — a real round closes the case</div>
-          </div>
-        </button>
-        <button onClick={() => setTideOpen(true)} data-testid="challenges-tidechart"
-          className="flex items-center gap-3 p-3 rounded-2xl bg-white border-2 border-outline-variant hover:border-teal-500/50 active:scale-[0.99] transition-all text-left cursor-pointer">
-          <div className="w-10 h-10 rounded-xl bg-teal-600/10 flex items-center justify-center shrink-0 text-lg">🗺️</div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-black text-slate-800">The Tide Chart</div>
-            <div className="text-[10px] text-slate-500">tide-marks · the family · the island · the week's water</div>
-          </div>
-        </button>
-        <button onClick={() => onOpenTool('rewards_store')} data-testid="challenges-shop"
-          className="flex items-center gap-3 p-3 rounded-2xl bg-white border-2 border-outline-variant hover:border-primary/50 active:scale-[0.99] transition-all text-left cursor-pointer">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <ShoppingBag className="w-5 h-5 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-black text-slate-800">Rewards Store</div>
-            <div className="text-[10px] text-slate-500">spend the gems the crossing paid — titles & accents</div>
-          </div>
-        </button>
-      </div>
-
-      {/* ── The trail itself — the proven MilestoneLog engine ── */}
-      <MilestoneLog onOpenTool={onOpenTool} />
+      {/* The Trail — a read-only progress view (insight data; allowed off the
+          walking part of the island by the same law that allows Insights). */}
+      <button onClick={() => setTideOpen(true)} data-testid="challenges-tidechart"
+        className="absolute right-3 z-10 flex items-center gap-1.5 rounded-full text-white text-[10.5px] font-black uppercase tracking-wide cursor-pointer"
+        style={{ top: 'max(12px, env(safe-area-inset-top))', background: 'rgba(0,0,0,0.32)', backdropFilter: 'blur(6px)', padding: '8px 14px' }}>
+        <MapIcon className="w-3.5 h-3.5" /> Trail
+      </button>
 
       {tideOpen && <TideChart onClose={() => setTideOpen(false)} />}
 
-      <p className="text-[9px] text-slate-400 text-center italic flex items-center justify-center gap-1">
-        <Lock className="w-3 h-3" /> each milestone unlocks its app in the Library — that's the point of the crossing
+      {/* Invisible until the island actually triggers one — walking a story
+          circle is the only door; this just answers when it opens. */}
+      <MilestoneLog onOpenTool={onOpenTool} hideShelf />
+
+      <p className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-[9px] font-bold text-white/70 text-center px-3 pointer-events-none" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}>
+        {pct}% of the crossing · walk to a glowing circle to open its first
       </p>
     </div>
   );

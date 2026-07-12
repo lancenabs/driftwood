@@ -64,7 +64,7 @@ const ROBOT_NAMES: Record<string, { name: string; emoji: string }> = {
 
 type Phase = 'log' | 'scene' | 'conch' | 'working' | 'closing' | 'closed';
 
-export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) => void }) {
+export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (id: string) => void; hideShelf?: boolean }) {
   const { addXp, addGems, unlockTool } = useGame();
   const [state, setState] = useState<LogState>(loadState);
   const [active, setActive] = useState<Milestone | null>(null);
@@ -247,7 +247,11 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
   };
 
   // ── The log shelf ──────────────────────────────────────────────────────────
+  // island-only law (2026-07-12): off-island, there is nothing to browse or
+  // open here — the shelf IS the island's story circles now. hideShelf mounts
+  // this component invisibly until a milestone is actually triggered.
   if (phase === 'log' || !active) {
+    if (hideShelf) return null;
     return (
       <div className="bg-white rounded-[2rem] border-2 border-outline-variant p-4 mb-4">
         <div className="flex items-center justify-between mb-2">
@@ -332,7 +336,7 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
   }
 
   // ── Scene / conch / working / closed ───────────────────────────────────────
-  return (
+  const activeCard = (
     <div className="bg-white rounded-[2rem] border-2 border-outline-variant p-4 mb-4">
       <div className="flex items-center justify-between mb-2">
         <p className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-600 flex items-center gap-1">
@@ -448,4 +452,16 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
       )}
     </div>
   );
+
+  // On the island (hideShelf), a triggered milestone floats as a real overlay
+  // above the 3D world instead of an inline tab card — the story circle calls,
+  // this answers, and closing it drops you right back on the ground you stood on.
+  if (hideShelf) {
+    return (
+      <div className="fixed inset-0 z-[70] bg-black/55 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 overflow-y-auto">
+        <div className="w-full max-w-md sm:my-auto">{activeCard}</div>
+      </div>
+    );
+  }
+  return activeCard;
 }

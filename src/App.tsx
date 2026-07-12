@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import { Heart, Moon, Sun, Settings, Home, PlusCircle, Anchor, BarChart2, Zap } from 'lucide-react';
+import { Heart, Moon, Sun, Settings, Home, PlusCircle, Anchor, BarChart2, Zap, Palmtree } from 'lucide-react';
 import BoardingStory from './components/BoardingStory';
-import HomeScreen from './components/HomeScreen';
-import MicroLessonScreen from './components/MicroLessonScreen';
-import CharacterSelectScreen from './components/CharacterSelectScreen';
-import LiveScenarioPlayScreen from './components/LiveScenarioPlayScreen';
-import DebriefScreen from './components/DebriefScreen';
 import SettingsScreen from './components/SettingsScreen';
-import GoalsDashboard from './components/GoalsDashboard';
-import GenogramEditor from './components/GenogramEditor';
-import { ScreenType, Character } from './types';
+import MyAppsGrid from './components/MyAppsGrid';
 import { MotionConfig } from 'motion/react';
 import { LANCEGameProvider, useGame } from './lance/components/LANCEGame/LANCEGameContext';
 import ChallengesTab from './components/ChallengesTab';
@@ -105,17 +98,21 @@ function DriftwoodShell() {
     return () => window.removeEventListener('app:open-safety-settings', openSafety);
   }, []);
 
-  // anything in the app can walk you to the fire (banners, the island's door)
-  // or to the Challenges tab. Registered BEFORE the boarding early-return —
-  // hooks must run in the same order on every render.
+  // anything in the app can walk you to the fire (banners) or to the Island
+  // tab (the shore's hero door, the Gathering bar's "Walk together" — island
+  // law, 2026-07-12: this IS how every challenge and game opens now).
+  // Registered BEFORE the boarding early-return — hooks must run in the same
+  // order on every render.
   React.useEffect(() => {
     const toFire = () => setShowGames(true);
     const toChallenges = () => setActiveTab('challenges');
     window.addEventListener('driftwood:open-campfire', toFire);
     window.addEventListener('driftwood:open-challenges', toChallenges);
+    window.addEventListener('driftwood:walk-island', toChallenges);
     return () => {
       window.removeEventListener('driftwood:open-campfire', toFire);
       window.removeEventListener('driftwood:open-challenges', toChallenges);
+      window.removeEventListener('driftwood:walk-island', toChallenges);
     };
   }, []);
 
@@ -136,16 +133,17 @@ function DriftwoodShell() {
     );
   }
 
-  // The flagship's five rooms (LANCE: Home · Library · Check In · Challenges ·
-  // Insights). Campfire games stay one tap away (home card + the ⚡ tab's door)
-  // — they are the milestones' instruments, so they live WITH the challenges.
-  // THE FLAGSHIP ORDER (Lance 2026-07-12, fleet law): Home · Library ·
-  // Check-in (the thumb's center) · Challenges · Insights.
+  // The flagship's five rooms, Driftwood's own way (LANCE nav-slot parity,
+  // island-only law 2026-07-12: "this app is different — it starts on the
+  // island"). Home · Library · Check-in keep the flagship's exact jobs; the
+  // fourth slot IS the 3D island now — no list, no bypass, every challenge
+  // and every game opens by walking to it there. Insights stays the read-only
+  // data room, off-island, same as the fleet.
   const NAV: { id: Tab; icon: typeof Home; label: string }[] = [
     { id: 'driftwood',  icon: Home,       label: 'Home' },
     { id: 'library',    icon: Anchor,     label: 'Library' },
     { id: 'checkin',    icon: PlusCircle, label: 'Check-in' },
-    { id: 'challenges', icon: Zap,        label: 'Challenges' },
+    { id: 'challenges', icon: Palmtree,   label: 'Island' },
     { id: 'insights',   icon: BarChart2,  label: 'Insights' },
   ];
 
@@ -231,7 +229,7 @@ function DriftwoodShell() {
       {/* Main viewport */}
       <main className="flex-1 min-h-0 relative w-full min-w-0">
         <div className="absolute inset-0 overflow-y-auto px-3 pb-4" style={{ display: activeTab === 'driftwood' ? 'block' : 'none' }}>
-          <FamilyScreens onOpenTool={openTool} />
+          <DriftwoodHome onOpenTool={openTool} />
         </div>
         {activeTab === 'checkin' && (
           <div className="absolute inset-0 overflow-y-auto">
@@ -239,9 +237,13 @@ function DriftwoodShell() {
           </div>
         )}
         {activeTab === 'challenges' && (
-          <div className="absolute inset-0 overflow-y-auto px-3 pb-4">
-            <ChallengesTab onOpenTool={openTool} onOpenGames={() => setShowGames(true)} />
-          </div>
+          // Full-bleed, no scroll wrapper — this IS the island, not a list
+          // about it (island-only law, 2026-07-12).
+          <ChallengesTab
+            onOpenTool={openTool}
+            onOpenGames={() => setShowGames(true)}
+            onLeaveIsland={() => setActiveTab('driftwood')}
+          />
         )}
         {activeTab === 'library' && (
           <div className="absolute inset-0 overflow-y-auto">
@@ -309,93 +311,23 @@ function DriftwoodShell() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  THE FAMILY SCREENS — the scaffold's real flow (home → lesson / scenario →
-//  debrief · goals · genogram), transplanted whole into the DRIFTWOOD tab.
-//  Phase 2 remaps these into the Family Deck; Phase 3 raises the shore around
-//  them. The scaffold's feedback-theater ("compiled and signed for clinician
-//  evaluation" — a false claim) did not make the crossing.
+//  THE HOME SHORE — island-first law (2026-07-12, "this app is different, it
+//  starts on the island"). Home has exactly three jobs now: the hero door
+//  onto the island (every challenge and game lives there, walked to), the
+//  Gathering (coordinate with family on other devices — light the fire, walk
+//  together), and the apps you've saved here from the Library. The old
+//  scaffold's separate lesson/practice/debrief/goals/genogram screen-flow —
+//  a second, competing "milestone" system that never touched the island or
+//  the robots — did not make the crossing; Goals and the Genogram remain one
+//  tap away as real Library tools (family_manifest, family_map).
 // ─────────────────────────────────────────────────────────────────────────────
-function FamilyScreens({ onOpenTool }: { onOpenTool: (id: string) => void }) {
-  const [activeScreen, setActiveScreen] = useState<ScreenType>('home');
-  // Re-tapping the Driftwood tab returns to the shore (bottom-nav convention).
-  React.useEffect(() => {
-    const home = () => setActiveScreen('home');
-    window.addEventListener('driftwood:go-home', home);
-    return () => window.removeEventListener('driftwood:go-home', home);
-  }, []);
-  const [selectedChar, setSelectedChar] = useState<Character | null>(null);
-  const [streak, setStreak] = useState(0);
-  const [empathyScore, setEmpathyScore] = useState(0);
-  const [safetyScore, setSafetyScore] = useState(0);
-  const [xpEarned, setXpEarned] = useState(0);
-  const [sessionHistory, setSessionHistory] = useState<{ session: number; empathy: number; safety: number }[]>(() => {
-    try {
-      const val = localStorage.getItem('driftwood_session_history_v1');
-      if (val) return JSON.parse(val);
-    } catch { /* fresh shore */ }
-    return [];
-  });
-
-  const handleFinishSimulation = (finalEmpathy: number, finalSafety: number, finalXp: number) => {
-    setEmpathyScore(finalEmpathy);
-    setSafetyScore(finalSafety);
-    setXpEarned(finalXp);
-    setSessionHistory(prev => {
-      const next = [...prev, { session: prev.length + 1, empathy: finalEmpathy, safety: finalSafety }].slice(-10);
-      try { localStorage.setItem('driftwood_session_history_v1', JSON.stringify(next)); } catch { /* ignore */ }
-      return next;
-    });
-    setActiveScreen('debrief');
-  };
-
+function DriftwoodHome({ onOpenTool }: { onOpenTool: (id: string) => void }) {
   return (
     <div className="pt-3">
-      {/* The Milestone Log moved to its own Challenges tab (flagship law) —
-          the home keeps the shore, the Gathering, and the swap card. */}
-      {activeScreen === 'home' && <TheShore onOpenTool={onOpenTool} />}
-      {activeScreen === 'home' && <GatheringBar />}
-      {activeScreen === 'home' && <PerspectiveSwap />}
-      {activeScreen === 'home' && (
-        <HomeScreen
-          onStartLesson={() => setActiveScreen('lesson')}
-          onEnterPractice={() => setActiveScreen('char-select')}
-          onViewGoals={() => setActiveScreen('goals')}
-          onViewGenogram={() => setActiveScreen('genogram')}
-          streak={streak}
-        />
-      )}
-      {activeScreen === 'lesson' && (
-        <MicroLessonScreen
-          onBack={() => setActiveScreen('home')}
-          onComplete={() => { setStreak(s => s + 1); setActiveScreen('home'); }}
-        />
-      )}
-      {activeScreen === 'char-select' && (
-        <CharacterSelectScreen
-          onBack={() => setActiveScreen('home')}
-          onSelectCharacter={(char) => { setSelectedChar(char); setActiveScreen('simulation'); }}
-        />
-      )}
-      {activeScreen === 'simulation' && selectedChar && (
-        <LiveScenarioPlayScreen
-          character={selectedChar}
-          onBack={() => setActiveScreen('char-select')}
-          onFinishSimulation={handleFinishSimulation}
-          sessionHistory={sessionHistory}
-        />
-      )}
-      {activeScreen === 'debrief' && (
-        <DebriefScreen
-          empathyScore={empathyScore}
-          safetyScore={safetyScore}
-          xpEarned={xpEarned}
-          sessionHistory={sessionHistory}
-          onDone={() => setActiveScreen('home')}
-          onRetry={() => setActiveScreen(selectedChar ? 'simulation' : 'char-select')}
-        />
-      )}
-      {activeScreen === 'goals' && <GoalsDashboard onBack={() => setActiveScreen('home')} />}
-      {activeScreen === 'genogram' && <GenogramEditor onBack={() => setActiveScreen('home')} />}
+      <TheShore onOpenTool={onOpenTool} />
+      <GatheringBar />
+      <MyAppsGrid onOpenTool={onOpenTool} />
+      <PerspectiveSwap />
     </div>
   );
 }

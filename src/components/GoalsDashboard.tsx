@@ -446,7 +446,7 @@ export default function GoalsDashboard({ onBack }: GoalsDashboardProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4 py-2 w-full max-w-md mx-auto text-on-background relative select-none">
+    <div className="flex flex-col gap-4 py-2 w-full max-w-2xl mx-auto text-on-background relative select-none">
       
       {/* Top Header Row */}
       <div className="flex items-center gap-3 bg-surface-container-lowest p-3 rounded-[2rem] border-2 border-outline-variant shadow-sm relative overflow-hidden">

@@ -321,7 +321,7 @@ export default function GottmanQuiz({ onBack }: { onBack?: () => void }) {
   const pctProgress = Math.round(((currentIdx) / totalQuestions) * 100);
 
   return (
-    <div className="flex flex-col gap-4 text-[#4B4B4B] w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-4 text-[#4B4B4B] w-full max-w-2xl mx-auto">
       
       {!isCompleted ? (
         /* QUIZ ACTIVE VIEW */
