@@ -15,7 +15,11 @@ interface Props {
 
 
 const CATEGORY_SECTIONS: { id: string; label: string; color: string; glow: string }[] = [
-  // ── REHABIT RECOVERY DECK — leads the grid on this ship ──
+  // ── THE FAMILY DECK — leads the grid on this island (the evil-eye catch:
+  //    this section was MISSING entirely; the app's own 14 tools rendered
+  //    nowhere while the vendored Recovery deck led a family app) ──
+  { id: 'family',     label: 'The Family Deck',    color: '#0E7C7C', glow: 'rgba(14,124,124,0.3)'   },
+  { id: 'relational', label: 'Relational',         color: '#EC4899', glow: 'rgba(236,72,153,0.3)'   },
   { id: 'recovery',   label: 'Recovery',           color: '#0D9488', glow: 'rgba(13,148,136,0.3)'   },
   { id: 'mood',       label: 'Mood & Tracking',   color: '#14B8A6', glow: 'rgba(20,184,166,0.3)'   },
   { id: 'breathing',  label: 'Breathwork',         color: '#38BDF8', glow: 'rgba(56,189,248,0.3)'   },
@@ -24,7 +28,6 @@ const CATEGORY_SECTIONS: { id: string; label: string; color: string; glow: strin
   { id: 'cbt',        label: 'CBT Tools',          color: '#F97316', glow: 'rgba(249,115,22,0.3)'   },
   { id: 'dbt',        label: 'DBT Skills',         color: '#EF4444', glow: 'rgba(239,68,68,0.3)'    },
   { id: 'depth',      label: 'Depth Psychology',   color: '#8B5CF6', glow: 'rgba(139,92,246,0.3)'   },
-  { id: 'relational', label: 'Relational',         color: '#EC4899', glow: 'rgba(236,72,153,0.3)'   },
   { id: 'habit',      label: 'Habit & Wellness',   color: '#22C55E', glow: 'rgba(34,197,94,0.3)'    },
   { id: 'clinical',   label: 'Clinical Tools',     color: '#3B82F6', glow: 'rgba(59,130,246,0.3)'   },
   { id: 'nutrition',  label: 'Nutrition & Gut',    color: '#84CC16', glow: 'rgba(132,204,22,0.3)'   },
