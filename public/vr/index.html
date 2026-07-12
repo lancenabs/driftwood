@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Driftwood VR — the island, stood on</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #BEE3F0; font-family: -apple-system, system-ui, sans-serif; touch-action: none; }
+  /* THE DV BRIGHT LINE — native DOM, above everything, always (the law) */
+  #crisis { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(255,255,255,0.96);
+            font-size: 10px; text-align: center; padding: 4px 8px; color: #334; border-bottom: 1px solid #e5e7eb; }
+  #crisis a { color: #C0392B; font-weight: 800; text-decoration: none; }
+  #hud { position: fixed; top: 30px; left: 10px; z-index: 40; display: flex; gap: 6px; }
+  .pill { background: rgba(255,255,255,0.92); border: none; border-radius: 999px; padding: 8px 14px;
+          font-size: 11px; font-weight: 800; color: #374151; box-shadow: 0 2px 8px rgba(0,0,0,0.12); cursor: pointer; }
+  #shells { position: fixed; top: 30px; right: 10px; z-index: 40; background: rgba(255,255,255,0.92); border-radius: 999px;
+            padding: 8px 14px; font-size: 11px; font-weight: 800; color: #B8860B; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  #hint { position: fixed; left: 50%; top: 64px; transform: translateX(-50%); z-index: 40; background: rgba(0,0,0,0.4);
+          color: #fff; border-radius: 12px; padding: 8px 16px; font-size: 11.5px; font-weight: 600; max-width: 86%;
+          text-align: center; transition: opacity 1.2s; }
+  #enter { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 40; border: none;
+           border-radius: 14px; padding: 14px 30px; font-size: 14px; font-weight: 900; letter-spacing: 0.04em;
+           background: #0E7C7C; color: #fff; cursor: pointer; box-shadow: 0 6px 20px rgba(14,124,124,0.4); }
+  #enter[disabled] { background: #9CA3AF; box-shadow: none; cursor: default; }
+  #say { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%); z-index: 45; max-width: 78%;
+         background: rgba(255,255,255,0.95); border-radius: 16px; padding: 10px 16px; font-size: 12.5px;
+         box-shadow: 0 4px 16px rgba(0,0,0,0.18); display: none; }
+  #say b { color: #B8860B; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; display: block; }
+  #palette { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 46; display: none;
+             background: rgba(255,255,255,0.94); border-radius: 20px; padding: 8px 10px; gap: 6px; align-items: center;
+             box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+  #palette button { border: 2px solid transparent; background: #F1F5F9; border-radius: 12px; padding: 8px 11px;
+                    font-size: 16px; cursor: pointer; }
+  #palette button.on { border-color: #0E7C7C; background: #E6F4F4; }
+</style>
+</head>
+<body>
+<div id="crisis">📞 <a href="tel:988">988</a> Suicide &amp; Crisis Lifeline · <a href="tel:18007997233">1-800-799-7233</a> DV Hotline (text START to 88788) — never gated. In crisis? <b>Take the headset off</b> — this island can wait.</div>
+<div id="hud">
+  <button class="pill" id="back">← the shore</button>
+  <button class="pill" id="build">🔨 Build</button>
+</div>
+<div id="shells">🐚 …</div>
+<div id="hint">Drag to look · WASD to walk · <b>ENTER VR</b> on Quest — left stick walks, right stick snap-turns, right trigger builds</div>
+<div id="say"><b id="sayName"></b><span id="sayLine"></span></div>
+<div id="palette"></div>
+<button id="enter" disabled>checking VR…</button>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.134.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createXRKit } from './xr-kit.js';
+
+// ═══ DRIFTWOOD VR — the family's island, stood on ═══════════════════════════
+// The exact world the phones walk (same terrain law, same textures, same
+// warmth, same build ledger) rendered for a headset. THE LAW travels: crisis
+// lines above everything, comfort kit aboard, honest data, desktop fallback.
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.08, 600);
+const rig = new THREE.Group();               // the player: rig carries camera
+rig.add(camera);
+scene.add(rig);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.xr.enabled = true;
+document.body.appendChild(renderer.domElement);
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+scene.fog = new THREE.Fog(0xCFE8F2, 60, 320);
+scene.add(new THREE.AmbientLight(0xffffff, 0.62));
+const sun = new THREE.DirectionalLight(0xFFF4DE, 1.15); sun.position.set(60, 120, 40); scene.add(sun);
+
+// ── THE TERRAIN LAW — identical numbers to the 2D island (one world) ─────────
+const mat = (c) => new THREE.MeshLambertMaterial({ color: c });
+const ISLAND_R = 110, SEA_Y = 0;
+function smoothNoise(x, z) {
+  return Math.sin(x * 0.055) * Math.cos(z * 0.047) + Math.sin(x * 0.021 + z * 0.033) * 1.6;
+}
+function islandHeight(x, z) {
+  const r = Math.hypot(x, z);
+  if (r > ISLAND_R + 26) return -6;
+  const edge  = 1 - THREE.MathUtils.smoothstep(r, ISLAND_R - 12, ISLAND_R + 20);
+  const shore = 1 - THREE.MathUtils.smoothstep(r, ISLAND_R - 55, ISLAND_R - 8);
+  let h = -5 + edge * 5.9;
+  h += shore * (7 + smoothNoise(x, z) * 2.4);
+  const spine = Math.exp(-Math.pow((x + 40) / 55, 2)) * Math.exp(-Math.pow((z + 55) / 70, 2));
+  h += spine * 26 * shore;
+  return h;
+}
+const groundY = (x, z) => Math.max(islandHeight(x, z), SEA_Y + 0.25);
+
+const texLoader = new THREE.TextureLoader();
+const tile = (url, rep) => { const t = texLoader.load(url); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep, rep); return t; };
+const texSand  = tile('/island3d/tex/sand.jpg', 170);
+const texGrass = tile('/island3d/tex/grass.jpg', 150);
+const texRock  = tile('/island3d/tex/rock.jpg', 110);
+const terrainGeo = new THREE.PlaneGeometry(ISLAND_R * 2 + 60, ISLAND_R * 2 + 60, 120, 120); // headset budget
+terrainGeo.rotateX(-Math.PI / 2);
+{
+  const pos = terrainGeo.attributes.position;
+  for (let i = 0; i < pos.count; i++) pos.setY(i, islandHeight(pos.getX(i), pos.getZ(i)));
+  terrainGeo.computeVertexNormals();
+}
+const terrainMat = new THREE.MeshLambertMaterial({ map: texSand });
+terrainMat.onBeforeCompile = (shader) => {
+  shader.uniforms.tGrass = { value: texGrass };
+  shader.uniforms.tRock = { value: texRock };
+  shader.vertexShader = shader.vertexShader
+    .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
+    .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+  shader.fragmentShader = shader.fragmentShader
+    .replace('#include <common>', '#include <common>\nuniform sampler2D tGrass;\nuniform sampler2D tRock;\nvarying vec3 vWPos;')
+    .replace('#include <map_fragment>', `
+      vec4 cSand  = mix(texture2D(map, vUv),           texture2D(map, vUv.yx * 0.23 + 0.37),  0.5);
+      vec4 cGrass = mix(texture2D(tGrass, vUv * 0.9),  texture2D(tGrass, vUv.yx * 0.21 + 0.53), 0.5);
+      vec4 cRock  = mix(texture2D(tRock, vUv * 0.66),  texture2D(tRock, vUv.yx * 0.15 + 0.11), 0.5);
+      float wob = sin(vWPos.x * 0.19) * sin(vWPos.z * 0.17) * 1.4
+                + sin(vWPos.x * 0.043 + vWPos.z * 0.051) * 2.2;
+      float grassMix = smoothstep(1.2, 6.0, vWPos.y + wob);
+      float rockMix  = smoothstep(9.5, 17.5, vWPos.y + wob);
+      vec4 sampledDiffuseColor = mix(mix(cSand, cGrass, grassMix), cRock, rockMix);
+      diffuseColor *= sampledDiffuseColor;
+    `);
+};
+scene.add(new THREE.Mesh(terrainGeo, terrainMat));
+
+// living water + Lance's real sky (the family's clock picks the pano)
+const waterGeo = new THREE.PlaneGeometry(900, 900, 36, 36);
+const water = new THREE.Mesh(waterGeo, new THREE.MeshLambertMaterial({ map: tile('/island3d/tex/water.jpg', 26), transparent: true, opacity: 0.86 }));
+water.rotation.x = -Math.PI / 2; water.position.y = SEA_Y;
+scene.add(water);
+const waterBase = Float32Array.from(waterGeo.attributes.position.array);
+
+let fireBoost = 0;
+{
+  const hr = new Date().getHours();
+  const sky = hr >= 21 || hr < 6 ? 'night' : hr >= 16 ? 'sunset' : 'day';
+  if (sky === 'night') fireBoost = 0.8;
+  texLoader.load(`/island3d/tex/sky-${sky}.jpg`, t => {
+    t.mapping = THREE.EquirectangularReflectionMapping;
+    const dome = new THREE.Mesh(
+      new THREE.SphereGeometry(480, 32, 20),
+      new THREE.MeshBasicMaterial({ map: t, side: THREE.BackSide, fog: false }) // the dome lives past fog-far
+    );
+    scene.add(dome);
+  }, undefined, () => { scene.background = new THREE.Color(0xBEE3F0); });
+}
+
+// ── the jungle (headset-budget scatter; same seeded law = the same island) ──
+let seed = 20260711;
+const rand = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+const dummy = new THREE.Object3D();
+function scatterOn(count, ok) {
+  const out = [];
+  let guard = count * 40;
+  while (out.length < count && guard-- > 0) {
+    const a = rand() * Math.PI * 2, r = Math.sqrt(rand()) * (ISLAND_R + 8);
+    const x = Math.cos(a) * r, z = Math.sin(a) * r, h = islandHeight(x, z);
+    if (ok(h)) out.push({ x, z, h });
+  }
+  return out;
+}
+function instancedScatter(geo, material, spots, place) {
+  const m = new THREE.InstancedMesh(geo, material, spots.length);
+  spots.forEach((s, i) => { place(dummy, s, i); dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix); });
+  m.instanceMatrix.needsUpdate = true;
+  scene.add(m);
+}
+const barkMat = new THREE.MeshLambertMaterial({ map: tile('/island3d/tex/bark.jpg', 1) });
+const palmSpots = scatterOn(56, h => h > 0.6 && h < 7);
+instancedScatter(new THREE.CylinderGeometry(0.16, 0.34, 7, 6), barkMat, palmSpots, (d, s) => {
+  d.position.set(s.x, s.h + 3.2, s.z);
+  d.rotation.set(0, rand() * Math.PI * 2, (rand() - 0.5) * 0.3);
+  d.scale.setScalar(0.8 + rand() * 0.5);
+});
+const frondSpots = [];
+for (const s of palmSpots) for (let i = 0; i < 6; i++) frondSpots.push({ ...s, fi: i });
+instancedScatter(new THREE.ConeGeometry(0.55, 3.6, 4), mat(0x3B8456), frondSpots, (d, s) => {
+  d.position.set(s.x + Math.cos((s.fi / 6) * Math.PI * 2) * 0.9, s.h + 6.9, s.z + Math.sin((s.fi / 6) * Math.PI * 2) * 0.9);
+  d.rotation.set(Math.PI / 2.5 * Math.sin((s.fi / 6) * Math.PI * 2), 0, Math.PI / 2.5 * Math.cos((s.fi / 6) * Math.PI * 2));
+});
+const treeSpots = scatterOn(90, h => h > 3.5 && h < 13);
+instancedScatter(new THREE.CylinderGeometry(0.3, 0.5, 5, 6), barkMat, treeSpots, (d, s) => {
+  d.position.set(s.x, s.h + 2.2, s.z); d.scale.setScalar(0.8 + rand() * 0.8);
+});
+instancedScatter(new THREE.SphereGeometry(2.6, 7, 5), mat(0x2F6B43), treeSpots, (d, s, i) => {
+  d.position.set(s.x, s.h + 6 + (i % 3) * 0.5, s.z);
+  d.scale.set(1 + rand() * 0.7, 0.75 + rand() * 0.4, 1 + rand() * 0.7);
+});
+instancedScatter(new THREE.ConeGeometry(0.5, 1.1, 5), mat(0x4E9B63), scatterOn(120, h => h > 3 && h < 11), (d, s) => {
+  d.position.set(s.x, s.h + 0.4, s.z); d.rotation.y = rand() * Math.PI; d.scale.setScalar(0.7 + rand());
+});
+instancedScatter(new THREE.DodecahedronGeometry(1.3, 0), new THREE.MeshLambertMaterial({ map: texRock }), scatterOn(40, h => h > 8), (d, s) => {
+  d.position.set(s.x, s.h + 0.4, s.z);
+  d.rotation.set(rand() * Math.PI, rand() * Math.PI, 0);
+  d.scale.setScalar(0.6 + rand() * 2.2);
+});
+instancedScatter(new THREE.CylinderGeometry(0.3, 0.4, 4.6, 7), new THREE.MeshLambertMaterial({ map: tile('/island3d/tex/grain.jpg', 1) }), scatterOn(26, h => h > 0.5 && h < 1.6), (d, s) => {
+  d.position.set(s.x, s.h + 0.3, s.z); d.rotation.set(0, rand() * Math.PI, Math.PI / 2);
+});
+
+// ── THE FIRE THE FAMILY BUILT — the week's warmth burns here too ─────────────
+let warmth = 0;
+try {
+  const evs = JSON.parse(localStorage.getItem('driftwood_events_v1') || '[]');
+  warmth = Math.min(evs.filter(e => e && e.action === 'fire_quiz_played').length, 24);
+} catch { /* a cold start is still a start */ }
+const CAMP = { x: 0, z: 92 };
+const fire = new THREE.Group();
+const logCount = 4 + Math.floor(warmth / 2);
+for (let i = 0; i < logCount; i++) {
+  const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 1.2, 5), mat(0x8a6a48));
+  stick.rotation.z = 0.5 + (i % 3) * 0.06; stick.rotation.y = (i / logCount) * Math.PI * 2;
+  stick.position.y = 0.3;
+  fire.add(stick);
+}
+const flame = new THREE.Mesh(new THREE.ConeGeometry(0.34, 1.1, 7), new THREE.MeshBasicMaterial({ color: 0xFFA64D }));
+flame.position.y = 0.9; flame.scale.setScalar(1 + warmth * 0.055);
+fire.add(flame);
+const fireLight = new THREE.PointLight(0xFFA64D, 1.1 + warmth * 0.05 + fireBoost, 12 + warmth * 0.8);
+fireLight.position.y = 1.4;
+fire.add(fireLight);
+fire.position.set(CAMP.x, groundY(CAMP.x, CAMP.z), CAMP.z);
+scene.add(fire);
+const tent = new THREE.Mesh(new THREE.ConeGeometry(1.6, 2.1, 4), mat(0xC96F4A));
+tent.position.set(6, groundY(6, 96) + 1.05, 96); tent.rotation.y = Math.PI / 4;
+scene.add(tent);
+
+// THE CRISIS PLANK — the law, in-world: a driftwood sign at the camp. The
+// real rule is on it: crisis = take the headset off. (The DOM strip guards
+// the flat page; this plank guards the world.)
+{
+  const c = document.createElement('canvas'); c.width = 512; c.height = 160;
+  const g = c.getContext('2d');
+  g.fillStyle = '#8a6a48'; g.fillRect(0, 0, 512, 160);
+  g.fillStyle = '#fff'; g.font = '900 44px sans-serif'; g.textAlign = 'center';
+  g.fillText('988 · always', 256, 62);
+  g.font = '600 28px sans-serif';
+  g.fillText('in crisis? take the headset off —', 256, 104);
+  g.fillText('this island can wait.', 256, 140);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.7), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c) }));
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 1.6, 6), mat(0x8a6a48));
+  const ggy = groundY(CAMP.x - 4, CAMP.z + 2);
+  post.position.set(CAMP.x - 4, ggy + 0.8, CAMP.z + 2);
+  sign.position.set(CAMP.x - 4, ggy + 1.75, CAMP.z + 2);
+  sign.rotation.y = 0.5;
+  scene.add(post, sign);
+}
+
+// ── THE JUMBLE — meshes where cast, standees where not (the honest chain) ───
+const glbLoader = new GLTFLoader();
+const JUMBLE = [
+  { id: 'skip', name: 'Skip', x: 6, z: 84, lines: ['A stick! For you! Or— for me? For US.', 'Race you to the rocks! I will lose on purpose. Maybe.'] },
+  { id: 'hollow', name: 'Hollow', x: -74, z: 22, lines: ['…it is safe in the shell. But it is warmer at the fire.', '…I come out slower than I go in. That is allowed.'] },
+  { id: 'echo2', name: 'Echo-2', x: 12, z: -38, lines: ['You said— you SAID— something kind. I am keeping it.', 'Say the important ones twice.'] },
+  { id: 'bailer', name: 'Bailer', x: 84, z: 38, lines: ['The boat is dry! I am keeping it that way.', 'Worry is water. I have a bucket. We will be fine.'] },
+  { id: 'collier', name: 'the Collier', x: -40, z: -55, lines: ['Sit, sit. The forge remembers every mended thing.', 'The seam shows, little one. That is how you know it held.'] },
+  { id: 'wright', name: 'the Wright', x: 10, z: 70, lines: ['You BUILT that? Show me the corners. Corners are where the honesty lives.', 'Every fort starts as one brave block. Lay the next one.'] },
+];
+const robots = [];
+function nameTag(text) {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 64;
+  const g = c.getContext('2d');
+  g.fillStyle = 'rgba(255,255,255,0.92)'; g.beginPath(); g.roundRect(4, 8, 248, 48, 22); g.fill();
+  g.fillStyle = '#B8860B'; g.font = '900 26px sans-serif'; g.textAlign = 'center';
+  g.fillText(text, 128, 41);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthWrite: false }));
+  sp.scale.set(1.7, 0.42, 1);
+  return sp;
+}
+for (const r of JUMBLE) {
+  const g = new THREE.Group();
+  const HEIGHTS = { collier: 2.5, skip: 1.35, wright: 1.9 };
+  const h = HEIGHTS[r.id] ?? 1.9;
+  // GLB first (bone-spread measured — the skinned-bbox lesson), standee second
+  fetch(`/island3d/robots3d/${r.id}.glb`, { method: 'HEAD' }).then(res => {
+    const ct = res.headers.get('content-type') || '';
+    if (!res.ok || ct.includes('text/html')) throw 0;
+    return new Promise((ok, no) => glbLoader.load(`/island3d/robots3d/${r.id}.glb`, ok, undefined, no));
+  }).then(gltf => {
+    const mesh = gltf.scene;
+    mesh.updateMatrixWorld(true);
+    let minY = Infinity, maxY = -Infinity, boned = false;
+    const p = new THREE.Vector3();
+    mesh.traverse(o => { if (o.isBone || o.type === 'Bone') { boned = true; o.getWorldPosition(p); minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y); } });
+    let rawH, rawMin;
+    if (boned && maxY - minY > 0.01) { rawH = (maxY - minY) * 1.15; rawMin = minY; }
+    else { const b = new THREE.Box3().setFromObject(mesh); rawH = Math.max(b.getSize(new THREE.Vector3()).y, 0.001); rawMin = b.min.y; }
+    const s = h / rawH;
+    mesh.scale.setScalar(s); mesh.position.y = -rawMin * s;
+    g.add(mesh);
+  }).catch(() => {
+    texLoader.load(`/island3d/robots3d/${r.id}.png`, tex => {
+      const w = h * (tex.image.width / tex.image.height);
+      const card = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.35 }));
+      card.position.y = h / 2 + 0.02;
+      g.add(card);
+      g.userData.card = card;
+    }, undefined, () => {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 0.8, 6), mat(0xA5805A));
+      post.position.y = 0.4; g.add(post);
+    });
+  });
+  const tag = nameTag(r.name);
+  tag.position.y = h + 0.45;
+  g.add(tag);
+  g.position.set(r.x, groundY(r.x, r.z), r.z);
+  g.userData.info = r;
+  scene.add(g);
+  robots.push(g);
+}
+// proximity speech — walk up to a robot and it speaks (a plank over its head)
+const say = document.getElementById('say');
+const lastSpoke = {};
+let sayPlank = null;
+function speak(r) {
+  const info = r.userData.info;
+  const n = (lastSpoke[info.id] ?? -1) + 1;
+  lastSpoke[info.id] = n;
+  const line = info.lines[n % info.lines.length];
+  document.getElementById('sayName').textContent = info.name;
+  document.getElementById('sayLine').textContent = line;
+  say.style.display = 'block';
+  clearTimeout(say._t);
+  say._t = setTimeout(() => { say.style.display = 'none'; }, 5000);
+  // the in-world plank (VR can't see the DOM)
+  if (sayPlank) scene.remove(sayPlank);
+  const c = document.createElement('canvas'); c.width = 768; c.height = 192;
+  const g2 = c.getContext('2d');
+  g2.fillStyle = 'rgba(255,255,255,0.95)'; g2.beginPath(); g2.roundRect(6, 6, 756, 180, 28); g2.fill();
+  g2.fillStyle = '#B8860B'; g2.font = '900 30px sans-serif'; g2.fillText(info.name.toUpperCase(), 30, 52);
+  g2.fillStyle = '#374151'; g2.font = '600 30px sans-serif';
+  const words = line.split(' '); let ln = '', y = 100;
+  for (const w of words) {
+    if ((ln + w).length > 44) { g2.fillText(ln, 30, y); y += 40; ln = ''; }
+    ln += w + ' ';
+  }
+  g2.fillText(ln, 30, y);
+  sayPlank = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.65), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+  const HEIGHTS = { collier: 2.5, skip: 1.35, wright: 1.9 };
+  sayPlank.position.copy(r.position).add(new THREE.Vector3(0, (HEIGHTS[info.id] ?? 1.9) + 1.1, 0));
+  scene.add(sayPlank);
+  clearTimeout(speak._t2);
+  speak._t2 = setTimeout(() => { if (sayPlank) { scene.remove(sayPlank); sayPlank = null; } }, 5000);
+}
+
+// ── BUILD MODE — the family's fort, standing in it ──────────────────────────
+// Same ledger (driftwood_build_v1 + the camp's build channel): what the kids
+// raised on their phones this week is STANDING HERE when the headset goes on.
+const BUILD_TYPES = [
+  { id: 'planks', label: '🪵', tex: '/island3d/tex/planks.jpg' },
+  { id: 'stone',  label: '🪨', tex: '/island3d/tex/path-stone.jpg' },
+  { id: 'sand',   label: '🏖', tex: '/island3d/tex/sand.jpg' },
+  { id: 'moss',   label: '🍀', tex: '/island3d/tex/moss.jpg' },
+  { id: 'leaf',   label: '🌿', color: 0x3F8A56 },
+];
+const BUILD_CAP = 1200;
+const buildMeshes = {};
+for (const t of BUILD_TYPES) {
+  const m = t.tex ? new THREE.MeshLambertMaterial({ map: texLoader.load(t.tex) }) : mat(t.color);
+  const im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), m, BUILD_CAP);
+  im.count = 0;
+  scene.add(im);
+  buildMeshes[t.id] = im;
+}
+const blocks = new Map();
+const cellY = (kx, i, kz) => groundY(kx, kz) + 0.5 + i;
+function rebuildBlocks() {
+  const counts = {};
+  for (const t of BUILD_TYPES) counts[t.id] = 0;
+  for (const [k, t] of blocks) {
+    const im = buildMeshes[t]; if (!im || counts[t] >= BUILD_CAP) continue;
+    const [kx, i, kz] = k.split('|').map(Number);
+    dummy.position.set(kx, cellY(kx, i, kz), kz);
+    dummy.rotation.set(0, 0, 0); dummy.scale.setScalar(1);
+    dummy.updateMatrix();
+    im.setMatrixAt(counts[t]++, dummy.matrix);
+  }
+  for (const t of BUILD_TYPES) { buildMeshes[t.id].count = counts[t.id]; buildMeshes[t.id].instanceMatrix.needsUpdate = true; }
+}
+const BUILD_KEY = 'driftwood_build_v1';
+try { for (const [k, t] of Object.entries(JSON.parse(localStorage.getItem(BUILD_KEY) || '{}'))) blocks.set(k, t); } catch { /* fresh sand */ }
+rebuildBlocks();
+function saveLocalBuild() {
+  try { const o = {}; for (const [k, t] of blocks) o[k] = t; localStorage.setItem(BUILD_KEY, JSON.stringify(o)); } catch { /* it stands in the scene */ }
+}
+let campCode = null;
+try { const g = JSON.parse(localStorage.getItem('driftwood_gathering_v1') || 'null'); campCode = g?.code ?? null; } catch {}
+function setBlock(k, t, fromRemote) {
+  if (t) blocks.set(k, t); else blocks.delete(k);
+  rebuildBlocks(); saveLocalBuild();
+  if (!fromRemote && campCode) fetch(`/api/gathering/${campCode}/build`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ k, t: t ?? null }),
+  }).catch(() => {});
+}
+function solidTop(x, z) {
+  const kx = Math.round(x), kz = Math.round(z);
+  let top = -Infinity;
+  for (let i = 0; i <= 30; i++) if (blocks.has(`${kx}|${i}|${kz}`)) top = cellY(kx, i, kz) + 0.5;
+  return top;
+}
+
+// build state + the palette (DOM for desktop; in-VR the palette rides the view)
+let building = false;
+let buildType = 'planks';
+const paletteEl = document.getElementById('palette');
+paletteEl.innerHTML = BUILD_TYPES.map(t => `<button data-t="${t.id}" class="${t.id === buildType ? 'on' : ''}">${t.label}</button>`).join('');
+paletteEl.querySelectorAll('button').forEach(b => b.onclick = () => {
+  buildType = b.dataset.t;
+  paletteEl.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+});
+document.getElementById('build').onclick = () => {
+  building = !building;
+  paletteEl.style.display = building ? 'flex' : 'none';
+  document.getElementById('enter').style.display = building ? 'none' : 'block';
+  ghost.visible = false;
+};
+// the ghost cube shows where the block will land
+const ghost = new THREE.Mesh(new THREE.BoxGeometry(1.02, 1.02, 1.02),
+  new THREE.MeshBasicMaterial({ color: 0x0E7C7C, transparent: true, opacity: 0.35, depthWrite: false }));
+ghost.visible = false;
+scene.add(ghost);
+const ray = new THREE.Raycaster();
+function cellFromRay(origin, dir) {
+  // march the ray to the first solid (terrain or block top) — simple + fast
+  const step = 0.35;
+  const p = origin.clone();
+  for (let i = 0; i < 40; i++) {
+    p.addScaledVector(dir, step);
+    const solid = Math.max(groundY(p.x, p.z), solidTop(p.x, p.z) === -Infinity ? -99 : solidTop(p.x, p.z));
+    if (p.y <= solid + 0.05) {
+      const kx = Math.round(p.x), kz = Math.round(p.z);
+      let lvl = 0;
+      while (blocks.has(`${kx}|${lvl}|${kz}`) && lvl < 30) lvl++;
+      return { kx, kz, lvl };
+    }
+  }
+  return null;
+}
+function topBlockAt(kx, kz) {
+  for (let i = 30; i >= 0; i--) if (blocks.has(`${kx}|${i}|${kz}`)) return `${kx}|${i}|${kz}`;
+  return null;
+}
+
+// ── shells — the hunt continues in the headset (same ledger) ─────────────────
+const shellGroup = new THREE.Group();
+scene.add(shellGroup);
+let collected = {};
+try { collected = JSON.parse(localStorage.getItem('driftwood_shells_v1') || '{}'); } catch { /* fresh hunt */ }
+{
+  let s2 = 977;
+  const r2 = () => { s2 = (s2 * 1103515245 + 12345) & 0x7fffffff; return s2 / 0x7fffffff; };
+  for (let i = 0; i < 40; i++) {
+    const a = r2() * Math.PI * 2, rr = Math.sqrt(r2()) * (ISLAND_R - 6);
+    const x = Math.cos(a) * rr, z = Math.sin(a) * rr;
+    const high = i >= 30;
+    const id = `shell-${i}`;
+    if (collected[id]) continue;
+    const sh = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), new THREE.MeshBasicMaterial({ color: 0xFFD700 }));
+    sh.position.set(x, groundY(x, z) + (high ? 4.5 : 0.5), z);
+    sh.userData.id = id;
+    shellGroup.add(sh);
+  }
+}
+const shellChip = document.getElementById('shells');
+const countShells = () => Object.keys(collected).length;
+shellChip.textContent = `🐚 ${countShells()}/40`;
+
+// ── THE GATHERING — the family walks this same ground, in scale ─────────────
+let meId = 'castaway-1', meName = 'Castaway';
+try { const u = JSON.parse(localStorage.getItem('driftwood_active_castaway_v1') || 'null'); if (u?.id) { meId = u.id; meName = u.name || meName; } } catch {}
+const others = new Map();
+const W = 120;
+const toNorm = v => Math.max(0, Math.min(1, (v + W) / (2 * W)));
+const fromNorm = v => v * 2 * W - W;
+if (campCode) {
+  const es = new EventSource(`/api/gathering/${campCode}/stream?actor=${encodeURIComponent(meId)}&name=${encodeURIComponent(meName)}-vr`);
+  es.onmessage = ev => {
+    let msg; try { msg = JSON.parse(ev.data); } catch { return; }
+    if (msg.kind === 'block') return setBlock(msg.k, msg.t, true);
+    if (msg.kind !== 'pos' || msg.pos.actor === meId) return;
+    const p = msg.pos;
+    let o = others.get(p.actor);
+    if (!o) {
+      const g = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.CapsuleGeometry ? new THREE.CapsuleGeometry(0.28, 0.9, 4, 8) : new THREE.CylinderGeometry(0.28, 0.28, 1.4, 8), mat(0x0E7C7C));
+      body.position.y = 0.95;
+      g.add(body);
+      const t = nameTag(p.name || 'family');
+      t.position.y = 2.0;
+      g.add(t);
+      scene.add(g);
+      o = { g, target: new THREE.Vector3() };
+      others.set(p.actor, o);
+    }
+    const x = fromNorm(p.x), z = fromNorm(p.y);
+    o.target.set(x, groundY(x, z), z);
+  };
+}
+let lastSent = 0;
+function broadcastPos() {
+  if (!campCode) return;
+  const now = Date.now();
+  if (now - lastSent < 200) return;
+  lastSent = now;
+  fetch(`/api/gathering/${campCode}/pos`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ actor: meId, name: meName + ' (VR)', x: toNorm(rig.position.x), y: toNorm(rig.position.z), facing: 'right', mode: 'walking' }),
+  }).catch(() => {});
+}
+
+// ── THE COMFORT KIT — the org's XR law, aboard ───────────────────────────────
+const kit = createXRKit({
+  renderer, camera, rig,
+  storageKey: 'driftwood_vr_comfort_v1',
+  accent: '#0E7C7C',
+  onSessionNudge: () => speakSystem('Twenty minutes on the island — a fine watch. The real shore is there whenever you are.'),
+});
+function speakSystem(line) {
+  document.getElementById('sayName').textContent = 'the island';
+  document.getElementById('sayLine').textContent = line;
+  say.style.display = 'block';
+  clearTimeout(say._t);
+  say._t = setTimeout(() => { say.style.display = 'none'; }, 6000);
+}
+
+// ── VR controllers: right trigger = place (build mode) / break (with grip) ──
+const rightCtrl = renderer.xr.getController(1);
+scene.add(rightCtrl);
+const ctrlRay = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.004, 0.004, 6, 5).rotateX(Math.PI / 2).translate(0, 0, -3),
+  new THREE.MeshBasicMaterial({ color: 0x0E7C7C, transparent: true, opacity: 0.4 })
+);
+ctrlRay.visible = false;
+rightCtrl.add(ctrlRay);
+let gripHeld = false;
+rightCtrl.addEventListener('squeezestart', () => { gripHeld = true; });
+rightCtrl.addEventListener('squeezeend', () => { gripHeld = false; });
+rightCtrl.addEventListener('selectstart', () => {
+  if (!building) {
+    // not building: a trigger near a robot makes it speak
+    const near = robots.find(r => r.position.distanceTo(rig.position) < 6);
+    if (near) speak(near);
+    return;
+  }
+  const origin = rightCtrl.getWorldPosition(new THREE.Vector3());
+  const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(rightCtrl.getWorldQuaternion(new THREE.Quaternion()));
+  const cell = cellFromRay(origin, dir);
+  if (!cell) return;
+  if (gripHeld) {
+    const k = topBlockAt(cell.kx, cell.kz);
+    if (k) setBlock(k, null);
+  } else if (cell.lvl <= 30) {
+    setBlock(`${cell.kx}|${cell.lvl}|${cell.kz}`, buildType);
+  }
+});
+renderer.xr.addEventListener('sessionstart', () => { if (building) ctrlRay.visible = true; });
+
+// ── desktop fallback: drag look + WASD (the Playwright door) ─────────────────
+let yaw = 0.35, pitch = -0.06, dragging = false, px = 0, py = 0;   // spawn faces the fire, not the sea
+const keys = {};
+addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+renderer.domElement.addEventListener('pointerdown', e => { dragging = true; px = e.clientX; py = e.clientY; });
+addEventListener('pointerup', () => { dragging = false; });
+addEventListener('pointermove', e => {
+  if (!dragging || renderer.xr.isPresenting) return;
+  yaw -= (e.clientX - px) * 0.004; pitch -= (e.clientY - py) * 0.003;
+  pitch = Math.max(-1.2, Math.min(0.6, pitch));
+  px = e.clientX; py = e.clientY;
+});
+renderer.domElement.addEventListener('click', e => {
+  if (renderer.xr.isPresenting) return;
+  if (building) {
+    const nx = (e.clientX / innerWidth) * 2 - 1, ny = -(e.clientY / innerHeight) * 2 + 1;
+    ray.setFromCamera({ x: nx, y: ny }, camera);
+    const cell = cellFromRay(ray.ray.origin, ray.ray.direction);
+    if (cell) {
+      if (keys['x']) { const k = topBlockAt(cell.kx, cell.kz); if (k) setBlock(k, null); }
+      else setBlock(`${cell.kx}|${cell.lvl}|${cell.kz}`, buildType);
+    }
+  } else {
+    const near = robots.find(r => r.position.distanceTo(rig.position) < 7);
+    if (near) speak(near);
+  }
+});
+
+// spawn at the camp, facing the fire
+rig.position.set(CAMP.x + 2.5, groundY(CAMP.x + 2.5, CAMP.z + 6), CAMP.z + 6);
+
+// ── ENTER VR — honest capability check, the deck's pattern ──────────────────
+const enterBtn = document.getElementById('enter');
+if (navigator.xr) {
+  navigator.xr.isSessionSupported('immersive-vr').then(ok => {
+    if (ok) {
+      enterBtn.disabled = false;
+      enterBtn.textContent = 'ENTER VR';
+      enterBtn.onclick = async () => {
+        try {
+          const session = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor', 'bounded-floor'] });
+          renderer.xr.setSession(session);
+        } catch (e) { enterBtn.textContent = 'VR blocked: ' + String(e).slice(0, 40); }
+      };
+    } else { enterBtn.textContent = 'VR NOT SUPPORTED'; }
+  }).catch(() => { enterBtn.textContent = 'VR NOT SUPPORTED'; });
+} else enterBtn.textContent = 'VR NOT SUPPORTED';
+
+document.getElementById('back').onclick = () => {
+  if (window.parent !== window) window.parent.postMessage({ type: 'driftwood:leave-island' }, '*');
+  else location.href = '/';
+};
+setTimeout(() => { document.getElementById('hint').style.opacity = '0'; }, 10000);
+
+// ── the loop ─────────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const t = clock.elapsedTime;
+
+  if (renderer.xr.isPresenting) {
+    kit.locomotion(1.4);
+    // build ghost from the right controller while building
+    if (building) {
+      ctrlRay.visible = true;
+      const origin = rightCtrl.getWorldPosition(new THREE.Vector3());
+      const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(rightCtrl.getWorldQuaternion(new THREE.Quaternion()));
+      const cell = cellFromRay(origin, dir);
+      if (cell) { ghost.visible = true; ghost.position.set(cell.kx, cellY(cell.kx, cell.lvl, cell.kz), cell.kz); }
+      else ghost.visible = false;
+    } else ctrlRay.visible = false;
+  } else {
+    // desktop walk
+    camera.rotation.set(pitch, yaw, 0, 'YXZ');
+    const speed = 9 * dt;
+    const fwd = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
+    const rightv = new THREE.Vector3(-fwd.z, 0, fwd.x);
+    if (keys['w']) rig.position.addScaledVector(fwd, speed);
+    if (keys['s']) rig.position.addScaledVector(fwd, -speed);
+    if (keys['a']) rig.position.addScaledVector(rightv, -speed);
+    if (keys['d']) rig.position.addScaledVector(rightv, speed);
+    if (building) {
+      // ghost follows the screen center
+      ray.setFromCamera({ x: 0, y: 0 }, camera);
+      const cell = cellFromRay(ray.ray.origin, ray.ray.direction);
+      if (cell) { ghost.visible = true; ghost.position.set(cell.kx, cellY(cell.kx, cell.lvl, cell.kz), cell.kz); }
+      else ghost.visible = false;
+    }
+  }
+
+  // the sea is the world's edge — the island holds you (waterline slide law)
+  {
+    const rr = Math.hypot(rig.position.x, rig.position.z);
+    const MAX_R = ISLAND_R + 4;
+    if (rr > MAX_R) { const k = MAX_R / rr; rig.position.x *= k; rig.position.z *= k; }
+  }
+
+  // terrain-follow (blocks are climbable — solidTop wins where taller)
+  const solid = Math.max(groundY(rig.position.x, rig.position.z), solidTop(rig.position.x, rig.position.z) === -Infinity ? -99 : solidTop(rig.position.x, rig.position.z));
+  const eyeBase = renderer.xr.isPresenting ? 0 : 1.62;   // XR adds real head height
+  rig.position.y += ((solid + eyeBase) - rig.position.y) * 0.25;
+
+  // shells: proximity collect
+  for (const sh of [...shellGroup.children]) {
+    sh.rotation.y = t * 2;
+    if (sh.position.distanceTo(rig.position) < 1.6) {
+      collected[sh.userData.id] = 1;
+      try { localStorage.setItem('driftwood_shells_v1', JSON.stringify(collected)); } catch {}
+      shellGroup.remove(sh);
+      shellChip.textContent = `🐚 ${countShells()}/40`;
+      speakSystem('🐚 a golden shell! ' + countShells() + ' of 40.');
+    }
+  }
+
+  // the fire breathes with the week's warmth
+  flame.scale.y = (1 + warmth * 0.055) * (1 + Math.sin(t * 9.1) * 0.1);
+  fireLight.intensity = (1.0 + warmth * 0.05 + fireBoost) + Math.sin(t * 7.3) * 0.15;
+
+  // water swell
+  {
+    const pos = waterGeo.attributes.position;
+    for (let i = 0; i < pos.count; i += 3) {
+      pos.setZ(i, waterBase[i * 3 + 2] + Math.sin(t * 0.7 + waterBase[i * 3] * 0.02) * 0.35);
+    }
+    pos.needsUpdate = true;
+  }
+
+  // family interpolation + my broadcast
+  for (const o of others.values()) o.g.position.lerp(o.target, 0.08);
+  broadcastPos();
+
+  // tags & say-plank face the player
+  for (const r of robots) r.children.forEach(ch => { if (ch.isSprite) ch.quaternion.copy(camera.quaternion); });
+  if (sayPlank) sayPlank.quaternion.copy(renderer.xr.isPresenting ? renderer.xr.getCamera().quaternion : camera.quaternion);
+
+  kit.update();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
