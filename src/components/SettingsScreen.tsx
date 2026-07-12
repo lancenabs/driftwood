@@ -181,7 +181,7 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
                   <SectionRow icon={Sliders} label="Privacy & Data" sub="Where entries live, boarding, reset" onPress={() => setScreen('data')} color="#94A3B8" />
 
                   <div className="mt-4 text-center text-[10px] text-slate-600 font-mono">
-                    Driftwood · the island that only yields to together
+                    Driftwood · loves together · works together · survives together
                   </div>
                 </div>
               )}

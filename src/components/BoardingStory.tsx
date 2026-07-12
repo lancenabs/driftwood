@@ -28,28 +28,43 @@ const FALLBACK_ART = '/shore/boarding_hero.jpg';
 // THE COLD OPEN — THE_TIDE_LINE.md canon, playable
 const CINEMATIC: { speaker: string; color: string; location: string; text: string; video: keyof typeof VIDEO }[] = [
   {
-    speaker: 'THE CROSSING', color: '#9CC3D5', location: 'THE SHIP · THREE DAYS OUT',
-    text: 'The family booked the crossing to get stronger. To get better. To connect again — the trip that was supposed to fix everything by itself.',
+    speaker: 'THE DOCK', color: '#9CC3D5', location: 'PIER 4 · MORNING · THE FAMILY TOUR',
+    text: 'The brochure said ISLAND ADVENTURE — A DAY TO RECONNECT. The family arrives the way they arrive everywhere lately: together, and in separate rooms. Two phones out. One argument already half-finished from the car, warming up for its hundredth performance.',
     video: 'ship',
   },
   {
-    speaker: 'THE CROSSING', color: '#9CC3D5', location: 'THE SHIP · SEPARATE ROOMS',
-    text: 'And on the ship, they did exactly what they did at home. One at the bow. One in the cabin. One in the game room. One on a phone in a stairwell. Same vessel — separate rooms.',
+    speaker: 'THE ARGUMENT', color: '#D14545', location: 'PIER 4 · THE SAME FIGHT',
+    text: '"You PROMISED you\'d leave work at home—" "Somebody has to PAY for—" "Can we not. CAN WE NOT." "Nobody even asked what I wanted to do today." Four voices, one knot. The youngest counts seagulls and pretends not to hear, which is a skill nobody should have to be good at.',
     video: 'ship',
   },
   {
-    speaker: 'THE STORM', color: '#7A8FB5', location: 'THE CROSSING · NIGHT',
-    text: 'Then the storm. Nobody was together when it hit. That is the point. That is the whole diagnosis, delivered by weather.',
+    speaker: 'MR. BAUER', color: '#E7C892', location: 'THE GANGWAY · THE GUIDE',
+    text: 'The guide is waiting at the boat like he\'s been waiting longer than a morning. Weathered hands. Eyes that do a headcount of the family and land somewhere deeper than a headcount. "Mr. Bauer," he says. "I take families to the island. Just families. It only works on families." Odd thing to say. He says it like a man who has seen this exact argument board this exact boat before.',
+    video: 'ship',
+  },
+  {
+    speaker: 'THE STORM', color: '#7A8FB5', location: 'OPEN WATER · NO WARNING',
+    text: 'It comes over the horizon like a decision. The sky goes green-black. Bauer\'s voice changes registers — the tour-guide is gone; something older takes the wheel. "LIFE JACKETS. NOW. All of you — to the mast line."',
+    video: 'storm',
+  },
+  {
+    speaker: 'MR. BAUER', color: '#E7C892', location: 'THE MAST LINE · HIS LAST ORDER',
+    text: 'He lashes the family\'s hands to one rope, hand over hand over hand, and puts both of his over all of theirs. "HOLD THE LINE. Not the rail — EACH OTHER. Whatever the sea takes, it does not get to take the LINE—" Lightning. The wheel spinning. His silhouette going back for it.',
+    video: 'storm',
+  },
+  {
+    speaker: ' ', color: '#0A1512', location: ' ',
+    text: '…',
     video: 'storm',
   },
   {
     speaker: 'THE TIDE LINE', color: '#F2A65A', location: 'THE ISLAND · THE GREY BEFORE DAWN',
-    text: 'You wake scattered down one shoreline, with nothing. A jungle rises behind the beach. Little driftwood robots watch from the rocks. And the island has one law, learned the hard way:',
+    text: 'Sand. Rain-light. The sound of a sea pretending nothing happened. The family wakes scattered down one shoreline — soaked, bruised, alive, still holding one rope with no boat on the end of it. They count heads the way you count when you cannot breathe until the number is right. The number is right. All of them. Except—',
     video: 'shore',
   },
   {
-    speaker: 'THE ISLAND', color: '#0E7C7C', location: 'THE LAW',
-    text: 'Nothing important works when attempted alone. Fires lit solo gutter out. Shelters raised by one pair of hands lean. The island is not cruel — it is honest, the way the ship never made you be. It only yields to together.',
+    speaker: 'THE COMPASS', color: '#E7C892', location: 'THE WRECK LINE · WHAT WASHED UP',
+    text: 'Mr. Bauer is not on the beach. Not in the shallows. Not anywhere a voice can reach. What washes up instead, glinting in the tide junk, is his brass compass — heavy, old, engraved with letters gone soft: TO M.B. — COME HOME. The needle does not point north. It points INLAND, toward the jungle, steady as a held breath. And from the treeline — small, wooden, gone the second anyone looks — something watches the family count heads.',
     video: 'shore',
   },
 ];
@@ -192,7 +207,7 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
               <div className="px-6 pb-10 text-center">
                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/50 mb-2">a family survival story</p>
                 <h1 className="font-display font-black text-5xl text-white drop-shadow-lg">Driftwood</h1>
-                <p className="text-sm text-white/75 mt-2 font-semibold">the island that only yields to together</p>
+                <p className="text-sm text-white/85 mt-2 font-semibold leading-relaxed">A family that loves together.<br/>A family that works together.<br/>A family that survives together.</p>
                 <motion.button whileTap={{ scale: 0.97 }} onClick={() => { setBeat(0); setPhase('cinematic'); }}
                   className="mt-7 w-full py-4 rounded-2xl font-black text-sm text-white cursor-pointer"
                   style={{ background: 'linear-gradient(135deg,#0E7C7C,#2E96B5)', boxShadow: '0 4px 28px rgba(14,124,124,0.5)' }}>

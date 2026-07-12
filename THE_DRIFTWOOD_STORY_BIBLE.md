@@ -85,3 +85,79 @@ One component (`TideChart.tsx`), four boards, reading existing state:
 
 *The island only yields to together. The Undertow only loses to named.
 — C., for L., 2026-07-12*
+
+---
+
+# PART II · THE COMMISSIONED ARC (Lance, 2026-07-12 — "build a masterpiece")
+*Decisions blessed: Mr. Bauer VANISHES in the storm (the island's running
+mystery, the mid-story crisis) · the little robot IS SKIP, deepened · the
+story family IS the player's family (claimed names in dialogue, honest
+fallbacks). Tagline law: "A family that loves together. A family that works
+together. A family that survives together."*
+
+## THE ARC, AS A SHORT NOVEL
+
+**COLD OPEN — THE DOCK.** The family arrives for Mr. Bauer's island tour
+already broken: the argument they've had a hundred times, phones out,
+someone almost stays in the car. Bauer — warm, odd, watchful, like he's
+seen this exact family before — gets them aboard. The storm takes the boat
+apart in four beats. His last act: lashing the family's hands to one line.
+"HOLD THE LINE. NOT THE RAIL — EACH OTHER—" Black.
+
+**S1 · THE WRECK (ch. 1–6): fear → the first fire.** They wake scattered on
+the tide line. Bauer is GONE — only his brass compass, washed up, points not
+north but INLAND. First meeting with Skip (both terrified; full scene in
+milestone 1). His refusal ("the Jumble watched you argue on the beach. We
+don't help storms."). The failed fire, night two — Skip returns, helps,
+his wooden hand catches; the family smothers it with sand and wet hands
+TOGETHER (their first together since the dock). His family's law follows:
+31 challenges. "Prove you're not a storm. Become one of us."
+
+**S2 · THE CAMP (7–13): robot culture + the family's hull.** The Jumble's
+village opens one hut per trust earned. Robot rules (never lie by the fire ·
+whoever holds the conch is heard to the end · repairs before verdicts).
+Each family member's needs/tells charted. Bauer thread: his knife found at
+a cold campsite — someone survived. The kids find robot carvings of a MAN
+teaching robots to build fires.
+
+**S3 · THE HEARTH (14–19): joy returns.** Game night canon, the waterfall
+cave, the joy-tide. The bottle from the Voyager washes ashore (two letters —
+the connected worlds' gift). Mid-season lightness before the fall.
+
+**S4 · THE STORM RETURNS (20–26): the crisis + reconciliation.** The second
+storm wrecks the camp — everything visual they built takes damage (co-op
+stakes: rebuilding is the gameplay). In the storm's chaos the family
+fractures back to the dock's argument — the Undertow named at last (ch. 20,
+the crown). THE CRISIS: the youngest goes missing in the storm looking for
+Bauer's trail; the family search — run as a real co-op challenge — ends at
+THE CAVE BEHIND THE WATERFALL: the child safe, warmed by a fire… and the
+truth of Mr. Bauer. He was here — YEARS ago. He built the Jumble from the
+driftwood of HIS own wreck, one robot per member of the family he lost —
+built them to practice the love he never got to finish. The compass points
+inland because it points to the village: his family's memorial that became
+a living one. He wasn't lost in THIS storm — he got the family OFF the boat
+and went back for the wheel; the sea keeps what it keeps. (Restraint: he is
+honored, not resurrected. The robots are his letter forward.) POWERFUL
+RECONCILIATION: the family reads his workshop wall — "A family that loves
+together. A family that works together. A family that survives together." —
+and understands the tour was always going to end on this island.
+**S5 · THE LAUNCH (27–31): the climax run (the last-7-10 law).** The
+acceptance trials — the Jumble's own initiation, now FUN: the great raft
+build (all hands, co-op), the feast, the naming ceremony where the robots
+carve the family's names into the village totem ("one of us"), the signal
+fire visible from the sea lane — and the choice: the rescue boat comes, and
+the family votes what the island taught them to vote. They leave TOGETHER —
+and Skip's hand (the burned one, brass-capped now like a medal) presses a
+compass into theirs. It points home. Home is each other. Final image: the
+totem on the island, one new carving added at the bottom, childish letters:
+"MR. BAUER'S FAMILY — ALL OF US."
+
+## ENGINE MAPPING (what lands where)
+- Cold open → BoardingStory CINEMATIC (this iteration).
+- Skip's first meeting / refusal / the fire / the 31 → milestones 1–3
+  openings (next iteration), speaker 'skip' + family archetype voices; the
+  claimed names interpolate via a {name} token resolved at render.
+- Bauer thread → clue-style beats + Tide Chart tide-marks (engine live).
+- The crisis/search → ms_flooded_camp + a co-op island search (Gathering).
+- World additions → island3d: waterfall cave, totem, Bauer's workshop
+  (art slots; ASSET_PROMPTS v3).

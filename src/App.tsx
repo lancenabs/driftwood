@@ -164,7 +164,7 @@ function DriftwoodShell() {
             </div>
             <div>
               <span className="font-display font-extrabold text-base text-primary tracking-tight">Driftwood</span>
-              <p className="text-[9px] text-on-surface-variant font-medium -mt-0.5">the island that only yields to together</p>
+              <p className="text-[9px] text-on-surface-variant font-medium -mt-0.5">loves together · works together · survives together</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
@@ -225,7 +225,7 @@ function DriftwoodShell() {
           );
         })}
         <div className="flex-1" />
-        <p className="text-[8px] text-on-surface-variant/70 px-3 pb-2 italic">the island that only yields to together</p>
+        <p className="text-[8px] text-on-surface-variant/70 px-3 pb-2 italic">A family that loves together. A family that works together. A family that survives together.</p>
       </nav>
 
       {/* Main viewport */}
