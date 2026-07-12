@@ -555,8 +555,10 @@ export const MILESTONES: Milestone[] = [
     title: 'Every Plank Has a Name',
     first: 'Raft-building begins — from the season\'s own planks, each one read aloud.',
     opening: [
-      { kind: 'narration', text: 'The raft goes together from everything the crossing earned: every plank is a milestone this crew actually closed, and each one gets read aloud at the laying — remember the first fire? The larder rules? The night the current got named? The reward economy IS the story\'s ending: you built the boat all along.' },
-      { kind: 'robot', who: 'echo2', text: 'I remember ALL of it! Slightly wrong! "The night the current got FAMOUS!" …close enough, WRITE IT DOWN.' },
+      { kind: 'narration', text: 'The morning after the cave, the Collier stands the family in front of the village and says the sentence the whole island has been building toward: "The Elders met. The trials begin. Five of them — the same five every Jumble passed. Finish, and you are one of us. And one of us…" (he looks at the sea) "…gets taken home."' },
+      { kind: 'robot', who: 'collier', text: 'Trial one: THE RAFT. His plans — Bauer\'s, from the cave, drawn for exactly this. Every plank gets a name before it gets a lashing: the name of something this family survived. You don\'t float on wood. You float on what the wood MEANS. That\'s not poetry. That\'s engineering. His kind.' },
+      { kind: 'robot', who: 'skip', text: '(clutching the plans, vibrating) I get to build a BOAT with my FAMILY from HIS DRAWINGS. If anyone needs me I\'ll be right here being extremely professional about it.' },
+      { kind: 'narration', text: 'The naming takes all morning — the storm, the argument, the flood, the fire that wouldn\'t light and then did — every survived thing made a plank, every plank made part of the hull. The raft grows on the beach like the family\'s whole crossing, keel-up.' },
     ],
     instrument: {
       toolId: 'passage_chart', toolName: 'The Passage Chart',
@@ -570,8 +572,10 @@ export const MILESTONES: Milestone[] = [
     title: 'The Load Test',
     first: 'Before launch: the raft carries the HEAVIEST cargo once, on purpose, in the shallows.',
     opening: [
-      { kind: 'narration', text: 'No crew launches untested. The load test is the hard conversation the family has been sailing around — rehearsed first in the shallows, with the conch, the ropes, and the pause all rigged. Say the heavy thing where the water is knee-deep. That\'s what shallows are FOR.' },
-      { kind: 'robot', who: 'collier', text: 'Test in the shallows, small ones. Deep water is a terrible place to learn your knots.' },
+      { kind: 'narration', text: 'Trial two, and the Collier is merciless the way only love gets: THE LOAD TEST. The raft goes in the cove water, and then the family goes ON it — all of them at once, then in every combination, while the Jumble watches from the rocks with clipboards. (Bailer has an actual clipboard. Nobody knows where he got a clipboard.)' },
+      { kind: 'robot', who: 'bailer', text: 'A raft that holds ONE of you is driftwood. A raft that holds ALL of you is a VESSEL. We test where it flexes when the weight shifts — because weight ALWAYS shifts. Someone gets sick. Someone gets sad. Someone gets a promotion in a city far away, hypothetically. The lashings that hold are the ones you tied TOGETHER. Shift the load. Again. AGAIN.' },
+      { kind: 'robot', who: 'echo2', text: '(as the family scrambles, laughing, re-balancing) …Notice what you\'re doing without being told: calling the shift OUT LOUD before you move. "Coming to your side." "Take my corner." That\'s the whole test. The raft was never being tested.' },
+      { kind: 'narration', text: 'By sundown the vessel holds every combination — even the silly ones, even everyone-on-one-corner while Skip shrieks about physics. It holds. The family knew it would. That\'s new, that knowing. That\'s the trial passed.' },
     ],
     instrument: {
       toolId: 'undertow_chart', toolName: 'The Undertow Chart',
@@ -585,8 +589,15 @@ export const MILESTONES: Milestone[] = [
     title: 'The Letter in the Bottle',
     first: 'Each member writes to the family a year out — sealed, launched, trusted to the tide.',
     opening: [
-      { kind: 'narration', text: 'The Jumble\'s launch-gift: bottles, one per member. Inside, a letter to this same family one year from now — what today-you wants remembered when the weather argues. The tide delivers these. It always has.' },
-      { kind: 'robot', who: 'skip', text: 'I\'ll fetch them back at the PERFECT moment! Fetching things at the perfect moment is my ONE skill and I\'m MAGNIFICENT at it!' },
+      { kind: 'narration', text: 'Trial three is not a trial, the Jumble admits — it\'s a FEAST, the biggest the village has thrown since the Before: the acceptance feast, fires doubled, the volley ball retrieved from its tree, the game box open, every small thing on the long table. And at the head of the table, one empty chair with an oilskin coat over it, because this village knows how to hold a feast and a missing person in the same heart.' },
+      { kind: 'robot', who: 'skip', text: 'Trial three is the letters. Everyone writes one — that\'s the rule from HIS book. To someone who isn\'t here, or someone who is, or someone you were. The sea delivers. It always has. (he pats the youngest\'s shoulder with his spliced hand) You can dictate. I write very fast and only some letters backward.' },
+      { kind: 'choice', id: 's5_letter', prompt: 'The feast quiets. The bottles wait. Who does your family write to?',
+        options: [
+          { id: 'bauer', label: 'To Mr. Bauer — the thank-you he sailed away before hearing' },
+          { id: 'selves', label: 'To yourselves, one year from now — from the people you became here' },
+        ] },
+      { kind: 'narration', when: { flag: 's5_letter', is: 'bauer' }, text: 'The letter to Bauer takes four hands and one page: what the lessons did, what the robots became, what the family knows now that the dock family didn\'t. Hollow seals it. The Jumble walks it to the water together, every lantern lit, and the tide takes it toward wherever kept him. Nobody says a word the whole way back. Nobody needs to.' },
+      { kind: 'narration', when: { flag: 's5_letter', is: 'selves' }, text: 'The letter forward gets written around the table, every voice a line: remember the spiral. Remember the sixty seconds. Remember the oils, the shell, the planks with names. Skip adds a postscript nobody reads until it\'s sealed: "P.S. — you have a robot family on an island and we are NOT hypothetical. Visit. — S." The tide takes it toward next year.' },
     ],
     instrument: {
       toolId: 'future_letter', toolName: 'The Letter in the Bottle',
@@ -600,8 +611,10 @@ export const MILESTONES: Milestone[] = [
     title: 'The Launch Council',
     first: 'The last council: what does this family take off the island — and what does it leave?',
     opening: [
-      { kind: 'narration', text: 'The night before launch, the driftwood table hosts its last parliament. Two lists by firelight: what this crew TAKES (the meeting, the cove, the ropes, the pause, the fire law) and what it LEAVES (the silent roles, the unread signals, the scorekeeping). Said aloud. Written down. Witnessed by robots.' },
-      { kind: 'robot', who: 'bailer', text: 'I\'m keeping your old scorekeeping! I\'ll bail it somewhere DEEP. It\'s the one cargo I\'m glad to sink.' },
+      { kind: 'narration', text: 'Trial four convenes at the village totem — the tall carved post where every Jumble\'s name lives, cut deep by the Collier\'s own hands. Tonight the whole village stands in a ring, lanterns up, and the Elders speak the old words: "Who vouches?"' },
+      { kind: 'robot', who: 'skip', text: 'I DO. (he is standing on a stump to be taller and still isn\'t, and has never cared less) I vouched on day one before I asked permission and I vouch LOUDER now. They put out my hand with THEIR hands. They named their planks. They found the Before and didn\'t look away. They are the twelfth family and the FIRST to finish, and I\'m the one who gets to say it because I\'m the sponsor: THEY\'RE OURS.' },
+      { kind: 'narration', text: 'The Collier steps to the totem with his carving knife. And one by one — each family member\'s name, spoken by the youngest robot and cut by the oldest — the family goes into the wood, into the village, into the long record of the island. Below the names, the Collier cuts one more line, his splices steady: MR. BAUER\'S FAMILY — ALL OF US.' },
+      { kind: 'robot', who: 'hollow', text: 'One of us. (the whole Jumble, together, like a bell:) ONE OF US. …The signal fire is yours to light now. Trial five is the lighting — and the choosing of what comes after. Sleep well. Tomorrow, the sea answers.' },
     ],
     instrument: {
       toolId: 'tide_table', toolName: 'The Tide Table',
@@ -615,9 +628,18 @@ export const MILESTONES: Milestone[] = [
     title: 'The Naming of the Boat',
     first: 'The launch — and the reveal the whole crossing was building toward.',
     opening: [
-      { kind: 'narration', text: 'Dawn. The raft sits at the tide line, every plank named, and the Collier — who has not stood fully upright in years — stands to speak the island\'s last lesson: "Look at what you\'re standing on, small ones. Driftwood. The wreck of the thing that broke you, rebuilt into the thing that carries you. That was always the assignment."' },
-      { kind: 'robot', who: 'collier', text: 'A family is not the boat that sank. It\'s what they build from it. …Now name your boat, and GO. Somebody out there is waiting to see it float.' },
-      { kind: 'narration', text: 'From the ridge, the whole Jumble waves — and far out, crossing the horizon, a ship with bone-white letters on its hull dips its colors once. High in its crow\'s nest, a small figure raises a lantern. The family was the somebody. The vote to launch is unanimous. The name goes on the bow — that part belongs to your family alone.' },
+      { kind: 'narration', text: 'Dawn. The signal fire takes on the first spark — the family\'s spark, struck with Bauer\'s fire-steel — and climbs the cliff-top wood like it was born knowing the way. Smoke, straight and tall, into a clear sky. And before the morning is out, the sea answers: a shape on the horizon. A boat. Real. Coming.' },
+      { kind: 'narration', text: 'The village walks the family down to the raft — which will not be needed now, and which nobody would un-build for anything — and the Collier asks the last question of the thirty-one: "She needs a name before she\'s a vessel. Even one that never sails. ESPECIALLY one that never sails. Name her."' },
+      { kind: 'choice', id: 's5_boat_name', prompt: 'The raft built from every named plank of this crossing. Her name:',
+        options: [
+          { id: 'bauer', label: 'THE MR. BAUER — so he gets his boat back' },
+          { id: 'together', label: 'THE TOGETHER — the island\'s one law, made a vessel' },
+          { id: 'skip', label: 'THE SKIP — the smallest scraps hold the most love per splinter' },
+        ] },
+      { kind: 'narration', when: { flag: 's5_boat_name', is: 'bauer' }, text: 'THE MR. BAUER, painted along the hull in the youngest\'s best letters. The Collier has to oil something that isn\'t squeaking. Twice.' },
+      { kind: 'narration', when: { flag: 's5_boat_name', is: 'together' }, text: 'THE TOGETHER, painted along the hull — the law made a vessel. Echo-2 repeats the name back exactly as spoken, which she has never once done, because there was no kinder way to say it.' },
+      { kind: 'narration', when: { flag: 's5_boat_name', is: 'skip' }, text: 'THE SKIP. The little robot reads his own name on a hull built from a family\'s survived things, and sits down right there on the sand, and the whole village pretends not to notice the smallest scrap of the Jumble holding his spliced hand over his knot-eyes.' },
+      { kind: 'narration', text: 'The rescue boat anchors off the cove. And at the water\'s edge, Skip presses something into the family\'s hands: the compass. Polished. The needle swings once, twice — and settles, pointing not at the island, not at the boat, but square at the middle of the family standing together on the sand. "He fixed it years ago," Skip says. "It never pointed north. It points HOME. That\'s why it kept pointing at the village — and look what it points at now." The family that boards the boat is not the family that fell off one. Behind them the signal fire burns tall — lit-ready, always, for whoever wrecks next. A family that loves together. A family that works together. A family that survives together. THE END — and the beginning, which is the same thing, on this island.' },
     ],
     instrument: {
       toolId: 'life_vision', toolName: 'The Far Charts',
