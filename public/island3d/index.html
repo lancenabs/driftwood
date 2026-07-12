@@ -21,7 +21,10 @@
          background: #fff; border-radius: 18px; padding: 10px 16px; font-size: 12.5px; font-weight: 700; color: #334;
          box-shadow: 0 4px 16px rgba(0,0,0,0.18); display: none; text-align: center; line-height: 1.45; }
   #say b { color: #B8860B; display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
-  #fit { position: fixed; right: 12px; bottom: 26px; z-index: 40; display: none; flex-direction: column; gap: 8px;
+  /* z above #jump (46) — the open picker must win the corner it shares with the thumb
+     button; 13 castaways now live here, so it scrolls instead of running off a phone */
+  #fit { position: fixed; right: 12px; bottom: 26px; z-index: 47; display: none; flex-direction: column; gap: 8px;
+         max-height: min(62vh, 560px); overflow-y: auto;
          background: rgba(255,255,255,0.94); border-radius: 20px; padding: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
   #fit h4 { margin: 0 0 2px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #9CA3AF; }
   .swatches { display: flex; gap: 6px; }
