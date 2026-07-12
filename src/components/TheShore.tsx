@@ -169,6 +169,19 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         <span className="text-[10px] font-bold opacity-90 normal-case">· learn each other, warm the family, together</span>
       </button>
 
+      {/* 🥽 THE HEADSET DOORS — the same island and the same fire, in XR.
+          Same-origin pages; the crisis law travels (988 + take-the-headset-off). */}
+      <div className="w-full flex border-t-2 border-outline-variant">
+        <a href="/vr/index.html" data-testid="vr-door"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-slate-800 text-white font-black text-[11px] uppercase tracking-wide cursor-pointer hover:brightness-110">
+          🥽 Stand on the island <span className="normal-case font-bold opacity-70">· VR</span>
+        </a>
+        <a href="/mr/index.html" data-testid="mr-door"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-slate-700 text-white font-black text-[11px] uppercase tracking-wide cursor-pointer hover:brightness-110 border-l border-slate-600">
+          🔥 The fire in your room <span className="normal-case font-bold opacity-70">· MR</span>
+        </a>
+      </div>
+
       {/* ── THE FIVE NEEDS ── */}
       <div className="bg-white p-3 border-t-2 border-outline-variant">
         <div className="grid grid-cols-5 gap-1.5">
