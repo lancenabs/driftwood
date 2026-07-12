@@ -90,7 +90,9 @@ function AppCard({
         boxShadow: `0 8px 28px ${toolColor}2E, 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)`,
         display: 'flex',
         flexDirection: 'column',
-        aspectRatio: '4/5',
+        // min-height, not a fixed aspect: 2-line names + 3-line descriptions
+        // were clipping the button row (the 2026-07-12 alignment catch)
+        minHeight: 208,
         transition: 'box-shadow 0.2s',
       }}
     >
@@ -167,10 +169,15 @@ function AppCard({
         </div>
       )}
 
-      {/* Name */}
+      {/* Name — clamped to 2 lines so every card's rows line up */}
       <div style={{
         fontSize: 13, fontWeight: 800, color: '#1C1C1E',
         lineHeight: 1.2, marginBottom: 5, position: 'relative', letterSpacing: -0.2,
+        minHeight: 31,
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical' as const,
+        overflow: 'hidden',
       }}>
         {tool.name}
       </div>
@@ -188,7 +195,7 @@ function AppCard({
       </div>
 
       {/* Action row: Open (big, colorful, primary tap target) + Get/Added */}
-      <div style={{ position: 'relative', marginTop: 12, display: 'flex', gap: 6, alignItems: 'center' }}>
+      <div style={{ position: 'relative', marginTop: 'auto', paddingTop: 12, display: 'flex', gap: 6, alignItems: 'center' }}>
         {/* Open button — filled with the tool's own gradient, soft clay shadow */}
         <div
           onClick={e => { e.stopPropagation(); onOpen(); }}
