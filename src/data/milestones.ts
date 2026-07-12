@@ -320,8 +320,10 @@ export const MILESTONES: Milestone[] = [
     title: 'Appreciation Volley',
     first: 'The signal fires get lit — starting with the smallest fuel: things noticed out loud.',
     opening: [
-      { kind: 'narration', text: 'Season III opens with a game the Jumble invented and takes absurdly seriously: the volley. One appreciation, specific, true, lobbed across the fire. Returned. Kept aloft. The rule: no "thanks for everything" — only "I saw the exact thing you did."' },
-      { kind: 'robot', who: 'skip', text: 'RALLY RULES! Specific! True! No fetching compliments back for yourself, that\'s MY bad habit! Go go go!' },
+      { kind: 'narration', text: 'Season three opens with the strangest sound the island has made yet: laughing. The camp works now — water, walls, the fire that takes on the first breath. And into the ease walks Skip, carrying a woven ball with the ceremony of a crown.' },
+      { kind: 'robot', who: 'skip', text: 'THE VOLLEY BALL. Not volleyball — the VOLLEY ball. Jumble rules: you can\'t hold it. You catch it, you say one true good thing about the thrower, you throw it on. Holding it too long is called HOARDING THE WARM and Bailer will make the noise.' },
+      { kind: 'robot', who: 'bailer', text: '(demonstrating the noise. It is somehow both a foghorn and a disappointed aunt.)' },
+      { kind: 'narration', text: 'The ball goes up. And the family discovers what the Jumble learned long ago: appreciation, in motion, with a timer, is a GAME — and games get played, where speeches get postponed. The specific ones land hardest. "You always check the fire last" beats "you\'re great" every single throw.' },
     ],
     instrument: {
       toolId: 'bottle_post', toolName: 'The Bottle Post',
@@ -335,8 +337,10 @@ export const MILESTONES: Milestone[] = [
     title: 'Game Night on the Sand',
     first: 'The camp plays — on purpose, on the calendar, no earning it first.',
     opening: [
-      { kind: 'narration', text: 'The Jumble is scandalized to learn the crew hasn\'t PLAYED since landfall. Play is not the reward for a finished camp; play is load-bearing. It goes on the calendar like water-carry, or it doesn\'t happen.' },
-      { kind: 'robot', who: 'bailer', text: 'I schedule my joy! Tuesdays! People laugh but MY joy actually HAPPENS.' },
+      { kind: 'narration', text: 'The Collier — THE COLLIER — arrives at the family fire carrying a driftwood box with a hinged lid, and the entire Jumble goes silent the way a town goes silent when the bank opens its vault.' },
+      { kind: 'robot', who: 'collier', text: 'Game night. Village law: once a week, all work stops. This box is older than any of us — HE built it before he built the first — (a pause, a re-route) —it was built. Long ago. Shell-toss, sand-nine, the memory game with the terrible penalties. Tonight your family hosts. Do not let Bailer bank the shells. He counts cards. He IS cards.' },
+      { kind: 'robot', who: 'skip', text: '(whispering) You\'re getting GAME NIGHT. It took the seagull two years to get game night.' },
+      { kind: 'narration', text: 'The lesson hides inside the fun, where the best ones live: a family that plays together builds a bank of light moments to spend on the heavy ones. Tonight the island collects deposits. The penalties ARE terrible. The youngest wins everything.' },
     ],
     instrument: {
       toolId: 'ships_calendar', toolName: 'The Ship\'s Calendar',
@@ -350,8 +354,16 @@ export const MILESTONES: Milestone[] = [
     title: 'The Story Circle',
     first: 'The fire gets its true purpose: the crew tells its own history, each voice a chapter.',
     opening: [
-      { kind: 'narration', text: 'The Collier wakes long enough to teach the oldest technology on any island: the story circle. Each member tells one true family story — the funny one, the hard one, the one the youngest has never heard. A family is a story it keeps agreeing to tell together.' },
-      { kind: 'robot', who: 'collier', text: 'Every crew that lasts, small ones, is a story that got told at enough fires. Start telling yours ON PURPOSE.' },
+      { kind: 'narration', text: 'The morning of story circle, the tide brings a guest: a green glass bottle, wax-sealed, riding the swell into the cove like it had the address. Inside — two letters, salt-stiff, in two different hands.' },
+      { kind: 'narration', text: 'The first is from a boy named Chip, to an island, to a workshop, to a father: thank-you words from someone who made it. The second is stranger — a captain, writing to their own future self: "there will be hard weeks; this is what today proves." At the bottom, under both signatures, a line in the boy\'s hand: "If a family finds this — the crew says: keep each other. It\'s the whole trick. — C."' },
+      { kind: 'robot', who: 'hollow', text: '…Other crews. Other water. Same trick. (he holds the bottle up to the light a long time) Put it on the story shelf. Tonight the circle goes around and every voice tells one: the hardest crossing you ever made, and who kept you. The bottle proves the genre. Your family proves the sequel.' },
+      { kind: 'choice', id: 's3_bottle', prompt: 'Two letters from another world\'s crossing. After the circle, what does the family do with them?',
+        options: [
+          { id: 'answer', label: 'Write back — seal your own letter in with theirs and give the sea all three' },
+          { id: 'keep', label: 'Keep them on the story shelf — some letters are meant to be arrived, not forwarded' },
+        ] },
+      { kind: 'narration', when: { flag: 's3_bottle', is: 'answer' }, text: 'The family writes back — to Chip, to the captain, to whoever the sea appoints next: what THIS crossing has proven so far, signed with every name at the fire. Three letters, one bottle, one tide. Skip salutes it out of the cove like a departing ship.' },
+      { kind: 'narration', when: { flag: 's3_bottle', is: 'keep' }, text: 'The letters take the place of honor on the story shelf, weighted with a game-night shell. Some nights, after circle, someone reads Chip\'s last line out loud like a toast: keep each other. It\'s the whole trick.' },
     ],
     instrument: {
       toolId: 'passage_chart', toolName: 'The Passage Chart',
@@ -365,8 +377,10 @@ export const MILESTONES: Milestone[] = [
     title: 'The Signal Fire',
     first: 'One fire is kept burning ALWAYS — the one that says "reach for me and I\'ll turn."',
     opening: [
-      { kind: 'narration', text: 'The crew builds a second, smaller fire that never goes out: the signal fire. Its law is Gottman\'s oldest finding wearing driftwood: when someone makes a bid — "look at this," "sit with me," a sigh aimed at the room — TURNING TOWARD it is what keeps crews alive. The fire is tended daily or it isn\'t a signal fire.' },
-      { kind: 'robot', who: 'skip', text: 'A bid is a stick held out! You don\'t have to build a CATHEDRAL! You just have to TAKE THE STICK!' },
+      { kind: 'narration', text: 'The cliff-top signal fire is the season\'s biggest build — a tower of dry wood, visible for miles, kept ready but unlit. The Collier supervises with unusual gravity, and halfway through the work the family realizes why: the Jumble has maintained a signal fire on this cliff for YEARS. Fresh-stocked. Never lit.' },
+      { kind: 'robot', who: 'collier', text: 'We keep it for HIM. (the words are out before the re-route can catch them; this time he lets them stand, hammering a stake much harder than the stake requires) …Someone taught us: a light you keep ready is a promise you haven\'t given up on. We re-stack it every storm season. You\'ll re-stack yours too. That\'s the milestone. Not the fire. The KEEPING of the fire.' },
+      { kind: 'robot', who: 'skip', text: '(very quietly, to the family, watching the Collier work) I told you I don\'t know what the Before is. But it has a signal fire. It\'s had one my whole life.' },
+      { kind: 'narration', text: 'The family builds theirs beside the Jumble\'s — two unlit promises on one cliff — and the compass, checked at dusk, points straight between them.' },
     ],
     instrument: {
       toolId: 'daily_rigging', toolName: 'The Daily Rigging',
@@ -380,8 +394,9 @@ export const MILESTONES: Milestone[] = [
     title: 'Feast of the Small Things',
     first: 'The camp invents its own holiday — a ritual nobody else on earth has.',
     opening: [
-      { kind: 'narration', text: 'The Jumble throws a feast for no reason except that the water-carry got done four days running. And the crew learns ritual-craft: the strongest families run on ceremonies they invented themselves — the pancake protocol, the terrible-joke toast, the Sunday walk. Design yours.' },
-      { kind: 'robot', who: 'echo2', text: 'A ritual is a thing you repeat ON PURPOSE! I repeat things by accident and it\'s NOT the same, believe me.' },
+      { kind: 'narration', text: 'Bailer announces it at dawn with the full foghorn: THE FEAST OF SMALL THINGS. The Jumble\'s oldest festival. Rules: no big dishes, no grand gestures — the table is built entirely from tiny good things, each one presented OUT LOUD with its story. The first shell of the day. The joke that landed. The nap.' },
+      { kind: 'robot', who: 'echo2', text: 'Big joys are weather — they come when they come. Small joys are AGRICULTURE. You farm them or you starve slow, and nobody notices they\'re starving because look, the sun\'s out. Tonight: everyone brings five. Yes, five. Hungry hearts underestimate the harvest. That\'s rather the point of the feast.' },
+      { kind: 'narration', text: 'By dark the driftwood table is covered — leaf-plates of little moments, each with its teller. It is ridiculous. It is the best meal anyone has had since the wreck. The youngest brings seven and is declared, by unanimous Jumble vote, "dangerously good at this."' },
     ],
     instrument: {
       toolId: 'tide_table', toolName: 'The Tide Table',
@@ -395,8 +410,10 @@ export const MILESTONES: Milestone[] = [
     title: 'The Quiet Cove',
     first: 'Pairs rotate through the cove — every two-person bond gets its own hour.',
     opening: [
-      { kind: 'narration', text: 'Season III closes on the island\'s gentlest law: a family is not one relationship; it is every PAIR inside it. The quiet cove takes two at a time — parent and kid, partner and partner, sibling and sibling — for an hour that belongs to that pair alone. The rotation is the point: every line in the family gets tended, not just the loudest.' },
-      { kind: 'robot', who: 'hollow', text: 'Two at a time I can DO. Whole crowds shut my shell. …Most people have a shell, they just hide it better than I do.' },
+      { kind: 'narration', text: 'Hollow leads them there himself, which has never happened — a cove on the leeward side where the water goes so still it doubles the sky. The Jumble\'s quiet place. No games here. No volley ball. The rule of the cove is carved small on one stone: BE. STILL. TOGETHER.' },
+      { kind: 'robot', who: 'hollow', text: 'The village taught you loud-together. This is the other half. Sitting in the same silence, on purpose, nobody performing — that\'s a family skill too. The hardest one. (he settles onto a stone like a heron) The little one couldn\'t do it for two years. Kept narrating the silence.' },
+      { kind: 'robot', who: 'skip', text: 'I\'ve gotten SO good at it now. Watch. (four seconds) That was the demo. The real one\'s longer.' },
+      { kind: 'narration', text: 'The family sits, still, together, while the tide breathes. Season three closes on the quietest triumph of the crossing so far: nobody needed anything to be different. Far out over the water, the sky is building something on the horizon. Nobody looks at it yet.' },
     ],
     instrument: {
       toolId: 'ships_calendar', toolName: 'The Ship\'s Calendar',
