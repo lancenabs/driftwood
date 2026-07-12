@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ChevronRight, X, Lock, CheckCircle2, Circle, Flag } from 'lucide-react';
 import { MILESTONES, SEASONS, isSeasonEnd, Milestone, Beat } from '../data/milestones';
+import { CRAFT } from '../data/milestoneCraft';
 import { TOOL_COMPLETION, readSaveSignature } from '../lance/components/LANCEGame/challengeCompletion';
 import { appendEvent } from '../lib/world';
 import { driftBell, tideCreak, emberPop } from '../lib/shoreSounds';
@@ -32,6 +33,16 @@ function loadState(): LogState {
 }
 function saveState(s: LogState) { localStorage.setItem(STATE_KEY, JSON.stringify(s)); }
 
+// A campfire-game instrument completes on a genuinely finished round — the
+// fire_quiz_played event the game itself appends (never a self-checked box).
+function gameRounds(gameId: string): number {
+  try {
+    const evs = JSON.parse(localStorage.getItem('driftwood_events_v1') || '[]');
+    return evs.filter((e: { action?: string; payload?: { game?: string } }) =>
+      e?.action === 'fire_quiz_played' && e?.payload?.game === gameId).length;
+  } catch { return 0; }
+}
+
 const ROBOT_NAMES: Record<string, { name: string; emoji: string }> = {
   skip:    { name: 'Skip',        emoji: '🤖' },
   hollow:  { name: 'Hollow',      emoji: '🐚' },
@@ -40,7 +51,7 @@ const ROBOT_NAMES: Record<string, { name: string; emoji: string }> = {
   collier: { name: 'The Collier', emoji: '⚒️' },
 };
 
-type Phase = 'log' | 'scene' | 'conch' | 'working' | 'closed';
+type Phase = 'log' | 'scene' | 'conch' | 'working' | 'closing' | 'closed';
 
 export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) => void }) {
   const [state, setState] = useState<LogState>(loadState);
@@ -62,20 +73,35 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
       const inv = loadState().investigating;
       if (!inv) return;
       const m = MILESTONES.find(x => x.id === inv.id);
-      const signal = m?.instrument
+      if (!m) return;
+      const craft = CRAFT[m.id];
+      if (craft?.gameId) {
+        // game instrument: a new finished round since the baseline closes it
+        if (gameRounds(craft.gameId) > Number(inv.baseline || 0)) finishMilestone(m);
+        return;
+      }
+      const signal = m.instrument
         ? (TOOL_COMPLETION as Record<string, { kind: string; keys?: string[] }>)[m.instrument.toolId]
         : null;
       if (!signal || signal.kind !== 'save' || !signal.keys) return;
       if (readSaveSignature(signal.keys) !== inv.baseline) {
-        finishMilestone(m!);
+        finishMilestone(m);
       }
     };
     window.addEventListener('driftwood:world-event', check);
     window.addEventListener('focus', check);
+    // the island's story circles: walking into the ring opens the milestone
+    const openFromIsland = (e: Event) => {
+      const id = (e as CustomEvent).detail?.id as string | undefined;
+      const m = MILESTONES.find(x => x.id === id);
+      if (m) openMilestone(m);
+    };
+    window.addEventListener('driftwood:open-milestone', openFromIsland);
     check();
     return () => {
       window.removeEventListener('driftwood:world-event', check);
       window.removeEventListener('focus', check);
+      window.removeEventListener('driftwood:open-milestone', openFromIsland);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -94,6 +120,17 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
 
   const beginWork = (m: Milestone) => {
     if (!m.instrument) return;
+    const craft = CRAFT[m.id];
+    if (craft?.gameId) {
+      // the instrument is a campfire game — baseline the real round count,
+      // then send the crew to the fire with the right game queued
+      const next = { ...loadState(), investigating: { id: m.id, baseline: String(gameRounds(craft.gameId)) } };
+      setState(next); saveState(next);
+      setPhase('working');
+      try { sessionStorage.setItem('driftwood_pending_game', craft.gameId); } catch { /* menu still opens */ }
+      window.dispatchEvent(new CustomEvent('driftwood:open-campfire'));
+      return;
+    }
     const signal = (TOOL_COMPLETION as Record<string, { kind: string; keys?: string[] }>)[m.instrument.toolId];
     const baseline = signal?.kind === 'save' && signal.keys ? readSaveSignature(signal.keys) : '';
     const next = { ...loadState(), investigating: { id: m.id, baseline } };
@@ -122,7 +159,9 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
         setCurtain({ season: s.n, name: s.name, arc: s.arc });
       }
     }
-    setActive(m); setPhase('closed');
+    setActive(m);
+    setBeatIdx(0);
+    setPhase(CRAFT[m.id]?.closing?.length ? 'closing' : 'closed');
   };
 
   const backToLog = () => { setActive(null); setPhase('log'); setBeatIdx(0); setConchConfirms([]); };
@@ -303,19 +342,46 @@ export default function MilestoneLog({ onOpenTool }: { onOpenTool: (id: string) 
       )}
 
       {phase === 'working' && active.instrument && (
-        <div className="flex flex-col gap-2 text-center py-2">
-          <p className="text-[12px] font-black text-slate-700">The work is open.</p>
-          <p className="text-[11px] text-slate-500 leading-relaxed px-2">{active.instrument.why}</p>
+        <div className="flex flex-col gap-2 py-2">
+          <p className="text-[12px] font-black text-slate-700 text-center">The work is open.</p>
+          <p className="text-[11px] text-slate-500 leading-relaxed px-2 text-center">{active.instrument.why}</p>
+          {CRAFT[active.id]?.steps && (
+            <ol className="flex flex-col gap-1.5 my-1">
+              {CRAFT[active.id].steps.map((st, i) => (
+                <li key={i} className="flex items-start gap-2 p-2 bg-surface-container-lowest border border-outline-variant rounded-xl">
+                  <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-black flex items-center justify-center">{i + 1}</span>
+                  <span className="text-[11px] leading-relaxed text-slate-600">{st}</span>
+                </li>
+              ))}
+            </ol>
+          )}
           <button
-            onClick={() => onOpenTool(active.instrument!.toolId)}
+            onClick={() => {
+              const craft = CRAFT[active.id];
+              if (craft?.gameId) {
+                try { sessionStorage.setItem('driftwood_pending_game', craft.gameId); } catch { /* menu opens */ }
+                window.dispatchEvent(new CustomEvent('driftwood:open-campfire'));
+              } else onOpenTool(active.instrument!.toolId);
+            }}
             className="w-full py-2.5 bg-secondary text-white font-display font-black rounded-xl border-b-[3px] border-on-secondary-container text-xs cursor-pointer"
           >
-            Open {active.instrument.toolName}
+            {CRAFT[active.id]?.gameId ? `🏕 To the fire: ${active.instrument.toolName}` : `Open ${active.instrument.toolName}`}
           </button>
-          <button onClick={backToLog} className="text-[10px] font-bold text-slate-400 cursor-pointer py-1">
+          <p className="text-[8px] text-slate-400 italic text-center">
+            The island counts the real work — a saved entry or a finished round — never a checked box.
+          </p>
+          <button onClick={backToLog} className="text-[10px] font-bold text-slate-400 cursor-pointer py-1 text-center w-full">
             Set it aside for now
           </button>
         </div>
+      )}
+
+      {phase === 'closing' && CRAFT[active.id]?.closing && (
+        <Beats
+          beats={CRAFT[active.id].closing}
+          doneLabel="Lay the plank"
+          onDone={() => setPhase('closed')}
+        />
       )}
 
       {phase === 'closed' && (

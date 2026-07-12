@@ -520,6 +520,43 @@ function broadcastPos() {
   }).catch(() => {});
 }
 
+
+// ── THE STORY CIRCLE — the next milestone stands on this island too ─────────
+const MS = [{"id":"ms_count_heads","n":1,"s":1,"t":"Count Heads"},{"id":"ms_high_ground","n":2,"s":1,"t":"High Ground"},{"id":"ms_first_fire","n":3,"s":1,"t":"First Fire"},{"id":"ms_fresh_water","n":4,"s":1,"t":"Fresh Water"},{"id":"ms_salvage","n":5,"s":1,"t":"The Salvage"},{"id":"ms_night_watch","n":6,"s":1,"t":"First Night Watch"},{"id":"ms_who_builds_what","n":7,"s":2,"t":"Who Builds What"},{"id":"ms_walls_door","n":8,"s":2,"t":"The Walls and the Door"},{"id":"ms_larder_rules","n":9,"s":2,"t":"The Larder Rules"},{"id":"ms_two_huts","n":10,"s":2,"t":"Two Huts or One"},{"id":"ms_second_language","n":11,"s":2,"t":"The Second Language"},{"id":"ms_storm_proofing","n":12,"s":2,"t":"Storm-Proofing"},{"id":"ms_map_of_us","n":13,"s":2,"t":"The Map of Us"},{"id":"ms_appreciation_volley","n":14,"s":3,"t":"Appreciation Volley"},{"id":"ms_game_night","n":15,"s":3,"t":"Game Night on the Sand"},{"id":"ms_story_circle","n":16,"s":3,"t":"The Story Circle"},{"id":"ms_signal_fire","n":17,"s":3,"t":"The Signal Fire"},{"id":"ms_feast_small_things","n":18,"s":3,"t":"Feast of the Small Things"},{"id":"ms_quiet_cove","n":19,"s":3,"t":"The Quiet Cove"},{"id":"ms_naming_undertow","n":20,"s":4,"t":"Naming the Undertow"},{"id":"ms_who_chases","n":21,"s":4,"t":"Who Chases, Who Hides"},{"id":"ms_speakers_shell","n":22,"s":4,"t":"The Speaker's Shell"},{"id":"ms_repair_rope","n":23,"s":4,"t":"Repair Rope"},{"id":"ms_apology_forge","n":24,"s":4,"t":"The Apology Forge"},{"id":"ms_flooded_camp","n":25,"s":4,"t":"The Flooded Camp"},{"id":"ms_riding_it_out","n":26,"s":4,"t":"Riding It Out Together"},{"id":"ms_every_plank","n":27,"s":5,"t":"Every Plank Has a Name"},{"id":"ms_load_test","n":28,"s":5,"t":"The Load Test"},{"id":"ms_letter_bottle","n":29,"s":5,"t":"The Letter in the Bottle"},{"id":"ms_launch_council","n":30,"s":5,"t":"The Launch Council"},{"id":"ms_naming_boat","n":31,"s":5,"t":"The Naming of the Boat"}];
+// season story-circle spots (mirror of src/data/milestoneCraft.ts SEASON_CIRCLES)
+const SEASON_CIRCLES = { 1: {x:-6, z:96}, 2: {x:14, z:66}, 3: {x:58, z:18}, 4: {x:-34, z:-44}, 5: {x:-58, z:58} };
+function nextMilestone() {
+  let closed = [];
+  try { closed = (JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || '{}').closed) || []; } catch {}
+  return MS.find(m => !closed.includes(m.id)) || null;
+}
+const nextMs = nextMilestone();
+let storyCircle = null, inCircle = false;
+window._circleDebug = () => ({ nextMs: nextMs?.id ?? null, circle: storyCircle ? { x: storyCircle.position.x, z: storyCircle.position.z } : null, player: (typeof player !== 'undefined' ? { x: player.position.x, z: player.position.z } : { x: rig.position.x, z: rig.position.z }) });
+if (nextMs) {
+  const spot = SEASON_CIRCLES[nextMs.s];
+  const cy = groundY(spot.x, spot.z);
+  storyCircle = new THREE.Group();
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(1.7, 2.1, 40).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ color: 0xF2A65A, transparent: true, opacity: 0.75, side: THREE.DoubleSide })
+  );
+  ring.position.y = 0.06;
+  storyCircle.add(ring);
+  storyCircle.userData.ring = ring;
+  const beam = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.05, 0.28, 7, 8, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0xFFD9A0, transparent: true, opacity: 0.18, depthWrite: false })
+  );
+  beam.position.y = 3.5;
+  storyCircle.add(beam);
+  const tag = nameTag(`⚑ ${nextMs.n} · ${nextMs.t}`);
+  tag.position.y = 2.9;
+  storyCircle.add(tag);
+  storyCircle.position.set(spot.x, cy, spot.z);
+  scene.add(storyCircle);
+}
+
 // ── THE COMFORT KIT — the org's XR law, aboard ───────────────────────────────
 const kit = createXRKit({
   renderer, camera, rig,
@@ -679,6 +716,17 @@ renderer.setAnimationLoop(() => {
       shellGroup.remove(sh);
       shellChip.textContent = `🐚 ${countShells()}/40`;
       speakSystem('🐚 a golden shell! ' + countShells() + ' of 40.');
+    }
+  }
+
+  // the story circle: pulse + the honest plank when the crew steps in
+  if (storyCircle) {
+    storyCircle.userData.ring.material.opacity = 0.55 + Math.sin(t * 3.1) * 0.25;
+    const wasIn = inCircle;
+    // XZ distance — the headset's eye height must not push the crew out of the ring
+    inCircle = Math.hypot(rig.position.x - storyCircle.position.x, rig.position.z - storyCircle.position.z) < 2.4;
+    if (inCircle && !wasIn) {
+      speakSystem(`⚑ Milestone ${nextMs.n} · ${nextMs.t} — the story stands here. The shore (your phone) carries the instrument; finish it there and the plank lands on this island.`);
     }
   }
 

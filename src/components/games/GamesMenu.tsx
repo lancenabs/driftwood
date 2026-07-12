@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FireQuiz from '../FireQuiz';
 import TwoTruthsTide from './TwoTruthsTide';
 import AppreciationVolley from './AppreciationVolley';
@@ -108,6 +108,18 @@ const GAMES: GameDef[] = [
 
 export default function GamesMenu({ onClose, embedded = false }: { onClose: () => void; embedded?: boolean }) {
   const [active, setActive] = useState<GameDef | null>(null);
+  // the milestone log queues a specific game (the instrument) before routing
+  // the crew to the fire — honor it once, then clear the slip
+  useEffect(() => {
+    try {
+      const pending = sessionStorage.getItem('driftwood_pending_game');
+      if (pending) {
+        sessionStorage.removeItem('driftwood_pending_game');
+        const g = GAMES.find(x => x.id === pending);
+        if (g) setActive(g);
+      }
+    } catch { /* the menu itself is the fallback */ }
+  }, []);
   if (active) return <>{active.render(() => setActive(null))}</>;
 
   return (

@@ -39,6 +39,11 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
     const leave = (e: MessageEvent) => {
       if (e.data?.type === 'driftwood:leave-island') setWalking(false);
       if (e.data?.type === 'driftwood:open-games') setFiring(true);
+      // a story circle on the island: come ashore and open that milestone
+      if (e.data?.type === 'driftwood:open-milestone' && e.data.id) {
+        setWalking(false);
+        setTimeout(() => window.dispatchEvent(new CustomEvent('driftwood:open-milestone', { detail: { id: e.data.id } })), 250);
+      }
     };
     // ANY door into the island (the shore button OR the Gathering bar) opens
     // the same 3D world — one island, no confusion.

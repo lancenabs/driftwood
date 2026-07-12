@@ -1116,6 +1116,45 @@ document.getElementById('back').onclick = () => {
 // The fire is the island's heart: stand close and a warm prompt rises; tap it
 // (or press E) and the Campfire Games open over the island. The world and the
 // work are one place now.
+
+// ── THE STORY CIRCLE — the next milestone stands ON the island ───────────────
+// The LANCE law, walked: the season's circle glows where the story is; step
+// into the ring and the shore opens that milestone. Everything happens here.
+const MS = [{"id":"ms_count_heads","n":1,"s":1,"t":"Count Heads"},{"id":"ms_high_ground","n":2,"s":1,"t":"High Ground"},{"id":"ms_first_fire","n":3,"s":1,"t":"First Fire"},{"id":"ms_fresh_water","n":4,"s":1,"t":"Fresh Water"},{"id":"ms_salvage","n":5,"s":1,"t":"The Salvage"},{"id":"ms_night_watch","n":6,"s":1,"t":"First Night Watch"},{"id":"ms_who_builds_what","n":7,"s":2,"t":"Who Builds What"},{"id":"ms_walls_door","n":8,"s":2,"t":"The Walls and the Door"},{"id":"ms_larder_rules","n":9,"s":2,"t":"The Larder Rules"},{"id":"ms_two_huts","n":10,"s":2,"t":"Two Huts or One"},{"id":"ms_second_language","n":11,"s":2,"t":"The Second Language"},{"id":"ms_storm_proofing","n":12,"s":2,"t":"Storm-Proofing"},{"id":"ms_map_of_us","n":13,"s":2,"t":"The Map of Us"},{"id":"ms_appreciation_volley","n":14,"s":3,"t":"Appreciation Volley"},{"id":"ms_game_night","n":15,"s":3,"t":"Game Night on the Sand"},{"id":"ms_story_circle","n":16,"s":3,"t":"The Story Circle"},{"id":"ms_signal_fire","n":17,"s":3,"t":"The Signal Fire"},{"id":"ms_feast_small_things","n":18,"s":3,"t":"Feast of the Small Things"},{"id":"ms_quiet_cove","n":19,"s":3,"t":"The Quiet Cove"},{"id":"ms_naming_undertow","n":20,"s":4,"t":"Naming the Undertow"},{"id":"ms_who_chases","n":21,"s":4,"t":"Who Chases, Who Hides"},{"id":"ms_speakers_shell","n":22,"s":4,"t":"The Speaker's Shell"},{"id":"ms_repair_rope","n":23,"s":4,"t":"Repair Rope"},{"id":"ms_apology_forge","n":24,"s":4,"t":"The Apology Forge"},{"id":"ms_flooded_camp","n":25,"s":4,"t":"The Flooded Camp"},{"id":"ms_riding_it_out","n":26,"s":4,"t":"Riding It Out Together"},{"id":"ms_every_plank","n":27,"s":5,"t":"Every Plank Has a Name"},{"id":"ms_load_test","n":28,"s":5,"t":"The Load Test"},{"id":"ms_letter_bottle","n":29,"s":5,"t":"The Letter in the Bottle"},{"id":"ms_launch_council","n":30,"s":5,"t":"The Launch Council"},{"id":"ms_naming_boat","n":31,"s":5,"t":"The Naming of the Boat"}];
+// season story-circle spots (mirror of src/data/milestoneCraft.ts SEASON_CIRCLES)
+const SEASON_CIRCLES = { 1: {x:-6, z:96}, 2: {x:14, z:66}, 3: {x:58, z:18}, 4: {x:-34, z:-44}, 5: {x:-58, z:58} };
+function nextMilestone() {
+  let closed = [];
+  try { closed = (JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || '{}').closed) || []; } catch {}
+  return MS.find(m => !closed.includes(m.id)) || null;
+}
+const nextMs = nextMilestone();
+let storyCircle = null, inCircle = false;
+window._circleDebug = () => ({ nextMs: nextMs?.id ?? null, circle: storyCircle ? { x: storyCircle.position.x, z: storyCircle.position.z } : null, player: (typeof player !== 'undefined' ? { x: player.position.x, z: player.position.z } : { x: rig.position.x, z: rig.position.z }) });
+if (nextMs) {
+  const spot = SEASON_CIRCLES[nextMs.s];
+  const cy = groundY(spot.x, spot.z);
+  storyCircle = new THREE.Group();
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(1.7, 2.1, 40).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ color: 0xF2A65A, transparent: true, opacity: 0.75, side: THREE.DoubleSide })
+  );
+  ring.position.y = 0.06;
+  storyCircle.add(ring);
+  storyCircle.userData.ring = ring;
+  const beam = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.05, 0.28, 7, 8, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0xFFD9A0, transparent: true, opacity: 0.18, depthWrite: false })
+  );
+  beam.position.y = 3.5;
+  storyCircle.add(beam);
+  const tag = nameTag(`⚑ ${nextMs.n} · ${nextMs.t}`, '#B45309');
+  tag.position.y = 2.9;
+  storyCircle.add(tag);
+  storyCircle.position.set(spot.x, cy, spot.z);
+  scene.add(storyCircle);
+}
+
 const gatherEl = document.createElement('button');
 gatherEl.textContent = '🔥 Gather round — play a campfire game';
 gatherEl.style.cssText = 'position:fixed;left:50%;bottom:160px;transform:translateX(-50%);z-index:45;display:none;background:linear-gradient(100deg,#F59E0B,#F2683A);color:#fff;border:none;border-radius:999px;padding:12px 20px;font-size:13px;font-weight:800;box-shadow:0 4px 18px rgba(242,104,58,0.5);cursor:pointer;font-family:inherit';
@@ -1216,6 +1255,18 @@ renderer.setAnimationLoop(() => {
   const wasNear = nearFire;
   nearFire = player.position.distanceTo(fire.position) < 5;
   if (nearFire !== wasNear) gatherEl.style.display = nearFire ? 'block' : 'none';
+
+  // the story circle: pulse, and open the milestone when the player steps in
+  if (storyCircle) {
+    storyCircle.userData.ring.material.opacity = 0.55 + Math.sin(t * 3.1) * 0.25;
+    const wasIn = inCircle;
+    // XZ distance — feet in the ring is what counts, not eye height
+    inCircle = Math.hypot(player.position.x - storyCircle.position.x, player.position.z - storyCircle.position.z) < 2.2;
+    if (inCircle && !wasIn) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'driftwood:open-milestone', id: nextMs.id }, '*');
+      else speak({ userData: { info: { id: 'circle', name: 'the story circle', lines: [`⚑ Milestone ${nextMs.n} · ${nextMs.t} — open Driftwood on your phone; the shore carries this one.`] } }, position: storyCircle.position });
+    }
+  }
 
   // third-person camera: behind + above, orbit by drag
   const cx = player.position.x + Math.sin(camYaw) * CAM_D * Math.cos(camPitch);
