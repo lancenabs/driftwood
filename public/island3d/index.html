@@ -871,9 +871,41 @@ for (const r of JUMBLE) {
   const post = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 0.8, 6), mat(0xA5805A));
   post.position.y = 0.4;
   g.add(post);
-  // THE JUMBLE STAND UP — Lance's full-body turnaround cutouts as billboard
-  // standees (transparent, ground-planted, camera-facing). The old portrait
-  // card is the honest fallback; both fall back to the bare post.
+  // THE JUMBLE IN THE ROUND — a real GLB wins when it exists (probe by
+  // content-type, the 07-09 lesson). Fallback chain stays honest:
+  // mesh → standee cutout → portrait card → bare post.
+  fetch(`/island3d/robots3d/${r.id}.glb`, { method: 'HEAD' }).then(res => {
+    const ct = res.headers.get('content-type') || '';
+    if (!res.ok || ct.includes('text/html')) return;
+    loadGLB(`/island3d/robots3d/${r.id}.glb`).then(gltf => {
+      const HEIGHTS = { collier: 2.5, skip: 1.35, lookout: 2.7, hoist: 1.7, teapot: 1.6, barnacle: 1.5 };
+      const h = HEIGHTS[r.id] ?? 1.9;
+      const mesh = gltf.scene;
+      // rigged casts report degenerate bind-pose bboxes (the skinned-mesh
+      // lesson) — measure by the bone spread when a skeleton is present
+      mesh.updateMatrixWorld(true);
+      let minY = Infinity, maxY = -Infinity, boned = false;
+      const _p = new THREE.Vector3();
+      mesh.traverse(o => { if (o.isBone || o.type === 'Bone') {
+        boned = true; o.getWorldPosition(_p);
+        if (_p.y < minY) minY = _p.y; if (_p.y > maxY) maxY = _p.y;
+      }});
+      let rawH, rawMin;
+      if (boned && maxY - minY > 0.01) { rawH = (maxY - minY) * 1.15; rawMin = minY; }
+      else {
+        const box = new THREE.Box3().setFromObject(mesh);
+        rawH = Math.max(box.getSize(new THREE.Vector3()).y, 0.001);
+        rawMin = box.min.y;
+      }
+      const s = h / rawH;
+      mesh.scale.setScalar(s);
+      mesh.position.y = -rawMin * s; // feet on the sand
+      post.visible = false;
+      g.userData.hasMesh = true;
+      if (g.userData.card) g.userData.card.visible = false; // the mesh relieves the standee
+      g.add(mesh);
+    }).catch(() => { /* the standee holds the post */ });
+  }).catch(() => {});
   loader.load(`/island3d/robots3d/${r.id}.png`, tex => {
     const HEIGHTS = { collier: 2.5, skip: 1.35, lookout: 2.7, hoist: 1.7, teapot: 1.6, barnacle: 1.5 };
     const h = HEIGHTS[r.id] ?? 1.9;
@@ -884,6 +916,7 @@ for (const r of JUMBLE) {
     );
     card.position.y = h / 2 + 0.02;
     post.visible = false;                  // real feet — the post stands down
+    if (g.userData.hasMesh) card.visible = false; // the GLB got here first
     g.add(card);
     g.userData.card = card;
   }, undefined, () => loader.load(`/robots/${r.id}.webp`, tex => {
