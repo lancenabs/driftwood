@@ -245,7 +245,7 @@ function DriftwoodShell() {
           <div className="absolute inset-0 overflow-y-auto">
             <LibraryTab onNavigate={(screen: string, toolId?: string) => {
               if (screen === 'tool' && toolId) openTool(toolId);
-              else if (screen === 'challenge') setActiveTab('driftwood');
+              else if (screen === 'challenge') setActiveTab('challenges');
             }} />
           </div>
         )}

@@ -12,6 +12,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ICON_IDS = new Set([
+  // ── THE FAMILY DECK (Foundry-cast icons landed 2026-07-11; registered
+  //    2026-07-12 — they sat on disk unwired, the flagship-parity catch) ──
+  'undertow_chart', 'mooring_lines', 'soundings', 'family_map', 'tide_table',
+  'bottle_post', 'mending_bench', 'barometer', 'passage_chart',
+  'family_manifest', 'daily_rigging', 'ships_calendar', 'sea_chest', 'ask_the_jumble',
   // ── REHABIT RECOVERY DECK (fenced addition) ──
   'urge_surfer', 'play_the_tape', 'halt_check', 'impulse_delay',
   'pros_cons_ledger', 'opposite_action', 'dbt_diary_card', 'secular_12_steps',

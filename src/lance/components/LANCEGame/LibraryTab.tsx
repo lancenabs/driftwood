@@ -376,10 +376,10 @@ export default function LibraryTab({ onNavigate }: Props) {
             }}>⚡</div>
             <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
               <div style={{ fontSize: 13, fontWeight: 900, color: 'white', letterSpacing: -0.2, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
-                Back to the shore
+                Go to Challenges
               </div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', fontWeight: 600, marginTop: 1, textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
-                Every tool here is already yours — the island just gives each one a job
+                Each milestone unlocks a new tool in this guide
               </div>
             </div>
             <div style={{ position: 'relative', fontSize: 18, color: '#7FD98C' }}>→</div>

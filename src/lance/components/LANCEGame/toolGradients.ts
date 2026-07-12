@@ -124,6 +124,25 @@ export const TOOL_GRADIENTS: Record<string, string> = {
   drills_cabinet:               'linear-gradient(145deg, #059669 0%, #134E4A 100%)',
   my_course:                    'linear-gradient(145deg, #0D9488 0%, #164E63 100%)',
   first_mate:                   'linear-gradient(145deg, #0284C7 0%, #1E3A8A 100%)',
+
+  // ── THE FAMILY DECK (Driftwood-native, 2026-07-12 flagship-parity pass) ──
+  // The island's palette: teal/lagoon for charts, amber for warmth, rose for
+  // repair — so the deck's cards wear real colors like every LANCE card.
+  undertow_chart:  'linear-gradient(145deg, #0E7C7C 0%, #2E96B5 100%)',
+  mooring_lines:   'linear-gradient(145deg, #2E96B5 0%, #38BDF8 100%)',
+  soundings:       'linear-gradient(145deg, #0EA5E9 0%, #0E7C7C 100%)',
+  family_map:      'linear-gradient(145deg, #10B981 0%, #0E7C7C 100%)',
+  tide_table:      'linear-gradient(145deg, #38BDF8 0%, #6366F1 100%)',
+  bottle_post:     'linear-gradient(145deg, #F59E0B 0%, #F2683A 100%)',
+  mending_bench:   'linear-gradient(145deg, #F43F5E 0%, #F59E0B 100%)',
+  barometer:       'linear-gradient(145deg, #6366F1 0%, #2E96B5 100%)',
+  passage_chart:   'linear-gradient(145deg, #0E7C7C 0%, #10B981 100%)',
+  family_manifest: 'linear-gradient(145deg, #F2A65A 0%, #D97706 100%)',
+  daily_rigging:   'linear-gradient(145deg, #14B8A6 0%, #0E7C7C 100%)',
+  ships_calendar:  'linear-gradient(145deg, #8B5CF6 0%, #6366F1 100%)',
+  sea_chest:       'linear-gradient(145deg, #A16207 0%, #F59E0B 100%)',
+  ask_the_jumble:  'linear-gradient(145deg, #F2683A 0%, #F2A65A 100%)',
+
 };
 
 // First hex of a tool's gradient = its accent color.
