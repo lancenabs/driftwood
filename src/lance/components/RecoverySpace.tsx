@@ -218,7 +218,7 @@ export default function RecoverySpace({ onTriggerInteractionAlert, onNavigateToT
       reasonsForSobriety: ["My ultimate health and long-term vitality", "Being fully emotionally present for my loved ones", "Reclaiming focus, clarity, and peace of mind"],
       mainTriggers: ["Chronic mental fatigue on Friday afternoons", "Heavy social pressures and networking environments", "Unresolved stress arguments or boundary spikes"],
       copingStrategies: ["Active 3-minute Urge Surfer session in my app", "Taking a walk with a large cold beverage", "Applying 4-7-8 breathing or double-inhale reset"],
-      safeContacts: ["National Support Hotline (988)", "Sponsor / Accountability buddy", "Support Group Meeting / Community portal"]
+      safeContacts: ["Sponsor / Accountability buddy", "Support Group Meeting / Community portal", "The contacts from your Settings safety plan"]
     };
   });
 
@@ -338,7 +338,7 @@ export default function RecoverySpace({ onTriggerInteractionAlert, onNavigateToT
       color: "text-red-700 bg-red-50 border-red-100 animate-pulse",
       progressColor: "accent-red-600 bg-red-100",
       textColor: "text-red-800",
-      strategy: "Stop what you are doing completely. Sit down, tap 'Activate Breathing Exercise' immediately to slow your heart rate, and call 988 if needed."
+      strategy: "Stop what you are doing completely. Sit down, tap 'Activate Breathing Exercise' immediately to slow your heart rate, and follow the safety plan you set up with your therapist in Settings."
     };
   };
 

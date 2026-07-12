@@ -575,24 +575,8 @@ export default function LearningLibrary({ onOpenTool }: Props) {
         })}
       </div>
 
-      <div className="p-4 rounded-2xl border flex items-center justify-between gap-3" style={{ background: '#FEF2F2', borderColor: '#FECACA' }}>
-        <div className="flex gap-3 items-center min-w-0">
-          <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: '#FEE2E2', color: '#B91C1C' }}>
-            <MessageSquare className="w-4 h-4" />
-          </div>
-          <div className="text-left min-w-0">
-            <h4 className="text-xs font-bold" style={{ color: '#7F1D1D' }}>In real danger right now?</h4>
-            <p className="text-[10px]" style={{ color: '#B91C1C' }}>Call or text 988 — free, 24/7.</p>
-          </div>
-        </div>
-        <a
-          href="tel:988"
-          className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-black text-white"
-          style={{ background: '#DC2626' }}
-        >
-          <Phone className="w-3.5 h-3.5" /> 988
-        </a>
-      </div>
+      {/* Crisis lines live in Settings → Safety & Crisis (therapist-configured
+          per state, 2026-07-12 law) — no hotline block on tool surfaces. */}
     </div>
   );
 }

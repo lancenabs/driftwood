@@ -59,14 +59,13 @@ const LEVELS: TempLevel[] = [
     range: [9, 10],
     label: 'Critical',
     color: '#991B1B',
-    lanceRead: "Maximum arousal. If you are experiencing thoughts of harming yourself or others, contact a crisis line immediately: 988 (Suicide & Crisis Lifeline). I am not equipped for this level — please contact a professional.",
+    lanceRead: "Maximum arousal. If you are experiencing thoughts of harming yourself or others, follow the safety plan you built with your therapist — it lives in Settings. I am not equipped for this level — please contact a professional.",
     interventions: [
-      'Crisis line: 988 (US) — call or text, 24/7',
-      'Text HOME to 741741 (Crisis Text Line)',
+      'Open your safety plan (Settings → Safety & Crisis)',
       'Call someone you trust right now',
       'If safety is at risk: 911 or nearest emergency room',
     ],
-    internNote: "Please reach out to a real person right now. A crisis line, a friend, anyone. You don't have to handle this alone. 988 is free, confidential, and available 24/7.",
+    internNote: "Please reach out to a real person right now. The plan you and your therapist wrote is in Settings — a friend, your therapist, anyone. You don't have to handle this alone.",
   },
 ];
 

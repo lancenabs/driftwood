@@ -154,13 +154,13 @@ export default function ClinicalScreens({ onBack }: { onBack: () => void }) {
                 <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
                   <MateCard>
                     You answered honestly about thoughts of death or self-harm — that honesty matters more
-                    than any score on this page. Please don't carry it alone: 988 answers around the clock,
-                    and the SOS screen has your people one tap away. This is exactly what they're for.
+                    than any score on this page. Please don't carry it alone: follow the safety plan you
+                    set up with your therapist (it lives in Settings), and reach a real person today.
                   </MateCard>
                   <button
-                    onClick={() => window.dispatchEvent(new CustomEvent('rehabit:sos'))}
+                    onClick={() => window.dispatchEvent(new CustomEvent('app:open-safety-settings'))}
                     className="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-2xl text-sm cursor-pointer transition-colors flex items-center justify-center gap-1.5">
-                    <LifeBuoy className="w-4 h-4" /> Open SOS — people first
+                    <LifeBuoy className="w-4 h-4" /> Open your safety plan (Settings)
                   </button>
                 </motion.div>
               )}
@@ -195,13 +195,13 @@ export default function ClinicalScreens({ onBack }: { onBack: () => void }) {
               <>
                 <MateCard>
                   One answer on this screen matters more than the total: the thoughts of death or self-harm.
-                  Please bring that to a human today — 988 now, your therapist this week. You logged it
+                  Please bring that to a human today — the safety plan in your Settings, your therapist this week. You logged it
                   honestly; let someone help you carry it.
                 </MateCard>
                 <button
-                  onClick={() => window.dispatchEvent(new CustomEvent('rehabit:sos'))}
+                  onClick={() => window.dispatchEvent(new CustomEvent('app:open-safety-settings'))}
                   className="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-2xl text-sm cursor-pointer transition-colors flex items-center justify-center gap-1.5">
-                  <LifeBuoy className="w-4 h-4" /> Open SOS
+                  <LifeBuoy className="w-4 h-4" /> Open your safety plan
                 </button>
               </>
             )}

@@ -149,42 +149,50 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
         </div>
       </div>
 
-      {/* 🏝 ENTER THE ISLAND — the unmissable door into the 3D world. Third
-          person, your avatar, the Jumble at their posts. Solo works; the
-          Gathering brings the family onto the same ground live. */}
-      <button onClick={() => setWalking(true)} data-testid="walk-island"
-        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-[#3ECFCF] to-[#7FD98C] text-white font-black text-sm cursor-pointer hover:brightness-105 active:brightness-95 transition-all border-t-2 border-outline-variant">
-        <span className="text-lg">🏝</span>
-        <span className="uppercase tracking-wide">Enter the Island</span>
-        <span className="text-[10px] font-bold opacity-90 normal-case">· build, hop, explore — meet the wood robots</span>
-        {(() => { // the shell run rides the door — the family's treasure count
-          try {
-            const n = Object.keys(JSON.parse(localStorage.getItem('driftwood_shells_v1') || '{}')).length;
-            return n > 0 ? <span data-testid="shell-count" className="text-[10px] font-black bg-white/25 rounded-full px-2 py-0.5">🐚 {n}/40</span> : null;
-          } catch { return null; }
-        })()}
-      </button>
-
-      {/* 🏕️ CAMPFIRE GAMES — the reconnection mini-games. Build a shared fire by
-          learning each other; every game warms the whole family's camp. */}
-      <button onClick={() => setFiring(true)} data-testid="fire-quiz"
-        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-sm cursor-pointer hover:brightness-105 active:brightness-95 transition-all border-t-2 border-outline-variant">
-        <span className="text-lg">🏕️</span>
-        <span className="uppercase tracking-wide">Campfire Games</span>
-        <span className="text-[10px] font-bold opacity-90 normal-case">· learn each other, warm the family, together</span>
-      </button>
-
-      {/* 🥽 THE HEADSET DOORS — the same island and the same fire, in XR.
-          Same-origin pages; the crisis law travels (988 + take-the-headset-off). */}
-      <div className="w-full flex border-t-2 border-outline-variant">
-        <a href="/vr/index.html" data-testid="vr-door"
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-slate-800 text-white font-black text-[11px] uppercase tracking-wide cursor-pointer hover:brightness-110">
-          🥽 Stand on the island <span className="normal-case font-bold opacity-70">· VR</span>
-        </a>
-        <a href="/mr/index.html" data-testid="mr-door"
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-slate-700 text-white font-black text-[11px] uppercase tracking-wide cursor-pointer hover:brightness-110 border-l border-slate-600">
-          🔥 The fire in your room <span className="normal-case font-bold opacity-70">· MR</span>
-        </a>
+      {/* THE DOORS — the LANCE quick-suite language (2026-07-12 home cleanup):
+          clean white cards, icon tiles, quiet labels. Same four doors. */}
+      <div className="bg-white p-3 border-t-2 border-outline-variant">
+        <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2 px-1">⚡ On the island today</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button onClick={() => setWalking(true)} data-testid="walk-island"
+            className="flex items-center gap-3 p-3 rounded-2xl border border-outline-variant/60 bg-slate-50 hover:bg-slate-100 active:scale-[0.99] transition-all text-left cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-lg shrink-0">🏝</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-black text-slate-800">Enter the Island</div>
+              <div className="text-[10px] font-bold text-primary uppercase tracking-wide">Launch ›</div>
+            </div>
+            {(() => { // the shell run rides the door — the family's treasure count
+              try {
+                const n = Object.keys(JSON.parse(localStorage.getItem('driftwood_shells_v1') || '{}')).length;
+                return n > 0 ? <span data-testid="shell-count" className="text-[10px] font-black text-slate-500 bg-slate-200 rounded-full px-2 py-0.5">🐚 {n}/40</span> : null;
+              } catch { return null; }
+            })()}
+          </button>
+          <button onClick={() => setFiring(true)} data-testid="fire-quiz"
+            className="flex items-center gap-3 p-3 rounded-2xl border border-outline-variant/60 bg-slate-50 hover:bg-slate-100 active:scale-[0.99] transition-all text-left cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-lg shrink-0">🏕️</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-black text-slate-800">Campfire Games</div>
+              <div className="text-[10px] font-bold text-amber-600 uppercase tracking-wide">Launch ›</div>
+            </div>
+          </button>
+          <a href="/vr/index.html" data-testid="vr-door"
+            className="flex items-center gap-3 p-3 rounded-2xl border border-outline-variant/60 bg-slate-50 hover:bg-slate-100 active:scale-[0.99] transition-all text-left cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-slate-800/10 flex items-center justify-center text-lg shrink-0">🥽</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-black text-slate-800">Stand on the Island</div>
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">VR headset ›</div>
+            </div>
+          </a>
+          <a href="/mr/index.html" data-testid="mr-door"
+            className="flex items-center gap-3 p-3 rounded-2xl border border-outline-variant/60 bg-slate-50 hover:bg-slate-100 active:scale-[0.99] transition-all text-left cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-lg shrink-0">🔥</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-black text-slate-800">The Fire in Your Room</div>
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Mixed reality ›</div>
+            </div>
+          </a>
+        </div>
       </div>
 
       {/* ── THE FIVE NEEDS ── */}

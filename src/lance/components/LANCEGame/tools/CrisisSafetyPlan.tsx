@@ -9,14 +9,24 @@ import { GlassPanel, CoachCard } from '../ui/GlassKit';
 
 // Design note (TOOL_INTERIOR_DESIGN_PLAN.md, S-tier): this tool is deliberately
 // EXEMPT from gamification pressure. No confetti, no RewardMoment, no streaks —
-// completion is honored with a single quiet glow. The 988 bar stays instantly
-// visible and instantly tappable on every screen; nothing here may slow it down.
+// completion is honored with a single quiet glow. The lifeline bar shows the
+// THERAPIST-CONFIGURED lines (Settings → Safety & Crisis, 2026-07-12 law) —
+// nothing preloaded; protocols differ by state and by practice.
 
 const ACCENT = '#818CF8'; // calm indigo — this tool's own accent
 
-// Always-visible crisis lifeline. Rendered on EVERY screen of this tool so a client
-// in acute distress never has to build or finish a plan to reach help. Taps dial/text 988.
+// Always-visible lifeline. Renders the first crisis line the therapist entered
+// during the safety onboarding, so a client in acute distress never has to
+// build or finish a plan to reach the help their own protocol names.
 function CrisisLifelineBar() {
+  const line = React.useMemo(() => {
+    try {
+      const raw = localStorage.getItem('driftwood_crisis_config_v1');
+      const cfg = raw ? JSON.parse(raw) : null;
+      return cfg?.lines?.[0] ?? null;
+    } catch { return null; }
+  }, []);
+  if (!line) return null;
   return (
     <div className="px-4 pt-3 pb-1 shrink-0 relative z-10">
       <div className="rounded-2xl p-3 flex items-center gap-2" style={{
@@ -28,16 +38,11 @@ function CrisisLifelineBar() {
         <Phone className="w-4 h-4 shrink-0" style={{ color: '#EF4444' }} />
         <div className="flex-1 min-w-0">
           <div className="text-[11px] font-black leading-tight" style={{ color: '#B91C1C' }}>In crisis right now? You don't have to finish this plan.</div>
-          <div className="text-[10px] leading-tight" style={{ color: '#9CA3AF' }}>988 Suicide &amp; Crisis Lifeline · free · 24/7 · confidential</div>
+          <div className="text-[10px] leading-tight" style={{ color: '#9CA3AF' }}>{line.label} · from your safety protocol</div>
         </div>
-        <a href="tel:988" aria-label="Call 988"
+        <a href={`tel:${String(line.number).replace(/[^\d+]/g, '')}`} aria-label={`Call ${line.label}`}
           className="px-3 py-2 rounded-xl font-black text-[11px] text-white active:scale-95 shrink-0"
           style={{ background: '#EF4444', boxShadow: '0 3px 0 #B91C1C' }}>Call</a>
-        <a href="sms:988" aria-label="Text 988"
-          className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-95 shrink-0"
-          style={{ background: '#FEE2E2', border: '1px solid #FCA5A5' }}>
-          <MessageSquare className="w-4 h-4" style={{ color: '#EF4444' }} />
-        </a>
       </div>
     </div>
   );
@@ -145,8 +150,8 @@ const STEPS = [
     subtitle: 'Step 4 of 6',
     emoji: '📞',
     prompt: 'Who can you call if things escalate? List people AND crisis resources.',
-    placeholder: 'Person: [Name] — [phone]\nPerson: [Name] — [phone]\n\n988 Suicide & Crisis Lifeline (call or text)\nCrisis Text Line: text HOME to 741741\nLocal ER: [nearest hospital name]',
-    lanceNote: "988 is free, confidential, available 24/7 and requires no insurance. Please include it here. I am not a substitute for a real human in a crisis.",
+    placeholder: 'Person: [Name] — [phone]\nPerson: [Name] — [phone]\n\nThe crisis lines from your safety protocol (Settings → Safety & Crisis)\nLocal ER: [nearest hospital name]',
+    lanceNote: "Include the crisis lines your therapist configured with you — they're written for your state and your practice. I am not a substitute for a real human in a crisis.",
     rows: 5,
   },
   {
@@ -156,7 +161,7 @@ const STEPS = [
     emoji: '🏥',
     prompt: 'Who are your mental health providers? Include contact info and after-hours protocols.',
     placeholder: 'Therapist: [Name] — [phone or practice]\nPsychiatrist: [Name] — [phone]\nAfter-hours: [protocol or answering service]',
-    lanceNote: "If you don't have a current provider, 988 can connect you with one. Open Path Collective and SAMHSA also offer low-cost referrals.",
+    lanceNote: "If you don't have a current provider, ask about referrals during your safety onboarding. Open Path Collective also offers low-cost options.",
     rows: 4,
   },
   {
@@ -199,7 +204,7 @@ export default function CrisisSafetyPlan({ onBack }: { onBack: () => void }) {
     exportWorksheetPdf({
       title: 'Crisis Safety Plan',
       subtitle: 'Personal plan — keep somewhere easy to find',
-      footerNote: '988 Suicide & Crisis Lifeline · call or text · free · 24/7',
+      footerNote: 'Crisis contacts: see the safety protocol configured with your therapist',
       sections: [...STEPS, {
         key: 'reasonsToLive' as keyof SafetyPlan,
         title: 'Reasons to Live',

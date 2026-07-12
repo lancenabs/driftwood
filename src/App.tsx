@@ -7,7 +7,6 @@ import CharacterSelectScreen from './components/CharacterSelectScreen';
 import LiveScenarioPlayScreen from './components/LiveScenarioPlayScreen';
 import DebriefScreen from './components/DebriefScreen';
 import SettingsScreen from './components/SettingsScreen';
-import CrisisStrip from './components/CrisisStrip';
 import GoalsDashboard from './components/GoalsDashboard';
 import GenogramEditor from './components/GenogramEditor';
 import { ScreenType, Character } from './types';
@@ -96,6 +95,14 @@ function DriftwoodShell() {
   const openTool = (toolId: string) =>
     window.dispatchEvent(new CustomEvent('driftwood:open-tool', { detail: { toolId } }));
 
+  // Tools point people at their safety plan (Settings → Safety & Crisis,
+  // the 2026-07-12 law) via this event — the only crisis pathway.
+  React.useEffect(() => {
+    const openSafety = () => { setActiveTool(null); setShowSettings(true); };
+    window.addEventListener('app:open-safety-settings', openSafety);
+    return () => window.removeEventListener('app:open-safety-settings', openSafety);
+  }, []);
+
   // anything in the app can walk you to the fire (banners, the island's door).
   // Registered BEFORE the boarding early-return — hooks must run in the same
   // order on every render (finishing the boarding in-session broke this).
@@ -105,12 +112,11 @@ function DriftwoodShell() {
     return () => window.removeEventListener('driftwood:open-campfire', toFire);
   }, []);
 
-  // THE BOARDING — full-screen until complete. The private DV page lives
-  // inside BoardingStory (traceless; only the fact of boarding is stored).
+  // THE BOARDING — full-screen until complete. Safety/crisis onboarding lives
+  // in Settings → Safety & Crisis (therapist-configured, 2026-07-12 law).
   if (!boarded) {
     return (
       <div className={`min-h-screen font-sans text-on-background flex flex-col ${isCalmMode ? 'theme-calm bg-surface-container' : 'bg-slate-50'}`}>
-        <CrisisStrip />
         <div className="flex-1 overflow-y-auto">
           <BoardingStory onStart={() => {
             try { localStorage.setItem('driftwood_boarded_v1', '1'); } catch { /* ignore */ }
@@ -134,8 +140,8 @@ function DriftwoodShell() {
 
   return (
     <div className={`h-screen font-sans text-on-background flex flex-col overflow-hidden transition-colors duration-300 ${isCalmMode ? 'theme-calm bg-surface-container' : 'bg-slate-50'}`}>
-      {/* THE DV BRIGHT LINE — the top of every screen, above everything. */}
-      <CrisisStrip />
+      {/* Crisis/safety information lives ONLY in Settings → Safety & Crisis
+          (therapist-configured per state — the 2026-07-12 law). */}
 
       {/* Header — honest brand, no borrowed badges */}
       <header className="w-full bg-white border-b border-outline-variant/30 py-2.5 px-4 shrink-0 z-30">
@@ -239,12 +245,8 @@ function DriftwoodShell() {
           </div>
         )}
 
-        {/* Settings sheet */}
-        {showSettings && (
-          <div className="absolute inset-0 z-40 bg-slate-50 overflow-y-auto">
-            <SettingsScreen onBack={() => setShowSettings(false)} />
-          </div>
-        )}
+        {/* Settings — the LANCE-style bottom sheet renders its own backdrop */}
+        {showSettings && <SettingsScreen onBack={() => setShowSettings(false)} />}
       </main>
       </div>
 

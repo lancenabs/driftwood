@@ -157,9 +157,9 @@ export default function ImpulseDelay({ onBack }: { onBack: () => void }) {
                 the heavy lifting. It's the oldest trick in the book because it works.
               </MateCard>
               <button
-                onClick={() => window.dispatchEvent(new CustomEvent('rehabit:sos'))}
+                onClick={() => window.dispatchEvent(new CustomEvent('app:open-safety-settings'))}
                 className="w-full py-2.5 bg-white border border-rose-200 text-rose-600 font-bold rounded-2xl text-xs cursor-pointer hover:bg-rose-50 transition-colors flex items-center justify-center gap-1.5">
-                <LifeBuoy className="w-3.5 h-3.5" /> Can't hold the lock — open SOS
+                <LifeBuoy className="w-3.5 h-3.5" /> Can't hold the lock — open your safety plan
               </button>
             </motion.div>
           )}
@@ -198,9 +198,9 @@ export default function ImpulseDelay({ onBack }: { onBack: () => void }) {
                     than a wave, the lifebuoy. No shame in either door.
                   </MateCard>
                   <button
-                    onClick={() => window.dispatchEvent(new CustomEvent('rehabit:sos'))}
+                    onClick={() => window.dispatchEvent(new CustomEvent('app:open-safety-settings'))}
                     className="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-2xl text-sm cursor-pointer transition-colors flex items-center justify-center gap-1.5">
-                    <LifeBuoy className="w-4 h-4" /> Open SOS
+                    <LifeBuoy className="w-4 h-4" /> Open your safety plan
                   </button>
                 </>
               ) : (

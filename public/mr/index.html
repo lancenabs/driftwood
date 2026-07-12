@@ -29,8 +29,8 @@
      (Quest 3 passthrough) — burning exactly the warmth the week earned.
 
      LAWS (inherited, non-negotiable):
-     · Crisis is the PHONE's pathway — 988 + the DV line on the HUD, always.
-       No crisis flow lives in a headset; the button says take it off.
+     · Crisis protocols are therapist-configured in the app's Settings →
+       Safety & Crisis. No crisis flow lives in a headset — rest is allowed.
      · The fire reads the SAME driftwood_events_v1 the phones write — this
        is the reconnection loop, projected onto the family's real floor.
      · MR sessions log to their own key (driftwood_mr_sessions_v1), never
@@ -41,8 +41,7 @@
 <div id="hud"><b>The Fire Circle</b> · the family's fire, in your real room<br/>
   <span id="mode">checking what this device can do…</span><br/>
   <span id="warmline"></span><br/>
-  <span style="color:#ffb4c0">In crisis? Take the headset off — call/text <b>988</b> · DV <b>1-800-799-7233</b>.</span></div>
-<button id="crisis" aria-label="Crisis — take the headset off">988</button>
+  <span style="color:#ffb4c0">You can take the headset off any time — this fire will keep.</span></div>
 <div id="toolline"></div>
 <div id="helm">
   <button data-tool="fire">🔥 Place the fire</button>
@@ -170,10 +169,6 @@ document.querySelectorAll('#helm button').forEach(b => b.onclick = () => {
     toolline('🪵 just sit. the fire asks nothing. (two quiet minutes counts as tending it)');
   }
 });
-document.getElementById('crisis').onclick = () => {
-  toolline('Take the headset off. Call or text 988 · DV 1-800-799-7233. This fire will keep.');
-};
-
 // ── AR placement: hit-test onto the real floor ───────────────────────────────
 let hitTestSource = null, viewerSpace = null;
 const reticle = new THREE.Mesh(

@@ -3,7 +3,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Search, X, Lock, Zap } from 'lucide-react';
 import { useGame } from './LANCEGameContext';
 import { getLockedTools, getUnlockedTools } from '../../lib/therapistLink';
-import { GAME_TOOLS, FREE_ACCESS_ALL } from './lanceGameData';
+import { GAME_TOOLS, FREE_ACCESS_ALL, SAFETY_TOOL_IDS } from './lanceGameData';
+
+// Safety/crisis tools are configured and opened from Settings → Safety & Crisis
+// only — never listed on the Library (search included).
+const LIBRARY_TOOLS = GAME_TOOLS.filter(t => !SAFETY_TOOL_IDS.includes(t.id));
 import { getToolIcon } from './toolIcons';
 import { TOOL_GRADIENTS } from './toolGradients';
 
@@ -271,8 +275,8 @@ export default function LibraryTab({ onNavigate }: Props) {
 
   const filteredTools = useMemo(() => {
     const q = query.toLowerCase();
-    if (!q) return GAME_TOOLS;
-    return GAME_TOOLS.filter(
+    if (!q) return LIBRARY_TOOLS;
+    return LIBRARY_TOOLS.filter(
       t => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || t.category.toLowerCase().includes(q),
     );
   }, [query]);
@@ -414,7 +418,7 @@ export default function LibraryTab({ onNavigate }: Props) {
         ) : (
           /* Category sections */
           CATEGORY_SECTIONS.map(cat => {
-            const catTools = GAME_TOOLS.filter(t => t.category === cat.id);
+            const catTools = LIBRARY_TOOLS.filter(t => t.category === cat.id);
             if (catTools.length === 0) return null;
 
             return (

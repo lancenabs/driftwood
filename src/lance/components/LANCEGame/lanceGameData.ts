@@ -141,6 +141,11 @@ export const STORY_ACTS: Record<number, StoryAct> = {
 // publishing to clients — all paywall logic and the PaywallScreen remain intact.
 export const FREE_ACCESS_ALL = true;
 
+// Safety/crisis tools live behind Settings → Safety & Crisis (therapist-configured
+// protocols vary by state — Lance's 2026-07-12 order). They never appear on the
+// Library or any general surface; Settings opens them once a protocol is set up.
+export const SAFETY_TOOL_IDS: string[] = ['crisis_safety_plan'];
+
 // ─── The 32 Tools ─────────────────────────────────────────────────────────
 
 export const GAME_TOOLS: GameTool[] = [
@@ -578,7 +583,7 @@ export const GAME_TOOLS: GameTool[] = [
     id: 'anger_thermometer',
     name: 'Anger Thermometer',
     emoji: '🌡️',
-    description: "Rate your anger on a 1–10 scale. LANCE reads the data and prescribes zone-specific interventions. Levels 9–10 route directly to crisis resources.",
+    description: "Rate your anger on a 1–10 scale. LANCE reads the data and prescribes zone-specific interventions. Levels 9–10 point to the safety plan you set up with your therapist.",
     tier: 3,
     category: 'mood',
     gradient: 'from-red-500 to-orange-400',
@@ -598,7 +603,7 @@ export const GAME_TOOLS: GameTool[] = [
     id: 'crisis_safety_plan',
     name: 'Crisis Safety Plan',
     emoji: '🛟',
-    description: "Stanley model safety plan with six steps. Warning signs, coping strategies, social contacts, crisis contacts, treatment team, and reasons to live. 988 always visible.",
+    description: "Stanley model safety plan with six steps. Warning signs, coping strategies, social contacts, crisis contacts, treatment team, and reasons to live. Opens from Settings → Safety & Crisis.",
     tier: 5,
     category: 'dbt',
     gradient: 'from-indigo-500 to-violet-600',
@@ -896,7 +901,7 @@ export const GAME_TOOLS: GameTool[] = [
     id: 'support_finder',
     name: 'Support Finder',
     emoji: '🧭',
-    description: 'Find nearby nature spaces and peer support groups matched to what you\'re working through, plus the 988 crisis line.',
+    description: 'Find nearby nature spaces and peer support groups matched to what you\'re working through.',
     tier: 1,
     category: 'clinical',
     gradient: 'from-teal-500 to-cyan-700',

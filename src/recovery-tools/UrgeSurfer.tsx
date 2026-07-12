@@ -164,9 +164,9 @@ export default function UrgeSurfer({ onBack }: { onBack: () => void }) {
                 Get on the board — start the ride
               </button>
               <button
-                onClick={() => window.dispatchEvent(new CustomEvent('rehabit:sos'))}
+                onClick={() => window.dispatchEvent(new CustomEvent('app:open-safety-settings'))}
                 className="w-full py-2.5 bg-white border border-rose-200 text-rose-600 font-bold rounded-2xl text-xs cursor-pointer hover:bg-rose-50 transition-colors flex items-center justify-center gap-1.5">
-                <LifeBuoy className="w-3.5 h-3.5" /> This is more than a wave — open SOS
+                <LifeBuoy className="w-3.5 h-3.5" /> This is more than a wave — open your safety plan
               </button>
             </motion.div>
           )}
@@ -188,9 +188,9 @@ export default function UrgeSurfer({ onBack }: { onBack: () => void }) {
                 The wave has passed — log the surf
               </button>
               <button
-                onClick={() => window.dispatchEvent(new CustomEvent('rehabit:sos'))}
+                onClick={() => window.dispatchEvent(new CustomEvent('app:open-safety-settings'))}
                 className="w-full py-2.5 bg-white border border-rose-200 text-rose-600 font-bold rounded-2xl text-xs cursor-pointer hover:bg-rose-50 transition-colors flex items-center justify-center gap-1.5">
-                <LifeBuoy className="w-3.5 h-3.5" /> I need more than the board — SOS
+                <LifeBuoy className="w-3.5 h-3.5" /> I need more than the board — my safety plan
               </button>
             </motion.div>
           )}

@@ -34,13 +34,14 @@ for (const room of ['Check-in', 'Library', 'Insights', 'Driftwood']) {
   await page.waitForTimeout(900);
 }
 
-// ── The crisis strip rides every room ────────────────────────────────────────
-current = 'law:strip';
+// ── No crisis info on any room (the 2026-07-12 law: Settings-only) ───────────
+current = 'law:clean-surfaces';
 for (const room of ['Check-in', 'Library', 'Insights', 'Driftwood']) {
   await page.locator('nav:visible').getByText(room, { exact: true }).click().catch(() => {});
   await page.waitForTimeout(500);
-  const lit = await page.getByText('National Domestic Violence Hotline').first().isVisible().catch(() => false);
-  if (!lit) findings.push({ where: `strip:${room}`, kind: 'DV-LINE-DOWN', msg: 'the bright line is not visible on this room' });
+  const body = await page.evaluate(() => document.body.innerText);
+  if (/988|1-800-799-7233|1-800-662-4357/.test(body))
+    findings.push({ where: `clean:${room}`, kind: 'CRISIS-ON-SURFACE', msg: 'hotline info on a general surface (belongs in Settings → Safety & Crisis)' });
 }
 
 // ── Every family-deck tool + island sample via the treaty ────────────────────

@@ -147,12 +147,12 @@ export default function DbtDiaryCard({ onBack }: { onBack: () => void }) {
             <MateCard>
               You rated the self-harm urge above zero — logging that honestly took real courage.
               This is exactly the moment the crew exists for: a human voice helps more than any card.
-              988 answers around the clock, and your own people are one tap away.
+              The safety plan you set up with your therapist lives in Settings, and your own people are one tap away.
             </MateCard>
             <button
-              onClick={() => window.dispatchEvent(new CustomEvent('rehabit:sos'))}
+              onClick={() => window.dispatchEvent(new CustomEvent('app:open-safety-settings'))}
               className="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-2xl text-sm cursor-pointer transition-colors flex items-center justify-center gap-1.5">
-              <LifeBuoy className="w-4 h-4" /> Open SOS — people first
+              <LifeBuoy className="w-4 h-4" /> Open your safety plan (Settings)
             </button>
           </motion.div>
         )}

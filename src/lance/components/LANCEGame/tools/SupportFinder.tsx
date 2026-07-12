@@ -82,27 +82,14 @@ export default function SupportFinder({ onBack }: Props) {
         <BigBackButton onBack={onBack} />
         <div className="flex-1">
           <h2 className="text-sm font-black" style={{ color: '#3C3C3C' }}>Support Finder</h2>
-          <p className="text-[10px]" style={{ color: '#9CA3AF' }}>Local resources &amp; hotlines</p>
+          <p className="text-[10px]" style={{ color: '#9CA3AF' }}>Local resources &amp; groups</p>
         </div>
         <Compass className="w-5 h-5" style={{ color: '#0D9488' }} />
       </div>
 
       <div className="relative flex-1 overflow-y-auto px-4 py-4 space-y-4 max-w-xl mx-auto w-full">
-        <div className="p-4 rounded-2xl border flex items-center justify-between gap-3" style={{ background: '#FEF2F2', borderColor: '#FECACA' }}>
-          <div className="flex gap-3 items-center min-w-0">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: '#FEE2E2', color: '#B91C1C' }}>
-              <Phone className="w-4 h-4" />
-            </div>
-            <div className="text-left min-w-0">
-              <h4 className="text-xs font-bold" style={{ color: '#7F1D1D' }}>In immediate danger?</h4>
-              <p className="text-[10px]" style={{ color: '#B91C1C' }}>Call or text 988 — free, 24/7.</p>
-            </div>
-          </div>
-          <a href="tel:988" className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-black text-white" style={{ background: '#DC2626' }}>
-            <Phone className="w-3.5 h-3.5" /> 988
-          </a>
-        </div>
-
+        {/* Crisis lines live in Settings → Safety & Crisis (therapist-configured
+            per state, 2026-07-12 law) — no hotline block on tool surfaces. */}
         <form onSubmit={search} className="rounded-3xl p-5 border space-y-3" style={{ background: 'rgba(255,255,255,0.78)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderColor: '#F0F0F0' }}>
           <p className="text-[11px] leading-relaxed font-semibold" style={{ color: '#6B7280' }}>
             Find nearby nature spaces and peer support groups matched to what you're working on.

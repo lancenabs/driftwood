@@ -5,9 +5,11 @@ import { THE_SEVEN, claimSlot, setActiveCastaway, readCrew } from '../lib/castaw
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE BOARDING — Driftwood's opening, on the L.A.N.C.E. onboarding template
-//  (the Bible): splash video → story cinematic → the private page (DV law,
-//  this world's own) → the family claims their castaways → THE CHOICE
-//  (Story mode vs Check-in), dark cinematic cards, switchable in Settings.
+//  (the Bible): splash video → story cinematic → the family claims their
+//  castaways → THE CHOICE (Story mode vs Check-in), dark cinematic cards,
+//  switchable in Settings. Safety/crisis content lives ONLY in Settings →
+//  Safety & Crisis (therapist-configured per state — the 2026-07-12 law);
+//  the boarding carries none.
 //
 //  Video slots auto-light when Lance's renders land (honest fallback: the
 //  boarding painting). Slots:
@@ -133,17 +135,16 @@ function SceneBackdrop({ video }: { video: string }) {
   );
 }
 
-type Phase = 'splash' | 'cinematic' | 'private' | 'crew' | 'mode';
+type Phase = 'splash' | 'cinematic' | 'crew' | 'mode';
 interface Member { slotId: string; name: string }
 
 export default function BoardingStory({ onStart }: { onStart: () => void }) {
   const [phase, setPhase] = useState<Phase>('splash');
   const [beat, setBeat] = useState(0);
   const [members, setMembers] = useState<Member[]>([{ slotId: THE_SEVEN[0].id, name: '' }]);
-  const [privateAckIdx, setPrivateAckIdx] = useState(0); // one private page per adult, pass-the-device
 
-  const phaseIndex: Record<Phase, number> = { splash: 0, cinematic: 1, private: 2, crew: 3, mode: 4 };
-  const totalDots = 5;
+  const phaseIndex: Record<Phase, number> = { splash: 0, cinematic: 1, crew: 2, mode: 3 };
+  const totalDots = 4;
 
   const claimAll = () => {
     const named = members.filter(m => m.name.trim());
@@ -158,7 +159,6 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
 
   const cine = CINEMATIC[Math.min(beat, CINEMATIC.length - 1)];
   const usedSlots = new Set(members.map(m => m.slotId));
-  const adults = Math.max(1, members.filter(m => m.name.trim()).length);
 
   return (
     <div className="fixed inset-0 z-[90] flex flex-col overflow-hidden">
@@ -172,8 +172,8 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
               style={{ width: i === phaseIndex[phase] ? 22 : 8, background: i <= phaseIndex[phase] ? '#F2A65A' : 'rgba(255,255,255,0.25)' }} />
           ))}
         </div>
-        {phase !== 'private' && phase !== 'mode' && (
-          <button onClick={() => setPhase(phase === 'crew' ? 'mode' : 'private')}
+        {phase !== 'mode' && (
+          <button onClick={() => setPhase(phase === 'crew' ? 'mode' : 'crew')}
             className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-white/50 cursor-pointer">
             <SkipForward className="w-3 h-3" /> skip
           </button>
@@ -182,7 +182,9 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
 
       <div className="relative z-10 flex-1" />
 
-      <div className="relative z-10">
+      {/* Content column — capped on desktop so the boarding never reads as
+          stretched mobile (the panels float as a centered card ≥lg). */}
+      <div className="relative z-10 w-full lg:max-w-xl lg:mx-auto lg:pb-10 lg:[&>div>div]:rounded-3xl lg:[&>div>div]:overflow-hidden">
         <AnimatePresence mode="wait">
           {/* ── SPLASH ── */}
           {phase === 'splash' && (
@@ -205,37 +207,8 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
           {phase === 'cinematic' && (
             <motion.div key={`cine-${beat}`} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               <SpeechPanel speakerColor={cine.color} speakerLabel={cine.speaker} locationLine={cine.location} text={cine.text}
-                onNext={() => (beat < CINEMATIC.length - 1 ? setBeat(beat + 1) : setPhase('private'))}
+                onNext={() => (beat < CINEMATIC.length - 1 ? setBeat(beat + 1) : setPhase('crew'))}
                 nextLabel={beat < CINEMATIC.length - 1 ? 'Continue' : 'Wade ashore'} />
-            </motion.div>
-          )}
-
-          {/* ── THE PRIVATE PAGE — the DV law, one adult at a time (traceless) ── */}
-          {phase === 'private' && (
-            <motion.div key={`private-${privateAckIdx}`} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <SpeechPanel speakerColor="#E8B4BC" speakerLabel="JUST FOR YOU" locationLine="PASS THE DEVICE · ONE ADULT AT A TIME">
-                <div className="space-y-3">
-                  <p className="text-[14px] font-semibold leading-relaxed text-white/90">
-                    Before the island: does conflict at home ever leave you feeling afraid, or unsafe?
-                    If it does — even sometimes — togetherness exercises can wait. Your safety comes
-                    first, and it comes alone if it needs to.
-                  </p>
-                  <a href="https://www.thehotline.org" target="_blank" rel="noopener noreferrer"
-                    className="block w-full text-center rounded-xl py-3 px-4 text-xs font-bold text-white/90 border border-white/25 bg-white/10">
-                    Private support — the Hotline · 1-800-799-7233 · text START to 88788
-                  </a>
-                  <p className="text-[10px] text-white/50 leading-relaxed">
-                    Nothing on this page is saved or shown to anyone — not which button you press,
-                    not whether you paused here.
-                  </p>
-                  <motion.button whileTap={{ scale: 0.97 }}
-                    onClick={() => (privateAckIdx + 1 < adults ? setPrivateAckIdx(privateAckIdx + 1) : setPhase('crew'))}
-                    className="w-full py-4 rounded-2xl font-black text-sm text-white cursor-pointer"
-                    style={{ background: 'linear-gradient(135deg,#0E7C7C,#2E96B5)' }}>
-                    {privateAckIdx + 1 < adults ? 'Pass the device →' : 'Continue to the shore'}
-                  </motion.button>
-                </div>
-              </SpeechPanel>
             </motion.div>
           )}
 

@@ -35,7 +35,7 @@
 </style>
 </head>
 <body>
-<div id="crisis">📞 <a href="tel:988">988</a> Suicide &amp; Crisis Lifeline · <a href="tel:18007997233">1-800-799-7233</a> DV Hotline (text START to 88788) — never gated. In crisis? <b>Take the headset off</b> — this island can wait.</div>
+<!-- Crisis/safety info lives in the app: Settings → Safety & Crisis (therapist-configured, 2026-07-12 law). -->
 <div id="hud">
   <button class="pill" id="back">← the shore</button>
   <button class="pill" id="build">🔨 Build</button>
@@ -237,17 +237,17 @@ const tent = new THREE.Mesh(new THREE.ConeGeometry(1.6, 2.1, 4), mat(0xC96F4A));
 tent.position.set(6, groundY(6, 96) + 1.05, 96); tent.rotation.y = Math.PI / 4;
 scene.add(tent);
 
-// THE CRISIS PLANK — the law, in-world: a driftwood sign at the camp. The
-// real rule is on it: crisis = take the headset off. (The DOM strip guards
-// the flat page; this plank guards the world.)
+// THE REST PLANK — a driftwood sign at the camp: take the headset off any
+// time; the island waits. (Crisis protocols are therapist-configured in the
+// app's Settings → Safety & Crisis — no crisis parameters live in a headset.)
 {
   const c = document.createElement('canvas'); c.width = 512; c.height = 160;
   const g = c.getContext('2d');
   g.fillStyle = '#8a6a48'; g.fillRect(0, 0, 512, 160);
   g.fillStyle = '#fff'; g.font = '900 44px sans-serif'; g.textAlign = 'center';
-  g.fillText('988 · always', 256, 62);
+  g.fillText('rest is allowed', 256, 62);
   g.font = '600 28px sans-serif';
-  g.fillText('in crisis? take the headset off —', 256, 104);
+  g.fillText('take the headset off any time —', 256, 104);
   g.fillText('this island can wait.', 256, 140);
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.7), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c) }));
   const post = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 1.6, 6), mat(0x8a6a48));

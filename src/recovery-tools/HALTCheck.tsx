@@ -150,9 +150,9 @@ export default function HALTCheck({ onBack }: { onBack: () => void }) {
 
         {stacked && (
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent('rehabit:sos'))}
+            onClick={() => window.dispatchEvent(new CustomEvent('app:open-safety-settings'))}
             className="w-full py-2.5 bg-white border border-rose-200 text-rose-600 font-bold rounded-2xl text-xs cursor-pointer hover:bg-rose-50 transition-colors flex items-center justify-center gap-1.5">
-            <LifeBuoy className="w-3.5 h-3.5" /> It's more than the body — open SOS
+            <LifeBuoy className="w-3.5 h-3.5" /> It's more than the body — open your safety plan
           </button>
         )}
 

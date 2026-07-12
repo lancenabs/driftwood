@@ -126,7 +126,7 @@ export default function CopingToolkit({ onLaunch }: CopingToolkitProps) {
         </div>
 
         <p className="text-[11px] text-slate-400 text-center leading-relaxed px-4">
-          If you ever feel unsafe, this isn’t a substitute for help — call or text <strong>988</strong>.
+          This isn’t a substitute for professional help — your safety plan lives in Settings, set up with your therapist.
         </p>
       </div>
     );

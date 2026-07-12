@@ -316,14 +316,8 @@ export default function DbtSkillsSpace({ onTriggerInteractionAlert, focusTab = '
         <p className="text-sm text-slate-600 leading-relaxed max-w-lg">
           If your emotional fire is burning too hot, cognitive thoughts do not work. You must use immediate <strong>biological hacks</strong> to cool down your neuro-chemistry.
         </p>
-        <div className="flex items-center gap-2 pt-1 text-[11px] font-bold text-red-800">
-          <Phone className="w-3.5 h-3.5 shrink-0" />
-          <span>In real danger right now? </span>
-          <a href="tel:988" className="underline decoration-2 underline-offset-2">Call 988</a>
-          <span>or</span>
-          <a href="sms:988" className="underline decoration-2 underline-offset-2">text 988</a>
-          <span>— free, 24/7.</span>
-        </div>
+        {/* Crisis lines live in Settings → Safety & Crisis (therapist-configured
+            per state, 2026-07-12 law) — no hotline block on tool surfaces. */}
       </div>
 
       {/* Internal Subtabs Row */}
