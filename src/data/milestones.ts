@@ -429,9 +429,10 @@ export const MILESTONES: Milestone[] = [
     title: 'Naming the Undertow',
     first: 'The storm comes back — and the crew finally maps the current under every fight.',
     opening: [
-      { kind: 'narration', text: 'It starts over nothing — firewood stacking — and in four exchanges two of the crew are drowning in the oldest current on the island. That night, Skip and Hollow ask for help with THEIR loop: Skip chases, Hollow seals, Skip chases harder, Hollow seals deeper. The crew maps it for the robots… and the map looks terribly familiar.' },
-      { kind: 'robot', who: 'skip', text: 'When he closes up I get LOUD and fetch-y and worse, and the louder I get the more closed he— …oh. OH. Are we… is this a THING other crews do?' },
-      { kind: 'robot', who: 'hollow', text: '(from inside the shell, very quietly) …nobody is the problem. The CURRENT is the problem. Say that part again.' },
+      { kind: 'narration', text: 'The storm the horizon was building arrives at midnight, and it is not weather with a name — it is the first storm\'s bigger sibling. By dawn the camp is wreckage: the shelter roof gone, the larder soaked, the volley ball in a tree. And in the wreck of it, cold and wet and exhausted, the family does the thing it swore it was done doing. The dock argument. Word for word. Like it never left — like it was only ever waiting for enough rain.' },
+      { kind: 'robot', who: 'skip', text: '(standing in the middle of it, small, rain running off him) STOP. Please. Please stop. You sound like the beach again. You sound like the day we wouldn\'t help you. (his voice does the wooden-crack thing) It\'s not YOU. Can\'t you feel it? It\'s the pull. The Elders have a name for it—' },
+      { kind: 'robot', who: 'hollow', text: 'The Undertow. (he says it like a tide table — a fact, not a curse) Every family that ever wrecked here brought one ashore. It isn\'t a person. It has never once been a person. It\'s the current that pulls each of you SEPARATELY so it can have you all. It is strongest after storms, when everyone is tired, and its favorite trick — its only trick — is convincing you the pull is coming from each other.' },
+      { kind: 'narration', text: 'The rain thins. The family stands among their broken camp, looking at each other — really looking — at four tired people who all thought the pull was coming from across the fire. Name a current and you can swim it. Refuse to name it, and it names you. Today, at last: the naming.' },
     ],
     instrument: {
       toolId: 'undertow_chart', toolName: 'The Undertow Chart',
@@ -445,8 +446,10 @@ export const MILESTONES: Milestone[] = [
     title: 'Who Chases, Who Hides',
     first: 'Each crew member finds their own move in the current — without shame, without exile.',
     opening: [
-      { kind: 'narration', text: 'With the Undertow mapped, each member does the braver, smaller thing: finds THEIR OWN move in it. The chaser\'s chase is love with the volume broken. The hider\'s shell is safety learned young. No move is villainy; every move once made sense.' },
-      { kind: 'robot', who: 'hollow', text: 'My shell kept me safe in the shipping crate. It\'s allowed to have been useful AND be in the way now. Both. At once.' },
+      { kind: 'narration', text: 'Rebuilding starts — planks re-lashed, larder dried — and the Undertow, named now, becomes visible in the daylight: when the hard talk starts, who in this family CHASES (louder, closer, fix it NOW), and who HIDES (quieter, farther, later, gone)? The Jumble sorts itself shamelessly for the demonstration.' },
+      { kind: 'robot', who: 'bailer', text: 'CHASER. Obviously. If a problem exists I am ALREADY AT IT, counting it. (a beat) Hollow once didn\'t speak for six days and I stood outside his hut for four of them. In the rain. Counting. It did not help. IT FELT LIKE HELPING.' },
+      { kind: 'robot', who: 'hollow', text: 'Hider. (nothing else. then, because the family waits:) …The chase feels like being hunted, to a hider. And the hide feels like abandonment, to a chaser. Neither of us is wrong. Both of us are drowning in the same current, in opposite directions. The trick the village learned: the chaser counts to sixty. The hider promises to come BACK. Out loud. Every time. The promise is the plank you both hold.' },
+      { kind: 'narration', text: 'The family sorts itself — honestly, gently, laughing once at how obvious it all is once it\'s on the sand. Chasers and hiders. And the plank between them, spoken out loud for the first time in maybe a decade of this family\'s pattern: sixty seconds, and always come back.' },
     ],
     instrument: {
       toolId: 'mooring_lines', toolName: 'The Mooring Lines',
@@ -460,8 +463,9 @@ export const MILESTONES: Milestone[] = [
     title: 'The Speaker\'s Shell',
     first: 'The conch arrives: whoever holds it, speaks; everyone else turns toward.',
     opening: [
-      { kind: 'narration', text: 'The sea delivers a conch shell the size of two hands, and the Collier declares the oldest parliament: whoever holds the shell speaks without interruption. On this island — and this is the trick — THE PHONE IS THE CONCH: pass the device, and the holder\'s voice is the only one.' },
-      { kind: 'robot', who: 'echo2', text: 'When you hold the shell I can\'t repeat over you! It\'s AGONY! It\'s also… probably the point.' },
+      { kind: 'narration', text: 'The conch comes down from the rules post — the actual conch, cool and heavy, passed to the family with two ceremonies\' worth of Jumble solemnity. Whoever holds it is heard to the end. Tonight the family runs its first full SHELL COUNCIL on the storm\'s hardest leftovers: the things said in the wreck of the camp.' },
+      { kind: 'robot', who: 'echo2', text: 'The shell has one law and it is not "be nice." It is: FINISH. Nobody gets interrupted into silence, and nobody escapes into it either. You hold it, you empty it — the true thing, all the way out. Then it passes. I will repeat back the kindest full sentence each of you manages. I am told this is very annoying and very effective.' },
+      { kind: 'narration', text: 'It is both. The shell goes around. The storm-words get finished properly this time — and it turns out half of them, said all the way to the end, were apologies wearing armor.' },
     ],
     instrument: {
       toolId: 'soundings', toolName: 'The Soundings',
@@ -475,8 +479,10 @@ export const MILESTONES: Milestone[] = [
     title: 'Repair Rope',
     first: 'The crew braids the rope that gets thrown DURING the storm, not after.',
     opening: [
-      { kind: 'narration', text: 'Rope work today: short lines, braided in calm water, thrown in rough. "I\'m getting loud — I need a minute, I\'m not leaving." "Can we start over?" "You matter more than this argument." A repair line only works if it was braided BEFORE the wave.' },
-      { kind: 'robot', who: 'skip', text: 'MY rope says "I\'m chasing because I\'m scared, not mad." Hollow braided it FOR me. I keep it in my chest hatch.' },
+      { kind: 'narration', text: 'The Collier brings out the village\'s strangest tool: a rope of many splices — dozens of them, knot after knot, each one wrapped in a different lashing. It is, he explains, ONE rope. It has never been replaced. It has only ever been repaired.' },
+      { kind: 'robot', who: 'collier', text: 'Every splice is a break that got MENDED. That\'s the whole rope. Anyone can keep an unbroken rope — there\'s no such thing, so it\'s easy. A family rope is splices or it\'s nothing. Today: each of you brings one frayed place — one break from the storm, or from before the island, we don\'t audit — and we splice it. Properly. So it holds LOAD.' },
+      { kind: 'robot', who: 'skip', text: '(holding up his bandaged hand, newly re-wrapped) I\'m basically a splice with legs. It\'s the strongest part of me now. That\'s not a metaphor, the Collier reinforced the joint. (a beat) Okay it\'s also a metaphor.' },
+      { kind: 'narration', text: 'The family splices. The repairs go in wrapped and deliberate, stronger at the mend than the rope ever was before the break — which is not a thing anyone believes about ropes or families until they\'ve made one hold.' },
     ],
     instrument: {
       toolId: 'mending_bench', toolName: 'The Mending Bench',
@@ -490,8 +496,9 @@ export const MILESTONES: Milestone[] = [
     title: 'The Apology Forge',
     first: 'The Collier\'s forge relights — and broken things get mended VISIBLY.',
     opening: [
-      { kind: 'narration', text: 'The old forge-keeper wakes fully the day the crew relights his forge, and teaches the kintsugi law of the island: mended things are stronger at the seam, and the seam SHOWS, proudly. An apology is a forging: name the break, feel its heat honestly, shape the repair, and let the join be visible forever.' },
-      { kind: 'robot', who: 'collier', text: 'Any fool can hide a crack, small ones. Crews that LAST are the ones that gild them.' },
+      { kind: 'narration', text: 'The forge hut opens last of all the village — the Collier\'s own country, coal-warm, tool-hung, immaculate. On the anvil: nothing. That\'s the point. What gets forged here isn\'t metal.' },
+      { kind: 'robot', who: 'collier', text: 'Four hammers make an apology that HOLDS. One: what I did — no fog, no "if anyone felt." Two: what it cost you — I say YOUR cost, out loud, so you know I carried it home. Three: what I\'ll do different — specific, or it\'s decoration. Four: the ask — not for forgiveness, that\'s yours to give or keep, but the ask to REPAIR. (he taps the anvil once) And the law of my forge: the word "but" melts here. Whatever it touches comes apart.' },
+      { kind: 'narration', text: 'One by one, family members take the anvil. The forge is hot and honest and nobody rushes anybody, and somewhere in the middle of it the storm\'s last damage — the damage the rain didn\'t do — gets hammered back true.' },
     ],
     instrument: {
       toolId: 'undertow_chart', toolName: 'The Undertow Chart',
@@ -505,8 +512,16 @@ export const MILESTONES: Milestone[] = [
     title: 'The Flooded Camp',
     first: 'A storm takes the cook-pit — and the crew learns the PAUSE signal.',
     opening: [
-      { kind: 'narration', text: 'Real weather, real flood, and the crew discovers mid-argument that you cannot bail and fight at once. The island installs its pause law: any member may call WATER RISING — the agreed signal that means twenty minutes, separate tasks, hearts below a hundred, then return. Calling it is seamanship, not surrender. The RETURN is the promise.' },
-      { kind: 'robot', who: 'bailer', text: 'Twenty minutes! Timed! I\'ll hold the timer! Flooded decks make TERRIBLE meeting rooms, I have MINUTES on this!' },
+      { kind: 'narration', text: 'The storm\'s tail floods the creek at dusk, and in the scramble to move the camp uphill, the count comes up short. One head. The youngest. Gone — and the sand by the north path says WHERE, and the where stops every heart in the camp: small footprints, heading inland. Toward the quiet camp. Toward the compass\'s heading. Looking for Mr. Bauer.' },
+      { kind: 'robot', who: 'skip', text: '(already moving, already shouting over his shoulder) JUMBLE! ALL LANTERNS! THE LITTLE ONE\'S GONE TOWARD THE FALLS — (and then, to the family, his knot-eyes fierce) Together. You hear me? The island only yields to together — TONIGHT MORE THAN EVER. Nobody searches alone. NOBODY.' },
+      { kind: 'choice', id: 's4_search', prompt: 'Dark. Flood water rising. The search parties form — where does the family line hold?',
+        options: [
+          { id: 'pairs', label: 'Split in pairs with lanterns — cover both paths' },
+          { id: 'oneline', label: 'One line, hands linked, straight up the compass heading' },
+        ] },
+      { kind: 'narration', when: { flag: 's4_search', is: 'pairs' }, text: 'Pairs, lanterns, whistles — the Jumble takes the ridge, the family takes the paths. It\'s Echo-2 who catches it on the wind: a small voice, singing to itself to be brave, somewhere behind the sound of falling water.' },
+      { kind: 'narration', when: { flag: 's4_search', is: 'oneline' }, text: 'One line, hands linked — the mast line all over again, Bauer\'s last order made flesh. The line walks the compass heading through the dark, nobody let go of, until the sound of falling water grows a second sound inside it: a small voice, singing to itself to be brave.' },
+      { kind: 'narration', text: 'THE WATERFALL. And behind the water, where no map on this island ever put anything: a glow. Warm. Steady. Firelight — coming from inside the falls. The youngest\'s voice is coming from the light. And the youngest\'s voice says the impossible thing, clear over the water: "IT\'S OKAY! COME SEE! IT\'S MISTER BAUER\'S HOUSE!"' },
     ],
     instrument: {
       toolId: 'barometer', toolName: 'The Barometer',
@@ -520,8 +535,11 @@ export const MILESTONES: Milestone[] = [
     title: 'Riding It Out Together',
     first: 'The season\'s last storm is ridden, start to finish, with every tool on the belt.',
     opening: [
-      { kind: 'narration', text: 'Season IV closes with weather the crew doesn\'t dodge: a real disagreement, taken ON PURPOSE, with the whole kit — the named current, the conch, the ropes, the pause. Not to win it. To ride it together and come out the far side still a crew. The Undertow doesn\'t die; it becomes crossable.' },
-      { kind: 'robot', who: 'hollow', text: 'Shell stayed OPEN the whole storm. Four minutes. …New record. (Skip cried. Don\'t tell Skip I told you.)' },
+      { kind: 'narration', text: 'Behind the waterfall: a cave the size of a chapel, dry as a kept promise. A cot. A workbench. Tools worn to the shape of one man\'s hands. Shelf after shelf of carved driftwood — practice arms, test legs, knot-eyes in rows like a choir. And the youngest, wrapped in an old oilskin coat, safe by a fire pit that was laid ready — laid YEARS ago — with dry wood that only needed a spark.' },
+      { kind: 'narration', text: 'On the workbench wall, burned into a plank in a steady hand, the words the family has been living without knowing it: A FAMILY THAT LOVES TOGETHER. A FAMILY THAT WORKS TOGETHER. A FAMILY THAT SURVIVES TOGETHER. And beneath the plank, a photograph — the same four sun-squinting faces from the tackle box. And beside it, a ledger, and the ledger tells the whole story to whoever reads page one.' },
+      { kind: 'robot', who: 'hollow', text: '(from the cave mouth — the whole Jumble crowding behind him, and none of them surprised) …So. You found the Before. (he steps in, and for once the tall quiet one talks long) His name was Bauer. He wrecked here first — years before any of you — with everything he loved already lost to him back on the mainland. A family that came apart in the ordinary way: too busy, too proud, too late. He built US from the storm-wood. One of us for each of them. He taught us fire and the spiral and the oils and the games — every lesson he wished he\'d taught THEM. And when he\'d built us whole, he sailed home to try again with the living. He came back every season after. Tours, he called them. Families, he brought. YOURS was the twelfth.' },
+      { kind: 'robot', who: 'skip', text: '(very small) The signal fire is his. We keep it lit-ready so he can always find the way back in. He made me LAST. Out of the leftover pieces. He said— (the wooden-crack voice) —he said the smallest scraps hold the most love per splinter, because you have to choose every single one.' },
+      { kind: 'narration', text: 'And the ledger\'s last entry, dated the morning of your tour, in the steady hand: "Family twelve today. They argue like I did. If the sea takes me before I get them home — Jumble, you know the drill. Thirty-one lessons. Give them everything. They\'re why we practice." The sea kept him. The lessons kept you. The family sits down together in Mr. Bauer\'s house, the storm riding itself out beyond the falls, and lets the truth be both things at once: the saddest story on this island, and the reason they\'re alive inside it.' },
     ],
     instrument: {
       toolId: 'mending_bench', toolName: 'The Mending Bench',
