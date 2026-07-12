@@ -3,6 +3,7 @@ import { Zap, Flame, ShoppingBag, Lock } from 'lucide-react';
 import { MILESTONES, SEASONS } from '../data/milestones';
 import { useGame } from '../lance/components/LANCEGame/LANCEGameContext';
 import MilestoneLog from './MilestoneLog';
+import TideChart from './TideChart';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE CHALLENGES TAB — Driftwood's dedicated challenge room on the flagship
@@ -25,6 +26,7 @@ export default function ChallengesTab({ onOpenTool, onOpenGames }: {
   onOpenGames: () => void;
 }) {
   const { xp, gems, unlockedTools } = useGame();
+  const [tideOpen, setTideOpen] = React.useState(false);
   const [, force] = React.useState(0);
   React.useEffect(() => {
     const bump = () => force(x => x + 1);
@@ -90,6 +92,14 @@ export default function ChallengesTab({ onOpenTool, onOpenGames }: {
             <div className="text-[10px] text-slate-500">the milestones' instruments — a real round closes the case</div>
           </div>
         </button>
+        <button onClick={() => setTideOpen(true)} data-testid="challenges-tidechart"
+          className="flex items-center gap-3 p-3 rounded-2xl bg-white border-2 border-outline-variant hover:border-teal-500/50 active:scale-[0.99] transition-all text-left cursor-pointer">
+          <div className="w-10 h-10 rounded-xl bg-teal-600/10 flex items-center justify-center shrink-0 text-lg">🗺️</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-black text-slate-800">The Tide Chart</div>
+            <div className="text-[10px] text-slate-500">tide-marks · the family · the island · the week's water</div>
+          </div>
+        </button>
         <button onClick={() => onOpenTool('rewards_store')} data-testid="challenges-shop"
           className="flex items-center gap-3 p-3 rounded-2xl bg-white border-2 border-outline-variant hover:border-primary/50 active:scale-[0.99] transition-all text-left cursor-pointer">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -104,6 +114,8 @@ export default function ChallengesTab({ onOpenTool, onOpenGames }: {
 
       {/* ── The trail itself — the proven MilestoneLog engine ── */}
       <MilestoneLog onOpenTool={onOpenTool} />
+
+      {tideOpen && <TideChart onClose={() => setTideOpen(false)} />}
 
       <p className="text-[9px] text-slate-400 text-center italic flex items-center justify-center gap-1">
         <Lock className="w-3 h-3" /> each milestone unlocks its app in the Library — that's the point of the crossing
