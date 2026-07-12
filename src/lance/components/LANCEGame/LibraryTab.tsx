@@ -73,11 +73,11 @@ function AppCard({
   return (
     <motion.div
       whileTap={{ scale: 0.96 }}
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ scale: 1.03, y: -4 }}
+      className="app-card-glass"
       onClick={onOpen}
       style={{
-        width: 162,
-        flexShrink: 0,
+        width: '100%',
         background: 'rgba(255,255,255,0.78)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
@@ -407,7 +407,15 @@ export default function LibraryTab({ onNavigate }: Props) {
                 No tools match "{query}"
               </div>
             ) : (
-              <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch' as React.CSSProperties['WebkitOverflowScrolling'] }}>
+              <div style={{
+                  // THE GRID LAW (2026-07-12): symmetric rectangles, no ragged
+                  // horizontal scroll — every card the same size, rows aligned,
+                  // 2-up on phones and as many as fit on desktop.
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(158px, 1fr))',
+                  gap: 10,
+                  paddingBottom: 4,
+                }}>
                 {filteredTools.map(tool => (
                   <AppCard
                     key={tool.id}
@@ -467,7 +475,15 @@ export default function LibraryTab({ onNavigate }: Props) {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch' as React.CSSProperties['WebkitOverflowScrolling'] }}>
+                <div style={{
+                  // THE GRID LAW (2026-07-12): symmetric rectangles, no ragged
+                  // horizontal scroll — every card the same size, rows aligned,
+                  // 2-up on phones and as many as fit on desktop.
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(158px, 1fr))',
+                  gap: 10,
+                  paddingBottom: 4,
+                }}>
                   {catTools.map(tool => (
                     <AppCard
                       key={tool.id}
