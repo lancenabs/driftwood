@@ -1147,6 +1147,8 @@ window._islandDebug = {
   teleport(x, z) { player.position.set(x, groundY(x, z), z); broadcastPos?.(); },
   rally: () => rally ? { spot: rally.spot, spotName: rally.spotName, met: rally.met } : null,
   landmarks: () => LANDMARKS.map(l => ({ id: l.id, name: l.name, x: l.x, z: l.z })),
+  // the 31 trail stations (defined later in the file; call after load)
+  trail: () => MS.map(m => { const s = milestoneSpot(m); return { n: m.n, x: s.x, z: s.z, h: islandHeight(s.x, s.z) }; }),
 };
 
 // proximity watch — 4Hz is plenty at walking speed
@@ -1277,8 +1279,29 @@ document.getElementById('back').onclick = () => {
 // The LANCE law, walked: the season's circle glows where the story is; step
 // into the ring and the shore opens that milestone. Everything happens here.
 const MS = [{"id":"ms_count_heads","n":1,"s":1,"t":"Count Heads"},{"id":"ms_high_ground","n":2,"s":1,"t":"High Ground"},{"id":"ms_first_fire","n":3,"s":1,"t":"First Fire"},{"id":"ms_fresh_water","n":4,"s":1,"t":"Fresh Water"},{"id":"ms_salvage","n":5,"s":1,"t":"The Salvage"},{"id":"ms_night_watch","n":6,"s":1,"t":"First Night Watch"},{"id":"ms_who_builds_what","n":7,"s":2,"t":"Who Builds What"},{"id":"ms_walls_door","n":8,"s":2,"t":"The Walls and the Door"},{"id":"ms_larder_rules","n":9,"s":2,"t":"The Larder Rules"},{"id":"ms_two_huts","n":10,"s":2,"t":"Two Huts or One"},{"id":"ms_second_language","n":11,"s":2,"t":"The Second Language"},{"id":"ms_storm_proofing","n":12,"s":2,"t":"Storm-Proofing"},{"id":"ms_map_of_us","n":13,"s":2,"t":"The Map of Us"},{"id":"ms_appreciation_volley","n":14,"s":3,"t":"Appreciation Volley"},{"id":"ms_game_night","n":15,"s":3,"t":"Game Night on the Sand"},{"id":"ms_story_circle","n":16,"s":3,"t":"The Story Circle"},{"id":"ms_signal_fire","n":17,"s":3,"t":"The Signal Fire"},{"id":"ms_feast_small_things","n":18,"s":3,"t":"Feast of the Small Things"},{"id":"ms_quiet_cove","n":19,"s":3,"t":"The Quiet Cove"},{"id":"ms_naming_undertow","n":20,"s":4,"t":"Naming the Undertow"},{"id":"ms_who_chases","n":21,"s":4,"t":"Who Chases, Who Hides"},{"id":"ms_speakers_shell","n":22,"s":4,"t":"The Speaker's Shell"},{"id":"ms_repair_rope","n":23,"s":4,"t":"Repair Rope"},{"id":"ms_apology_forge","n":24,"s":4,"t":"The Apology Forge"},{"id":"ms_flooded_camp","n":25,"s":4,"t":"The Flooded Camp"},{"id":"ms_riding_it_out","n":26,"s":4,"t":"Riding It Out Together"},{"id":"ms_every_plank","n":27,"s":5,"t":"Every Plank Has a Name"},{"id":"ms_load_test","n":28,"s":5,"t":"The Load Test"},{"id":"ms_letter_bottle","n":29,"s":5,"t":"The Letter in the Bottle"},{"id":"ms_launch_council","n":30,"s":5,"t":"The Launch Council"},{"id":"ms_naming_boat","n":31,"s":5,"t":"The Naming of the Boat"}];
-// season story-circle spots (mirror of src/data/milestoneCraft.ts SEASON_CIRCLES)
+// season anchors (mirror of src/data/milestoneCraft.ts SEASON_CIRCLES) — the
+// waypoints of THE TRAIL. Each season's milestones are strung along the leg
+// from its anchor to the next season's anchor: 31 DISTINCT stations the
+// family hikes across the whole island over the crossing (the captain's law,
+// verbatim: "the user must walk to EACH challenge, as if they were really on
+// the island"). One spot per milestone, deterministic on every device.
 const SEASON_CIRCLES = { 1: {x:-6, z:96}, 2: {x:14, z:66}, 3: {x:58, z:18}, 4: {x:-34, z:-44}, 5: {x:-58, z:58} };
+const TRAIL_END = { x: -20, z: 88 }; // S5 walks back toward the wreck beach — the raft launches where they landed
+function milestoneSpot(m) {
+  const a = SEASON_CIRCLES[m.s];
+  const b = m.s < 5 ? SEASON_CIRCLES[m.s + 1] : TRAIL_END;
+  const legMs = MS.filter(x => x.s === m.s);
+  const i = legMs.findIndex(x => x.id === m.id);
+  const t = legMs.length > 1 ? i / (legMs.length - 1) : 0;
+  // walk the leg + a small deterministic sideways step so the trail meanders
+  const px = a.x + (b.x - a.x) * t, pz = a.z + (b.z - a.z) * t;
+  const side = Math.sin(m.n * 2.39996) * 9; // golden-angle jitter, stable per milestone
+  const len = Math.hypot(b.x - a.x, b.z - a.z) || 1;
+  let x = px + (-(b.z - a.z) / len) * side, z = pz + ((b.x - a.x) / len) * side;
+  // stay on land: step toward the island's heart until the ground holds
+  for (let k = 0; k < 24 && islandHeight(x, z) < 0.25; k++) { x *= 0.94; z *= 0.94; }
+  return { x, z };
+}
 function nextMilestone() {
   let closed = [];
   try { closed = (JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || '{}').closed) || []; } catch {}
@@ -1288,7 +1311,7 @@ const nextMs = nextMilestone();
 let storyCircle = null, inCircle = false;
 window._circleDebug = () => ({ nextMs: nextMs?.id ?? null, circle: storyCircle ? { x: storyCircle.position.x, z: storyCircle.position.z } : null, player: (typeof player !== 'undefined' ? { x: player.position.x, z: player.position.z } : { x: rig.position.x, z: rig.position.z }) });
 if (nextMs) {
-  const spot = SEASON_CIRCLES[nextMs.s];
+  const spot = milestoneSpot(nextMs);
   const cy = groundY(spot.x, spot.z);
   storyCircle = new THREE.Group();
   const ring = new THREE.Mesh(
