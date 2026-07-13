@@ -146,10 +146,15 @@ export default function TideChart({ onClose }: { onClose: () => void }) {
         {/* ══ THE ISLAND CHART ══ */}
         {board === 'island' && (
           <div>
-            <div className="relative w-full rounded-2xl border-2 border-teal-200/25 overflow-hidden" style={{
-              aspectRatio: '16/9',
-              background: 'radial-gradient(ellipse 70% 80% at 50% 55%, #C9B182 0%, #A88F5F 38%, #2E7D6E 42%, #14424A 70%, #0B2A33 100%)',
-            }}>
+            <div className="relative w-full rounded-2xl border-2 border-teal-200/25 overflow-hidden" style={{ aspectRatio: '16/9' }}>
+              {/* a real aerial cove underneath the stylized map tint — texture
+                  without losing the pins' legibility (2026-07-13 art pass) */}
+              <img src="/ambient/cove-aerial.webp" alt="" aria-hidden loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover opacity-45"
+                onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              <div className="absolute inset-0" style={{
+                background: 'radial-gradient(ellipse 70% 80% at 50% 55%, #C9B182CC 0%, #A88F5FCC 38%, #2E7D6EDD 42%, #14424AEE 70%, #0B2A33F5 100%)',
+              }} />
               {SEASONS.map(sn => {
                 const spot = SEASON_SPOTS[sn.n];
                 const done = MILESTONES.filter(m => m.season === sn.n).every(m => closed.includes(m.id));

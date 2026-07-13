@@ -1032,13 +1032,17 @@ export default function LibraryScreen() {
               setActiveToolId('relationship_roadmap');
               setActiveSubSection('tool');
             }}
-            className="w-full text-left bg-gradient-to-r from-stone-900 to-stone-800 text-white p-5 rounded-[2.2rem] border-2 border-stone-800 hover:border-stone-700 shadow-sm transition-all flex items-start gap-4 group cursor-pointer relative overflow-hidden"
+            className="w-full text-left text-white p-5 rounded-[2.2rem] border-2 border-stone-800 hover:border-stone-700 shadow-sm transition-all flex items-start gap-4 group cursor-pointer relative overflow-hidden"
           >
+            <img src="/ambient/jungle-canopy.webp" alt="" aria-hidden loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover story-kenburns"
+              onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            <div className="absolute inset-0 bg-gradient-to-r from-stone-900/92 via-stone-900/80 to-stone-900/55" />
             <div className="absolute right-0 top-0 w-24 h-24 bg-[#FF6EA7]/10 rounded-full blur-xl pointer-events-none"></div>
-            <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-2xl group-hover:scale-105 transition-transform">
+            <div className="relative w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 text-2xl group-hover:scale-105 transition-transform">
               🗺️
             </div>
-            <div className="flex-grow">
+            <div className="relative flex-grow">
               <div className="flex justify-between items-center">
                 <span className="font-display font-black text-xs text-white uppercase tracking-wider group-hover:text-[#FF6EA7] transition-colors">
                   Relationship Roadmap

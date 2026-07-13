@@ -304,11 +304,15 @@ export default function ResourceVault() {
     <div className="flex flex-col gap-4 text-[#4B4B4B] animate-fade-in" id="resource-vault-parent">
       
       {/* Immersive Top Hero Panel */}
-      <div className="bg-gradient-to-r from-stone-900 to-stone-800 text-white p-5 rounded-[2.2rem] shadow-sm relative overflow-hidden">
+      <div className="text-white p-5 rounded-[2.2rem] shadow-sm relative overflow-hidden">
+        <img src="/ambient/wood-grain.webp" alt="" aria-hidden loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-900/90 via-stone-900/85 to-stone-800/75" />
         <div className="absolute right-0 top-0 w-36 h-36 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
         <div className="absolute left-1/3 bottom-0 w-24 h-24 bg-[#FF6EA7]/10 rounded-full blur-xl pointer-events-none"></div>
-        
-        <div className="flex justify-between items-start">
+
+        <div className="relative flex justify-between items-start">
           <div className="flex-1">
             <span className="text-[9px] font-black uppercase tracking-widest text-secondary">FamilyFrame Clinical Cloud</span>
             <h4 className="font-display font-black text-base text-white leading-tight mt-0.5">Clinical Resource Vault</h4>

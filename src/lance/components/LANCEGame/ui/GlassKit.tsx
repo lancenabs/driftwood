@@ -18,9 +18,15 @@ import { INTERN_POSES, LANCE_POSES } from '../GameCharacter';
 import { NARRATOR, SECOND_VOICE } from '../narrator';
 
 // Category → region hero backdrop (public/region-heroes/<cat>.webp).
+// 'recovery' was tagged on 10-15 tools but missing here — those interiors
+// rendered with no backdrop at all despite recovery.webp already existing
+// on disk (caught in the 2026-07-12 art sweep). 'family' has no matching
+// asset yet (Driftwood-only category, 14 tools) — falls through to null
+// honestly until public/region-heroes/family.webp is commissioned.
 const REGION_CATEGORIES = new Set([
   'mood', 'breathing', 'cognitive', 'somatic', 'cbt', 'dbt', 'depth',
   'relational', 'habit', 'clinical', 'nutrition', 'theory', 'insight', 'gamification',
+  'recovery',
 ]);
 
 export function regionHeroFor(toolId: string): string | null {
