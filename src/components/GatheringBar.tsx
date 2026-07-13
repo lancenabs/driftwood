@@ -1,10 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { gatheringState, hostGathering, joinGathering, leaveGathering, passConch, resumeGathering, GatheringState } from '../lib/gathering';
+import { readEvents } from '../lib/world';
 import { THE_SEVEN, readCrew, activeCastaway } from '../lib/castaways';
 // "Walk together" now opens the SAME 3D island as the shore door (one island,
 // no confusion). The 3D world reads the live camp and puts the family on the
 // same ground — the old 2D IslandSeek map is retired as the play surface.
 const enterIsland = () => window.dispatchEvent(new CustomEvent('driftwood:walk-island'));
+
+// The standing rally, if one is out: the latest rally_called (≤2h old) with
+// no rally_met after it. Read from the world log — the Gathering transport
+// already merges the family's calls into it.
+function activeRally(): { spotName: string; name: string } | null {
+  const evs = readEvents();
+  for (let i = evs.length - 1; i >= 0; i--) {
+    const e = evs[i];
+    if (e.action === 'rally_met') return null;
+    if (e.action === 'rally_called') {
+      if (Date.now() - Date.parse(e.at) > 2 * 3600 * 1000) return null;
+      return { spotName: String(e.payload?.spotName ?? 'the meeting spot'), name: String(e.payload?.name ?? 'Someone') };
+    }
+  }
+  return null;
+}
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE GATHERING BAR — the fire circle, live (D3D-0 · bible §6).
@@ -24,8 +41,13 @@ export default function GatheringBar() {
   useEffect(() => {
     const sync = () => setG(gatheringState());
     window.addEventListener('driftwood:gathering', sync);
+    // rallies arrive as world events (the family calling from another device)
+    window.addEventListener('driftwood:world-event', sync);
     resumeGathering();                 // a dropped phone shouldn't end the circle
-    return () => window.removeEventListener('driftwood:gathering', sync);
+    return () => {
+      window.removeEventListener('driftwood:gathering', sync);
+      window.removeEventListener('driftwood:world-event', sync);
+    };
   }, []);
 
   const me = activeCastaway();
@@ -104,6 +126,24 @@ export default function GatheringBar() {
           Leave quietly
         </button>
       </div>
+
+      {/* a standing rally — someone is waiting at a named place, live */}
+      {(() => {
+        const r = activeRally();
+        if (!r) return null;
+        return (
+          <div className="flex items-center gap-2 mt-2 p-2 rounded-2xl bg-white border-2 border-teal-500/40" data-testid="rally-banner">
+            <span className="text-base animate-pulse">📣</span>
+            <p className="flex-1 text-[10px] font-black text-teal-800">
+              {r.name} called the family to <span className="uppercase tracking-wide">{r.spotName}</span> — they're waiting there now.
+            </p>
+            <button onClick={enterIsland}
+              className="shrink-0 text-[9px] font-black uppercase tracking-wide rounded-full px-2.5 py-1.5 bg-teal-600 text-white cursor-pointer">
+              🏝 Walk there
+            </button>
+          </div>
+        );
+      })()}
 
       {/* presence — warm, never counting absence */}
       <div className="flex items-center gap-1.5 mt-2 flex-wrap" data-testid="gathering-presence">

@@ -1039,6 +1039,139 @@ rosterReady.then(() => {
   }
 });
 
+// ── THE NAMED PLACES — "meet me at our rock" (the captain's vision, verbatim:
+// "the wife can say, hey, meet me at the rock on the other side of the island,
+// our rock, and we can do the breathing exercise together"). Real places with
+// real names, always rendered; the rally system below makes them meeting
+// points across devices. ─────────────────────────────────────────────────────
+const LANDMARKS = [
+  { id: 'our_rock',    name: 'Our Rock',        emoji: '🪨', x: 78,  z: -62 },
+  { id: 'quiet_cove',  name: 'The Quiet Cove',  emoji: '🌊', x: -80, z: -20 },
+  { id: 'lookout',     name: 'The Lookout',     emoji: '🔭', x: 30,  z: -85 },
+  { id: 'wreck_beach', name: 'The Wreck Beach', emoji: '⛵', x: -6,  z: 96 },
+  { id: 'forge',       name: 'The Forge',       emoji: '⚒️', x: -34, z: -44 },
+];
+for (const lm of LANDMARKS) {
+  const ly = groundY(lm.x, lm.z);
+  const g = new THREE.Group();
+  const rock = new THREE.Mesh(
+    new THREE.DodecahedronGeometry(lm.id === 'our_rock' ? 1.5 : 0.7),
+    mat(lm.id === 'our_rock' ? 0x8D9AA5 : 0xA9B4BC)
+  );
+  rock.position.y = lm.id === 'our_rock' ? 0.9 : 0.4;
+  rock.rotation.set(0.3, lm.x, 0.2);
+  g.add(rock);
+  const lmTag = nameTag(`${lm.emoji} ${lm.name}`, '#475569');
+  lmTag.position.y = 2.2;
+  g.add(lmTag);
+  g.position.set(lm.x, ly, lm.z);
+  scene.add(g);
+  lm.pos = new THREE.Vector3(lm.x, ly, lm.z);
+}
+
+// THE RALLY — one family member calls a place; every gathered device raises
+// the beacon; arriving there TOGETHER answers it (rally_met feeds the fifth
+// need — presence proven by walking, not by tapping).
+let rally = null; // { spot, spotName, beacon, met }
+// the island speaks with its own from-id (device id + '-island'): the app on
+// THIS phone then merges island-born events into its world log like any
+// family member's (its skip-guard only filters its own app-published voice),
+// so TOGETHER gets fed on every device — including the caller's.
+const deviceIdRaw = (() => { try { return localStorage.getItem('driftwood_device_v1') || 'dev-island'; } catch { return 'dev-island'; } })();
+const islandFrom = deviceIdRaw + '-island';
+function sayLine(name, line, ms = 5000) {
+  document.getElementById('sayName').textContent = name;
+  document.getElementById('sayLine').textContent = line;
+  say.style.display = 'block';
+  clearTimeout(say._t);
+  say._t = setTimeout(() => { say.style.display = 'none'; }, ms);
+}
+function raiseRally(spotId, callerName) {
+  const lm = LANDMARKS.find(l => l.id === spotId);
+  if (!lm) return;
+  if (rally?.beacon) scene.remove(rally.beacon);
+  const beacon = new THREE.Group();
+  const pillar = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.12, 0.6, 12, 10, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0xFFB84D, transparent: true, opacity: 0.35, depthWrite: false })
+  );
+  pillar.position.y = 6;
+  beacon.add(pillar);
+  const rallyRing = new THREE.Mesh(
+    new THREE.RingGeometry(2.2, 2.7, 40).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ color: 0xF59E0B, transparent: true, opacity: 0.8, side: THREE.DoubleSide })
+  );
+  rallyRing.position.y = 0.08;
+  beacon.add(rallyRing);
+  const beaconTag = nameTag('📣 meet here!', '#B45309');
+  beaconTag.position.y = 3.4;
+  beacon.add(beaconTag);
+  beacon.position.copy(lm.pos);
+  scene.add(beacon);
+  rally = { spot: spotId, spotName: lm.name, beacon, met: false };
+  if (callerName) sayLine(callerName, `Meet me at ${lm.name} ${lm.emoji} — I'll wait for you there!`, 6000);
+}
+function celebrateRallyMet() {
+  if (!rally || rally.met) return;
+  rally.met = true;
+  sayLine('the island', `🫂 You made it to ${rally.spotName} together. The island noticed.`);
+  const b = rally.beacon;
+  setTimeout(() => { scene.remove(b); if (rally?.beacon === b) rally = null; }, 4800);
+}
+function postRallyEvent(action, payload) {
+  if (!campCode) return;
+  fetch(`/api/gathering/${campCode}/events`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: `ev-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      actor: me.id, action, payload, at: new Date().toISOString(), from: islandFrom,
+    }),
+  }).catch(() => {});
+}
+
+// the call button — rises when you stand at a named place while gathered
+const rallyEl = document.createElement('button');
+rallyEl.style.cssText = 'position:fixed;left:50%;bottom:212px;transform:translateX(-50%);z-index:45;display:none;background:linear-gradient(100deg,#0E7C7C,#2E96B5);color:#fff;border:none;border-radius:999px;padding:11px 18px;font-size:12.5px;font-weight:800;box-shadow:0 4px 18px rgba(14,124,124,0.5);cursor:pointer;font-family:inherit';
+rallyEl.dataset.testid = 'rally-call';
+document.body.appendChild(rallyEl);
+let nearLandmark = null;
+rallyEl.onclick = () => {
+  if (!nearLandmark) return;
+  postRallyEvent('rally_called', { spot: nearLandmark.id, spotName: nearLandmark.name, name: me.name });
+  raiseRally(nearLandmark.id, null);
+  sayLine(me.name || 'You', `📣 The family's phones just heard it: meet at ${nearLandmark.name}.`, 4500);
+};
+
+// the QA hatch (same spirit as _circleDebug): teleport + rally introspection
+window._islandDebug = {
+  teleport(x, z) { player.position.set(x, groundY(x, z), z); broadcastPos?.(); },
+  rally: () => rally ? { spot: rally.spot, spotName: rally.spotName, met: rally.met } : null,
+  landmarks: () => LANDMARKS.map(l => ({ id: l.id, name: l.name, x: l.x, z: l.z })),
+};
+
+// proximity watch — 4Hz is plenty at walking speed
+setInterval(() => {
+  const p = player.position;
+  let lm = null;
+  for (const l of LANDMARKS) if (Math.hypot(p.x - l.pos.x, p.z - l.pos.z) < 5) { lm = l; break; }
+  nearLandmark = lm;
+  rallyEl.style.display = lm && campCode && (!rally || rally.spot !== lm.id) ? 'block' : 'none';
+  if (lm) rallyEl.textContent = `📣 Meet me at ${lm.name} ${lm.emoji}`;
+  if (rally && !rally.met) {
+    const b = rally.beacon.position;
+    if (Math.hypot(p.x - b.x, p.z - b.z) < 6) {
+      for (const [, o] of others) {
+        if (Math.hypot(o.rig.position.x - b.x, o.rig.position.z - b.z) < 6) {
+          postRallyEvent('rally_met', { spot: rally.spot, spotName: rally.spotName });
+          celebrateRallyMet();
+          break;
+        }
+      }
+    }
+    rally.beacon.rotation.y += 0.08;
+  }
+}, 250);
+
 // ── THE GATHERING in 3D — family avatars on the same ground ─────────────────
 // Positions ride the existing ephemeral channel (normalized 0..1 ↔ world ±30).
 const others = new Map(); // actor → { rig, target, name }
@@ -1050,6 +1183,29 @@ const fromNorm = v => v * 2 * W - W;
 if (campCode) {
   document.getElementById('hint').textContent = `camp ${campCode} — the family walks this same ground · drag to look · stick to walk`;
   const es = new EventSource(`/api/gathering/${campCode}/stream?actor=${encodeURIComponent(me.id)}&name=${encodeURIComponent(me.name)}`);
+  // rally messages ride the same stream (a second listener — EventSource
+  // supports addEventListener alongside onmessage; one connection, one seat
+  // in the camp's presence)
+  es.addEventListener('message', ev => {
+    let msg; try { msg = JSON.parse(ev.data); } catch { return; }
+    if (msg.kind === 'welcome') {
+      // a rally already standing when this device arrived
+      const evs = msg.events ?? [];
+      for (let i = evs.length - 1; i >= 0; i--) {
+        const e = evs[i];
+        if (e.action === 'rally_met') break;
+        if (e.action === 'rally_called' && Date.now() - Date.parse(e.at) < 2 * 3600 * 1000) {
+          raiseRally(e.payload?.spot, e.from !== islandFrom ? (e.payload?.name || 'family') : null);
+          break;
+        }
+      }
+      return;
+    }
+    if (msg.kind !== 'event' || !msg.event) return;
+    const e = msg.event;
+    if (e.action === 'rally_called' && e.from !== islandFrom) raiseRally(e.payload?.spot, e.payload?.name || 'family');
+    if (e.action === 'rally_met') celebrateRallyMet();
+  });
   // the camp's build is the truth when gathered — pull it, then live-merge
   fetch(`/api/gathering/${campCode}/build`).then(r => r.json()).then(b => {
     if (b?.blocks) { for (const [k, t] of Object.entries(b.blocks)) blocks.set(k, t); rebuildBlocks(); }
