@@ -26,31 +26,38 @@ const VIDEO = {
 const FALLBACK_ART = '/shore/boarding_hero.jpg';
 
 // THE COLD OPEN — THE_TIDE_LINE.md canon, playable
-const CINEMATIC: { speaker: string; color: string; location: string; text: string; video: keyof typeof VIDEO }[] = [
+// `art`: the commissioned Ken Burns still (ASSET_PROMPTS_V3) — slow-zooms
+// over the beat when the file exists; the video/painting carry it otherwise.
+const CINEMATIC: { speaker: string; color: string; location: string; text: string; video: keyof typeof VIDEO; art?: string }[] = [
   {
     speaker: 'THE DOCK', color: '#9CC3D5', location: 'PIER 4 · MORNING · THE FAMILY TOUR',
     text: 'The brochure said ISLAND ADVENTURE — A DAY TO RECONNECT. The family arrives the way they arrive everywhere lately: together, and in separate rooms. Two phones out. One argument already half-finished from the car, warming up for its hundredth performance.',
     video: 'ship',
+    art: '/story/act1/01_the_dock.jpg',
   },
   {
     speaker: 'THE ARGUMENT', color: '#D14545', location: 'PIER 4 · THE SAME FIGHT',
     text: '"You PROMISED you\'d leave work at home—" "Somebody has to PAY for—" "Can we not. CAN WE NOT." "Nobody even asked what I wanted to do today." Four voices, one knot. The youngest counts seagulls and pretends not to hear, which is a skill nobody should have to be good at.',
     video: 'ship',
+    art: '/story/act1/01_the_dock.jpg',
   },
   {
     speaker: 'MR. BAUER', color: '#E7C892', location: 'THE GANGWAY · THE GUIDE',
     text: 'The guide is waiting at the boat like he\'s been waiting longer than a morning. Weathered hands. Eyes that do a headcount of the family and land somewhere deeper than a headcount. "Mr. Bauer," he says. "I take families to the island. Just families. It only works on families." Odd thing to say. He says it like a man who has seen this exact argument board this exact boat before.',
     video: 'ship',
+    art: '/story/act1/02_bauer_wheel.jpg',
   },
   {
     speaker: 'THE STORM', color: '#7A8FB5', location: 'OPEN WATER · NO WARNING',
     text: 'It comes over the horizon like a decision. The sky goes green-black. Bauer\'s voice changes registers — the tour-guide is gone; something older takes the wheel. "LIFE JACKETS. NOW. All of you — to the mast line."',
     video: 'storm',
+    art: '/story/act1/03_storm_wall.jpg',
   },
   {
     speaker: 'MR. BAUER', color: '#E7C892', location: 'THE MAST LINE · HIS LAST ORDER',
     text: 'He lashes the family\'s hands to one rope, hand over hand over hand, and puts both of his over all of theirs. "HOLD THE LINE. Not the rail — EACH OTHER. Whatever the sea takes, it does not get to take the LINE—" Lightning. The wheel spinning. His silhouette going back for it.',
     video: 'storm',
+    art: '/story/act1/04_hold_the_line.jpg',
   },
   {
     speaker: ' ', color: '#0A1512', location: ' ',
@@ -61,11 +68,13 @@ const CINEMATIC: { speaker: string; color: string; location: string; text: strin
     speaker: 'THE TIDE LINE', color: '#F2A65A', location: 'THE ISLAND · THE GREY BEFORE DAWN',
     text: 'Sand. Rain-light. The sound of a sea pretending nothing happened. The family wakes scattered down one shoreline — soaked, bruised, alive, still holding one rope with no boat on the end of it. They count heads the way you count when you cannot breathe until the number is right. The number is right. All of them. Except—',
     video: 'shore',
+    art: '/story/act1/05_tide_line.jpg',
   },
   {
     speaker: 'THE COMPASS', color: '#E7C892', location: 'THE WRECK LINE · WHAT WASHED UP',
     text: 'Mr. Bauer is not on the beach. Not in the shallows. Not anywhere a voice can reach. What washes up instead, glinting in the tide junk, is his brass compass — heavy, old, engraved with letters gone soft: TO M.B. — COME HOME. The needle does not point north. It points INLAND, toward the jungle, steady as a held breath. And from the treeline — small, wooden, gone the second anyone looks — something watches the family count heads.',
     video: 'shore',
+    art: '/story/act1/06_compass_ashore.jpg',
   },
 ];
 
@@ -132,18 +141,27 @@ function SpeechPanel({ speakerColor, speakerLabel, locationLine, text, onNext, n
   );
 }
 
-// ── Background: video slot with the honest painting fallback ─────────────────
-function SceneBackdrop({ video }: { video: string }) {
+// ── Background: art still (Ken Burns) → video → the honest painting, in that
+// order of preference; whatever exists carries the scene, nothing fakes it. ──
+function SceneBackdrop({ video, art }: { video: string; art?: string }) {
   const [videoOk, setVideoOk] = useState(true);
+  const [artOk, setArtOk] = useState(true);
   useEffect(() => { setVideoOk(true); }, [video]);
+  useEffect(() => { setArtOk(true); }, [art]);
   return (
-    <div className="absolute inset-0" style={{ background: '#0A1512' }}>
+    <div className="absolute inset-0 overflow-hidden" style={{ background: '#0A1512' }}>
       <img src={FALLBACK_ART} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover opacity-45" />
-      {videoOk && (
+      {videoOk && (!art || !artOk) && (
         <video key={video} src={video} autoPlay muted loop playsInline
           className="absolute inset-0 w-full h-full object-cover"
           style={{ opacity: 0.85 }}
           onError={() => setVideoOk(false)} />
+      )}
+      {art && artOk && (
+        <img key={art} src={art} alt="" aria-hidden
+          className="absolute inset-0 w-full h-full object-cover story-kenburns"
+          style={{ opacity: 0.92 }}
+          onError={() => setArtOk(false)} />
       )}
       <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(10,21,18,0.35), rgba(10,21,18,0.15) 45%, rgba(10,21,18,0.75))' }} />
     </div>
@@ -177,7 +195,7 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
 
   return (
     <div className="fixed inset-0 z-[90] flex flex-col overflow-hidden">
-      <SceneBackdrop video={phase === 'cinematic' ? VIDEO[cine.video] : VIDEO.shore} />
+      <SceneBackdrop video={phase === 'cinematic' ? VIDEO[cine.video] : VIDEO.shore} art={phase === 'cinematic' ? cine.art : undefined} />
 
       {/* progress dots + honest skip (crisis strip stays above via App) */}
       <div className="relative z-10 flex items-center justify-between px-5 pt-9">

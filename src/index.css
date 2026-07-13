@@ -162,3 +162,15 @@
 @media (prefers-reduced-motion: reduce) {
   .glass-card-shimmer { animation: none; opacity: 0; }
 }
+
+/* ── THE KEN BURNS LAW (2026-07-12): story stills slow-zoom for heartfelt
+   transitions. Applied to any .story-kenburns img; the reduced-motion block
+   above already stands this down when the OS asks. ── */
+@keyframes story-kenburns {
+  from { transform: scale(1.06) translate(1.5%, 1%); }
+  to   { transform: scale(1.18) translate(-1.5%, -1%); }
+}
+.story-kenburns {
+  animation: story-kenburns 9s ease-in-out both;
+  will-change: transform;
+}

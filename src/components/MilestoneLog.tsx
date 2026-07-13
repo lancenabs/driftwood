@@ -70,6 +70,20 @@ const ROBOT_NAMES: Record<string, { name: string; emoji: string }> = {
 
 type Phase = 'log' | 'scene' | 'conch' | 'working' | 'closing' | 'closed';
 
+// A story still that slow-zooms over its beat (the Ken Burns law). Missing
+// art renders nothing at all — the text carries the scene alone, honestly.
+function StoryArt({ src }: { src: string }) {
+  const [ok, setOk] = React.useState(true);
+  if (!ok) return null;
+  return (
+    <div className="rounded-2xl overflow-hidden border-2 border-outline-variant mb-1" style={{ aspectRatio: '16/9' }}>
+      <img src={src} alt="" aria-hidden loading="lazy"
+        className="w-full h-full object-cover story-kenburns"
+        onError={() => setOk(false)} />
+    </div>
+  );
+}
+
 export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (id: string) => void; hideShelf?: boolean }) {
   const { addXp, addGems, unlockTool } = useGame();
   const [state, setState] = useState<LogState>(loadState);
@@ -262,6 +276,7 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
       <div className="flex flex-col gap-2">
         {visible.map((b, i) => (
           <div key={i}>
+            {b.art && <StoryArt src={b.art} />}
             {b.kind === 'narration' && (
               <p className="font-serif italic text-[12px] leading-relaxed text-slate-600 px-1">{b.text}</p>
             )}
@@ -407,13 +422,36 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
       </div>
 
       {phase === 'scene' && (
-        <Beats
-          beats={active.opening}
-          doneLabel={active.instrument
-            ? (active.instrument.conjoint && readCrew().length > 1 ? 'Pass the conch' : `Do it: ${active.instrument.toolName}`)
-            : 'Mark the first'}
-          onDone={() => afterScene(active)}
-        />
+        <>
+          <Beats
+            beats={active.opening}
+            doneLabel={active.instrument
+              ? (active.instrument.conjoint && readCrew().length > 1 ? 'Pass the conch' : `Do it: ${active.instrument.toolName}`)
+              : 'Mark the first'}
+            onDone={() => afterScene(active)}
+          />
+          {/* THE NAMES LAW ("the story is about US"): where the story counts
+              or carves the family, the REAL claimed names appear. */}
+          {active.id === 'ms_count_heads' && readCrew().length > 0 && (
+            <div className="mt-2 p-2.5 rounded-2xl bg-amber-50 border-2 border-amber-200 text-center">
+              <p className="text-[8px] font-black uppercase tracking-[0.25em] text-amber-600 mb-1">the headcount</p>
+              <p className="text-[12px] font-display font-black text-amber-800">
+                {readCrew().map(c => c.name).join(' · ')} — all ashore.
+              </p>
+            </div>
+          )}
+          {active.id === 'ms_launch_council' && readCrew().length > 0 && (
+            <div className="mt-2 p-2.5 rounded-2xl text-center" style={{ background: '#2A1F14', border: '2px solid #B4530966' }}>
+              <p className="text-[8px] font-black uppercase tracking-[0.25em] text-amber-500/80 mb-1">cut into the totem</p>
+              <p className="text-[12px] font-display font-black tracking-wide" style={{ color: '#E7C892' }}>
+                {readCrew().map(c => c.name.toUpperCase()).join(' · ')}
+              </p>
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] mt-1" style={{ color: '#B45309' }}>
+                MR. BAUER'S FAMILY — ALL OF US
+              </p>
+            </div>
+          )}
+        </>
       )}
 
       {phase === 'conch' && active.instrument && (
