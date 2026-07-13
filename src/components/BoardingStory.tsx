@@ -141,27 +141,31 @@ function SpeechPanel({ speakerColor, speakerLabel, locationLine, text, onNext, n
   );
 }
 
-// ── Background: art still (Ken Burns) → video → the honest painting, in that
-// order of preference; whatever exists carries the scene, nothing fakes it. ──
+// ── Background: VIDEO (motion, the cinematic law 2026-07-12) → art still
+// (Ken Burns) → the honest painting, in that order; whatever exists carries
+// the scene, nothing fakes it. The art still doubles as the video's poster
+// so slow loads fade dramatically instead of popping. ──
 function SceneBackdrop({ video, art }: { video: string; art?: string }) {
   const [videoOk, setVideoOk] = useState(true);
+  const [videoLive, setVideoLive] = useState(false);   // first real frame drawn
   const [artOk, setArtOk] = useState(true);
-  useEffect(() => { setVideoOk(true); }, [video]);
+  useEffect(() => { setVideoOk(true); setVideoLive(false); }, [video]);
   useEffect(() => { setArtOk(true); }, [art]);
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: '#0A1512' }}>
       <img src={FALLBACK_ART} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover opacity-45" />
-      {videoOk && (!art || !artOk) && (
-        <video key={video} src={video} autoPlay muted loop playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: 0.85 }}
-          onError={() => setVideoOk(false)} />
-      )}
-      {art && artOk && (
+      {art && artOk && !(videoOk && videoLive) && (
         <img key={art} src={art} alt="" aria-hidden
           className="absolute inset-0 w-full h-full object-cover story-kenburns"
           style={{ opacity: 0.92 }}
           onError={() => setArtOk(false)} />
+      )}
+      {videoOk && (
+        <video key={video} src={video} autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ opacity: videoLive ? 0.85 : 0, transition: 'opacity 1.4s ease' }}
+          onPlaying={() => setVideoLive(true)}
+          onError={() => setVideoOk(false)} />
       )}
       <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(10,21,18,0.35), rgba(10,21,18,0.15) 45%, rgba(10,21,18,0.75))' }} />
     </div>
