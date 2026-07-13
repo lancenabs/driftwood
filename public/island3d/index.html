@@ -405,21 +405,22 @@ const AVATARS = {
   chip:     { glb: '/island3d/chip_idle.glb',  label: '🤖 Chip',     h: 1.5 },
   shipmate: { glb: '/island3d/shipmate.glb',   label: '🔩 Shipmate', h: 1.6 },
 };
-// THE FAMILY — auto-light: when family-<id>.glb lands in /island3d/ (the
-// meshes cast from Lance's Higgsfield family), each joins the roster and the
-// character picker automatically. Missing = simply absent, never broken.
+// THE FAMILY — auto-light: when family-<id>.glb lands in /island3d/, each joins
+// the roster + picker automatically. Missing = simply absent, never broken.
+// BODY-NEUTRAL LABELS (2026-07-12 inclusivity law): pick a body by SILHOUETTE,
+// then choose your skin tone with the swatches — every mesh takes every tone,
+// so the two casts are just more builds, not a gendered or racial roster.
 const FAMILY_SLOTS = [
-  { id: 'family-dad',      label: '👨 Dad',      h: 1.8 },
-  { id: 'family-mom',      label: '👩 Mom',      h: 1.65 },
-  { id: 'family-boy-oldest',   label: '🧒 Oldest',   h: 1.3 },
-  { id: 'family-boy-middle',   label: '🧒 Middle',   h: 1.15 },
-  { id: 'family-boy-youngest', label: '🧒 Youngest', h: 1.0 },
-  { id: 'family-robot',    label: '🤖 Buddy-bot', h: 0.9 },
-  // family #2 — the diversity line (cast from Lance's african_american_family)
-  { id: 'family2-dad',         label: '👨🏾 Dad Ⅱ',     h: 1.8 },
-  { id: 'family2-mom',         label: '👩🏾 Mom Ⅱ',     h: 1.65 },
-  { id: 'family2-boy-older',   label: '🧒🏾 Older Ⅱ',   h: 1.3 },
-  { id: 'family2-boy-younger', label: '🧒🏾 Younger Ⅱ', h: 1.1 },
+  { id: 'family-dad',      label: '🧍 Tall',       h: 1.8 },
+  { id: 'family-mom',      label: '🧍 Medium',     h: 1.65 },
+  { id: 'family-boy-oldest',   label: '🧒 Youth · big',   h: 1.3 },
+  { id: 'family-boy-middle',   label: '🧒 Youth · mid',   h: 1.15 },
+  { id: 'family-boy-youngest', label: '🧒 Youth · small', h: 1.0 },
+  { id: 'family-robot',    label: '🪵 Driftwood pal', h: 0.9 },
+  { id: 'family2-dad',         label: '🧍 Tall · 2',    h: 1.8 },
+  { id: 'family2-mom',         label: '🧍 Medium · 2',  h: 1.65 },
+  { id: 'family2-boy-older',   label: '🧒 Youth · big 2',   h: 1.3 },
+  { id: 'family2-boy-younger', label: '🧒 Youth · small 2', h: 1.1 },
 ];
 const rosterReady = Promise.all(FAMILY_SLOTS.map(async s => {
   try {
@@ -476,11 +477,26 @@ function buildAvatar({ kind = 'human', tint = null, name = '' } = {}) {
     const rawH = Math.max(bb.max.y - bb.min.y, 0.01);
     let s = spec.h / rawH; if (!(s > 0.2 && s < 8)) s = 1;
     model.scale.setScalar(s);
-    // optional team tint on the mesh material(s)
-    if (tint) model.traverse(o => { if (o.isMesh && o.material) {
-      o.material = o.material.clone();
-      o.material.color = new THREE.Color(tint);
-    }});
+    // optional SKIN TONE (2026-07-12 inclusivity law): shift only the
+    // skin-like materials toward the chosen tone — low-saturation surfaces
+    // (skin, neutral tones) blend to the tint; vivid clothing keeps its color.
+    // A stylized placeholder until the modular tintable meshes land; still
+    // lets every family pick a tone that's theirs, on any mesh.
+    if (tint) {
+      const target = new THREE.Color(tint);
+      model.traverse(o => { if (o.isMesh && o.material) {
+        const mats = Array.isArray(o.material) ? o.material : [o.material];
+        o.material = mats.map(m => {
+          const c = m.clone();
+          if (c.color) {
+            const hsl = {}; c.color.getHSL(hsl);
+            if (hsl.s < 0.42) c.color.lerp(target, 0.72); // skin/neutral → tone
+          }
+          return c;
+        });
+        if (!Array.isArray(o.material)) o.material = o.material[0];
+      }});
+    }
     g.add(model);
     g.userData.model = model;
     // find the walk bones + a foot bone (for bulletproof grounding)
@@ -550,21 +566,31 @@ function animateWalk(rig, speed, dt, t) {
   }
 }
 
-// my chosen avatar (persisted) — default the human Castaway
-let myKind = 'human';
-try { const f = JSON.parse(localStorage.getItem(FIT_KEY) || 'null'); if (f?.kind && AVATARS[f.kind]) myKind = f.kind; } catch {}
-let player = buildAvatar({ kind: myKind, name: me.name || 'You' });
+// my chosen avatar (persisted) — default the human Castaway. Skin tone
+// (myTint) is pre-seeded from the boarding swatch on the claimed castaway,
+// then overridable here on the island (2026-07-12 inclusivity law).
+let myKind = 'human', myTint = null;
+try { const f = JSON.parse(localStorage.getItem(FIT_KEY) || 'null'); if (f?.kind && AVATARS[f.kind]) myKind = f.kind; if (f?.tint) myTint = f.tint; } catch {}
+// pre-seed the tone the family picked at boarding (only if none chosen yet here)
+if (!myTint) { try {
+  const crew = JSON.parse(localStorage.getItem('driftwood_castaways_v1') || '[]');
+  const mine = crew.find(c => c.slotId === me.id);
+  if (mine?.tint) myTint = mine.tint;
+} catch {} }
+let player = buildAvatar({ kind: myKind, tint: myTint, name: me.name || 'You' });
 player.position.set(2, groundY(2, 86), 86);   // wake up at the camp, facing the fire
 scene.add(player);
-function swapPlayer(kind) {
+function rebuildPlayer() {
   const pos = player.position.clone(), rot = player.rotation.y;
   scene.remove(player);
-  myKind = kind;
-  localStorage.setItem(FIT_KEY, JSON.stringify({ kind }));
-  player = buildAvatar({ kind, name: me.name || 'You' });
+  localStorage.setItem(FIT_KEY, JSON.stringify({ kind: myKind, ...(myTint ? { tint: myTint } : {}) }));
+  player = buildAvatar({ kind: myKind, tint: myTint, name: me.name || 'You' });
   player.position.copy(pos); player.rotation.y = rot;
   scene.add(player);
+  broadcastPos && broadcastPos();  // family sees the new look immediately
 }
+function swapPlayer(kind) { myKind = kind; rebuildPlayer(); }
+function setPlayerTint(tint) { myTint = tint; rebuildPlayer(); }
 
 // ── THE BUILDER'S ISLAND — every kid an architect ────────────────────────────
 // Mario's hop meets the block game, on OUR island with Lance's real textures.
@@ -1033,10 +1059,29 @@ rosterReady.then(() => {
   for (const [kind, spec] of Object.entries(AVATARS)) {
     const b = document.createElement('button');
     b.textContent = spec.label;
+    b.dataset.kind = kind;
     b.style.cssText = `border:2px solid ${kind === myKind ? '#0E7C7C' : 'transparent'};background:#fff;border-radius:12px;padding:8px 12px;font-size:12px;font-weight:800;color:#374151;cursor:pointer;white-space:nowrap`;
-    b.onclick = () => { swapPlayer(kind); charsEl.querySelectorAll('button').forEach(x => x.style.borderColor = x === b ? '#0E7C7C' : 'transparent'); };
+    b.onclick = () => { swapPlayer(kind); charsEl.querySelectorAll('button').forEach(x => x.style.borderColor = x.dataset.kind === myKind ? '#0E7C7C' : 'transparent'); };
     charsEl.appendChild(b);
   }
+  // ── SKIN TONE — a look you pick, on any body (2026-07-12 inclusivity law) ──
+  const toneWrap = document.createElement('div');
+  toneWrap.style.cssText = 'margin-top:10px;padding-top:10px;border-top:1px solid #E5E7EB';
+  toneWrap.innerHTML = '<h4 style="margin:0 0 6px;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF">skin tone</h4>';
+  const toneRow = document.createElement('div');
+  toneRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap';
+  const TONES = [null, '#F6D7C4', '#E8B98F', '#C98E5A', '#A26B3F', '#7A4B2A', '#4A2F20'];
+  for (const t of TONES) {
+    const s = document.createElement('button');
+    s.title = t ? 'skin tone' : 'the mesh’s own look';
+    s.dataset.tone = t || 'none';
+    const on = (myTint || null) === t;
+    s.style.cssText = `width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid ${on ? '#0E7C7C' : 'rgba(0,0,0,0.15)'};background:${t || 'repeating-conic-gradient(#ddd 0 25%, #fff 0 50%) 50% / 10px 10px'}`;
+    s.onclick = () => { setPlayerTint(t); toneRow.querySelectorAll('button').forEach(x => x.style.borderColor = ((x.dataset.tone === 'none' ? null : x.dataset.tone) === (myTint || null)) ? '#0E7C7C' : 'rgba(0,0,0,0.15)'); };
+    toneRow.appendChild(s);
+  }
+  toneWrap.appendChild(toneRow);
+  fitEl.appendChild(toneWrap);
 });
 
 // ── THE NAMED PLACES — "meet me at our rock" (the captain's vision, verbatim:
@@ -1149,6 +1194,9 @@ window._islandDebug = {
   landmarks: () => LANDMARKS.map(l => ({ id: l.id, name: l.name, x: l.x, z: l.z })),
   // the 31 trail stations (defined later in the file; call after load)
   trail: () => MS.map(m => { const s = milestoneSpot(m); return { n: m.n, x: s.x, z: s.z, h: islandHeight(s.x, s.z) }; }),
+  // the family members this device currently sees, and their chosen looks
+  others: () => { const out = []; for (const [actor, o] of others) out.push({ actor, kind: o.kind, tint: o.tint }); return out; },
+  me: () => ({ kind: myKind, tint: myTint }),
 };
 
 // proximity watch — 4Hz is plenty at walking speed
@@ -1229,15 +1277,24 @@ if (campCode) {
     }
     if (msg.kind !== 'pos' || msg.pos.actor === me.id) return;
     const p = msg.pos;
+    // the sender's actual look, if they sent it; else a stable hash fallback
+    const kinds = Object.keys(AVATARS);
+    const wantKind = (p.kind && AVATARS[p.kind]) ? p.kind : kinds[(p.actor.charCodeAt(9) || 1) % kinds.length];
+    const wantTint = p.tint || null;
     let o = others.get(p.actor);
-    if (!o) {
-      // family members ride the same real meshes; spread them across the roster
-      const kinds = Object.keys(AVATARS);
-      const kind = kinds[(p.actor.charCodeAt(9) || 1) % kinds.length];
-      const rig = buildAvatar({ kind, name: p.name || 'family' });
+    const buildRig = () => {
+      const rig = buildAvatar({ kind: wantKind, tint: wantTint, name: p.name || 'family' });
+      const at = new THREE.Vector3(fromNorm(p.x), groundY(fromNorm(p.x), fromNorm(p.y)), fromNorm(p.y));
+      rig.position.copy(at);
       scene.add(rig);
-      o = { rig, target: new THREE.Vector3(), speed: 0 };
-      others.set(p.actor, o);
+      return { rig, target: at.clone(), speed: 0, kind: wantKind, tint: wantTint };
+    };
+    if (!o) { o = buildRig(); others.set(p.actor, o); }
+    else if (o.kind !== wantKind || o.tint !== wantTint) {
+      // they changed their look mid-session — rebuild them where they stand
+      const keep = o.rig.position.clone();
+      scene.remove(o.rig);
+      o = buildRig(); o.rig.position.copy(keep); others.set(p.actor, o);
     }
     const nx = fromNorm(p.x), nz = fromNorm(p.y);
     o.speed = o.rig.position.distanceTo(new THREE.Vector3(nx, 0, nz)) * 2;
@@ -1257,7 +1314,9 @@ function broadcastPos() {
   lastSent = now;
   fetch(`/api/gathering/${campCode}/pos`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ actor: me.id, name: me.name, x: toNorm(player.position.x), y: toNorm(player.position.z), facing: 'right', mode: 'walking' }),
+    // carry the chosen look so the family sees each other AS THEMSELVES (kind =
+    // body mesh, tint = skin tone) instead of a hash-assigned stranger.
+    body: JSON.stringify({ actor: me.id, name: me.name, x: toNorm(player.position.x), y: toNorm(player.position.z), facing: 'right', mode: 'walking', kind: myKind, tint: myTint || '' }),
   }).catch(() => {});
 }
 

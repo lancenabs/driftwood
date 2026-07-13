@@ -170,7 +170,7 @@ app.get("/api/gathering/:code", (req, res) => {
 app.post("/api/gathering/:code/pos", (req, res) => {
   const camp = loadCamp(String(req.params.code).toUpperCase());
   if (!camp) return res.status(404).json({ error: "no such camp" });
-  const { actor, name, x, y, facing, mode, emote } = req.body ?? {};
+  const { actor, name, x, y, facing, mode, emote, kind, tint } = req.body ?? {};
   if (!actor || typeof x !== "number" || typeof y !== "number") return res.status(400).json({ error: "actor, x, y required" });
   broadcast(camp, {
     kind: "pos",
@@ -182,6 +182,9 @@ app.post("/api/gathering/:code/pos", (req, res) => {
       facing: facing === "left" ? "left" : "right",
       mode: mode === "hiding" ? "hiding" : "walking",
       emote: typeof emote === "string" ? emote.slice(0, 8) : undefined,
+      // the sender's chosen look — so the family sees each other as themselves
+      kind: typeof kind === "string" ? kind.slice(0, 40) : undefined,
+      tint: typeof tint === "string" && tint ? tint.slice(0, 9) : undefined,
       at: Date.now(),
     },
   });

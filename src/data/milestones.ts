@@ -72,7 +72,7 @@ export const MILESTONES: Milestone[] = [
           { id: 'speak', label: 'Speak first — "we\'re shipwrecked. we need help."' },
         ] },
       { kind: 'narration', when: { flag: 's1_first_meeting', is: 'kneel' }, text: 'The tallest of you kneels — slow, palms open, the way you approach anything small that could bolt. The robot watches. Then, very carefully, he kneels TOO, which is not how any of this works, and somehow that is the moment everyone stops being scared.' },
-      { kind: 'narration', when: { flag: 's1_first_meeting', is: 'speak' }, text: '"We\'re shipwrecked," someone says, hands up. "Our guide is gone. We need help." The robot\'s knot-eyes go from face to face — and stop on the youngest, who waves. A small wooden hand, entirely without permission from its owner, waves back.' },
+      { kind: 'narration', when: { flag: 's1_first_meeting', is: 'speak' }, text: '"We\'re shipwrecked," someone says, hands up. "Our guide is gone. We need help." The robot\'s knot-eyes go from face to face — and stop on the one who cannot help waving. A small wooden hand, entirely without permission from its owner, waves back.' },
       { kind: 'robot', who: 'skip', text: '…You\'re a FAMILY. We saw you land. We watched from the trees — we watch everything that washes in. And we heard you on the beach yesterday. The loud voices. The words you threw.' },
       { kind: 'narration', text: 'The little robot straightens up to his entire unimpressive height, and delivers what is obviously a rehearsed line from somebody older:' },
       { kind: 'robot', who: 'skip', text: 'The Jumble does not help storms. And a family that talks to each other like weather… is a storm. I\'m sorry. I\'m not allowed. I\'m— I\'m really sorry. You seem nice when you\'re not shouting.' },
@@ -106,13 +106,13 @@ export const MILESTONES: Milestone[] = [
     title: 'First Fire',
     first: 'The island\'s law, learned the hard way: fires lit alone gutter out.',
     opening: [
-      { art: '/story/act1/08_burned_hand.jpg', kind: 'narration', text: 'Night two. No fire. Three tries, three guttered flames, and the cold coming in off the water like it has a key to the place. The youngest is shivering. The argument starts the way it always starts — whose fault, whose job — and then stops, because a small wooden shape steps out of the dark carrying dry tinder in both branch-arms.' },
-      { kind: 'robot', who: 'skip', text: 'I\'m not helping! This is NOT helping. This is… littering. In your direction. Cold kids override the rules — that one\'s MY rule, I just made it, don\'t tell the Collier.' },
+      { art: '/story/act1/08_burned_hand.jpg', kind: 'narration', text: 'Night two. No fire. Three tries, three guttered flames, and the cold coming in off the water like it has a key to the place. Someone is shivering and pretending not to be. The argument starts the way it always starts — whose fault, whose job — and then stops, because a small wooden shape steps out of the dark carrying dry tinder in both branch-arms.' },
+      { kind: 'robot', who: 'skip', text: 'I\'m not helping! This is NOT helping. This is… littering. In your direction. Cold castaways override the rules — that one\'s MY rule, I just made it, don\'t tell the Collier.' },
       { kind: 'narration', text: 'He shows them the trick of it — the nest of fibers, the patient breath, slower, slower — and leans close to demonstrate, and the ember catches all at once. Beautifully. Onto his hand.' },
       { kind: 'robot', who: 'skip', text: 'oh. OH. FIRE. I\'M THE FIRE NOW. THIS IS WHY WE HAVE RULES—' },
       { kind: 'narration', text: 'What happens next takes four seconds and no discussion: one of you snatches him up, one scoops wet sand, two pairs of hands smother the little burning fist together — four humans moving as ONE THING for the first time since the dock. The flame dies. The hand is charred at the knuckles. The robot stares at it, then at the circle of terrified faces around him, and his knot-eyes do something wooden eyes should not be able to do.' },
       { kind: 'robot', who: 'skip', text: '…You saved me. I\'m FLAMMABLE, that\'s the whole reason we don\'t DO fire rescue, it\'s in the SONG we sing about it — and you just— all four of you, at the same time— (very quietly) The Jumble is wrong about you. Storms don\'t put things out.' },
-      { kind: 'narration', text: 'He sits with them at their fire — THEIR fire, the one that finally caught — until the youngest falls asleep. In the morning he is back, hand bandaged in palm-leaf, standing very formally on a piece of driftwood to be taller, with news.' },
+      { kind: 'narration', text: 'He sits with them at their fire — THEIR fire, the one that finally caught — until the first of you falls asleep beside it. In the morning he is back, hand bandaged in palm-leaf, standing very formally on a piece of driftwood to be taller, with news.' },
       { kind: 'robot', who: 'skip', text: 'I asked. I argued! I told them about the sand and the hands. And the Elders said: rules are rules — the Jumble helps FAMILY, and family is EARNED. Thirty-one challenges. The same ones every one of us passed to become Jumble. Finish them and you\'re not strangers we\'re helping. You\'re one of us — and we get you HOME. All of you. I already signed as your sponsor. It\'s me. I\'m the sponsor. I may have signed before asking them, please do well.' },
       { kind: 'choice', id: 's1_the_pledge', prompt: 'Thirty-one challenges to earn a family of robots — and a way home. The family answers as one:',
         options: [
@@ -152,14 +152,14 @@ export const MILESTONES: Milestone[] = [
     first: 'The wreck washed in more than wreckage: the crew inventories what it still HAS.',
     opening: [
       { kind: 'narration', text: 'All morning the tide delivers pieces of the old boat. And something turns when the counting starts: this family is not empty-handed. It never was. Salvage first, grief later — the inventory of what SURVIVED.' },
-      { kind: 'narration', text: 'Then the youngest finds it, wedged under a hull plank: Mr. Bauer\'s tackle box. Latched, dry inside. Fishing line, hooks, a fire-steel, a folded photograph gone soft with salt — a family, but not YOUR family. Four faces, sun-squinting, on a boat. On the back, one word in pencil: "us."' },
+      { kind: 'narration', text: 'Then someone finds it, wedged under a hull plank: Mr. Bauer\'s tackle box. Latched, dry inside. Fishing line, hooks, a fire-steel, a folded photograph gone soft with salt — a family, but not YOUR family. Four faces, sun-squinting, on a boat. On the back, one word in pencil: "us."' },
       { kind: 'choice', id: 's1_tackle_box', prompt: 'Mr. Bauer\'s tackle box, and someone else\'s family in a photograph. What does yours do with it?',
         options: [
           { id: 'use', label: 'Use the tools — he\'d want them keeping you alive' },
           { id: 'cairn', label: 'Build a cairn for the box — tools borrowed, photo kept safe' },
         ] },
       { kind: 'narration', when: { flag: 's1_tackle_box', is: 'use' }, text: 'The vote is quiet and unanimous: Bauer lashed your hands to a line so you\'d live. The tools go to work — the line to the fishing rocks, the fire-steel to the pit keeper. The photograph gets a dry pocket and a promise: whoever "us" is, the box goes back to him. Somehow.' },
-      { kind: 'narration', when: { flag: 's1_tackle_box', is: 'cairn' }, text: 'You build the cairn above the tide line, borrow the tools one at a time like library books, and set the photograph inside facing the sea. The youngest asks who they are. Nobody knows. "Somebody\'s us," says the oldest, and that answer holds all season.' },
+      { kind: 'narration', when: { flag: 's1_tackle_box', is: 'cairn' }, text: 'You build the cairn above the tide line, borrow the tools one at a time like library books, and set the photograph inside facing the sea. "Who are they?" someone asks. Nobody knows. "Somebody\'s us," someone answers, and that answer holds all season.' },
       { kind: 'robot', who: 'hollow', text: '(the tall quiet one, first words to the family, from a distance) …He kept that box on his knee, crossings back. Log what washed in. All of it. What survives a wreck is never random. It\'s what was HELD tightest.' },
     ],
     instrument: {
@@ -225,7 +225,7 @@ export const MILESTONES: Milestone[] = [
     title: 'The Larder Rules',
     first: 'Food stores need rules everyone made — the first real family meeting.',
     opening: [
-      { art: '/story/act2/13_rules_post.jpg', kind: 'narration', text: 'The larder hut opens — and Bailer is ALREADY IN IT, mid-count, surrounded by the most organized shelves on the island. He has counted everything. He has counted things that cannot be counted. There is a shelf labeled "MISC. DREAD (4)."' },
+      { art: '/story/act2/13_rules_post.jpg', kind: 'narration', text: 'The larder hut opens — and Bailer is ALREADY IN IT, mid-count, surrounded by the most organized shelves on the island. She has counted everything. She has counted things that cannot be counted. There is a shelf labeled "MISC. DREAD (4)."' },
       { kind: 'robot', who: 'bailer', text: 'RULES OF THE LARDER. One: needs before wants — the man taught— A ROBOT taught us that, an anonymous robot. Two: nobody eats the last of anything alone; last-of-anything is a FAMILY food. Three: whoever is hungriest gets believed. We learned rule three the hard way. There is a song about it. There will not be a performance.' },
       { kind: 'narration', text: 'The family writes its own larder rules under the Jumble\'s — needs and wants, out loud, and the discovery every stocked shelf makes possible: this family has ENOUGH, when the counting is honest. Enough was never the problem. The counting was.' },
     ],
@@ -249,7 +249,7 @@ export const MILESTONES: Milestone[] = [
           { id: 'adopt', label: 'Adopt it — hardest day sleeps nearest the fire' },
           { id: 'own', label: 'Draw your own map — honest, in your family\'s shape' },
         ] },
-      { kind: 'narration', when: { flag: 's2_spiral', is: 'adopt' }, text: 'The spiral comes to camp. The first night, nobody will admit to the hardest day — so the youngest assigns it, with terrifying accuracy, and the right person sleeps warm. The spiral knows. The spiral always knows.' },
+      { kind: 'narration', when: { flag: 's2_spiral', is: 'adopt' }, text: 'The spiral comes to camp. The first night, nobody will admit to the hardest day — so the quietest voice assigns it, with terrifying accuracy, and the right person sleeps warm. The spiral knows. The spiral always knows.' },
       { kind: 'narration', when: { flag: 's2_spiral', is: 'own' }, text: 'Your family draws its own shape in the sand — not the Jumble\'s spiral, yours — and Skip studies it for a long time and then copies it into his charcoal log under the heading OTHER GOOD SHAPES. The village has been collecting family-shapes for years, it turns out. All of them count.' },
     ],
     instrument: {
@@ -265,7 +265,7 @@ export const MILESTONES: Milestone[] = [
     first: 'Half the crew\'s signals were missing their targets. The island teaches signal-reading.',
     opening: [
       { art: '/story/act2/15_five_oils.jpg', kind: 'narration', text: 'It starts with a squeak. Skip\'s elbow, dry as a hinge in a drought — and the Collier, without a word, crossing the whole ring to oil it. Skip lights up like a lantern.' },
-      { kind: 'robot', who: 'skip', text: 'The Jumble has five oils! Everybody runs best on a different one. The Collier\'s is FIXING things for you — he never says a nice word, he just re-shingles your roof at dawn. Bailer\'s is counted time — sit with him while he counts and he\'s HAPPY. Echo-2 needs the words out loud. Hollow needs the shells — little gifts, no note. And mine is— (he goes shy) —mine\'s when somebody just… stays nearby. That\'s the whole oil. Nearby.' },
+      { kind: 'robot', who: 'skip', text: 'The Jumble has five oils! Everybody runs best on a different one. The Collier\'s is FIXING things for you — he never says a nice word, he just re-shingles your roof at dawn. Bailer\'s is counted time — sit with her while she counts and she\'s HAPPY. Echo-2 needs the words out loud. Hollow needs the shells — little gifts, no note. And mine is— (he goes shy) —mine\'s when somebody just… stays nearby. That\'s the whole oil. Nearby.' },
       { kind: 'narration', text: 'The question lands on the family like a dropped conch: which oil does each of YOU run on? Wrong-oiling is the loneliest maintenance there is — years of faithful effort, poured into the wrong hinge. Today the family learns each other\'s.' },
     ],
     instrument: {
@@ -280,7 +280,7 @@ export const MILESTONES: Milestone[] = [
     title: 'Storm-Proofing',
     first: 'The ridgepole gets set: the values this camp will NOT trade, whatever the weather.',
     opening: [
-      { art: '/story/act2/16_bauers_knife.jpg', kind: 'narration', text: 'The Collier calls it weather-sense: the village storm-proofs on the CALM days, because lashing a roof in the wind is just expensive praying. The family works the camp — extra lashings, deeper stakes, the fire\'s dry-store — and it\'s the oldest who finds it, scouting deadfall up the north path.' },
+      { art: '/story/act2/16_bauers_knife.jpg', kind: 'narration', text: 'The Collier calls it weather-sense: the village storm-proofs on the CALM days, because lashing a roof in the wind is just expensive praying. The family works the camp — extra lashings, deeper stakes, the fire\'s dry-store — and it\'s while scouting deadfall up the north path that someone finds it.' },
       { kind: 'narration', text: 'A campsite. Old. Cold. A stone ring gone green, a lean-to collapsed into its own bones — and driven into the log beside the fire ring, waiting years for a hand its size: a knife. Bone-handled, sea-rusted, and along the flat of the blade, scratched deep and deliberate: M. BAUER.' },
       { kind: 'robot', who: 'skip', text: '(gone very still, both hands around his bandaged one) …That\'s the quiet camp. We don\'t play there. The Elders say it belongs to the Before. (a long pause) I don\'t know what the Before is. Whenever I ask, the Collier oils something that isn\'t squeaking.' },
       { kind: 'choice', id: 's2_knife', prompt: 'Mr. Bauer\'s knife — YEARS old, in an island campsite. He has been here before. What now?',
@@ -307,7 +307,7 @@ export const MILESTONES: Milestone[] = [
       { art: '/story/act2/17_remembering_house.jpg', kind: 'narration', text: 'Season two closes in the village\'s longest hut — the one the Jumble calls the Remembering House. The family is invited in for the first time. The walls are carved, floor to eave: robot history, panel by panel, in patient knife-work.' },
       { kind: 'narration', text: 'And in every early panel: a MAN. Broad hands. A tackle box. Carving robots out of storm-wreck driftwood, one by one — teaching them fire, teaching them the spiral, teaching them the five oils. In the last panel of the row he stands with seven small figures around him, and the carver has worked the wood so the man\'s face is turned away. Toward the sea.' },
       { kind: 'robot', who: 'echo2', text: '(quietly, watching the family look) Every family has panels like these. Who taught whom to argue like that? Where did the silence pattern sail in from? Patterns travel bloodlines like currents travel water. Tonight you carve YOUR panels — the family across generations — and you get to mark which patterns land with you, and which ones you leave in the water.' },
-      { kind: 'narration', text: 'Nobody asks the Jumble who the man is. Not yet. Some questions you carry until they\'re ripe. But the youngest, on the way out, stops at the turned-away face and — very gently, when the robots aren\'t looking — touches the carved tackle box with one finger. It is exactly the same box. Down to the latch.' },
+      { kind: 'narration', text: 'Nobody asks the Jumble who the man is. Not yet. Some questions you carry until they\'re ripe. But the last one out stops at the turned-away face and — very gently, when the robots aren\'t looking — touches the carved tackle box with one finger. It is exactly the same box. Down to the latch.' },
     ],
     instrument: {
       toolId: 'family_map', toolName: 'The Family Map',
@@ -341,9 +341,9 @@ export const MILESTONES: Milestone[] = [
     first: 'The camp plays — on purpose, on the calendar, no earning it first.',
     opening: [
       { art: '/story/act3/19_game_night.jpg', kind: 'narration', text: 'The Collier — THE COLLIER — arrives at the family fire carrying a driftwood box with a hinged lid, and the entire Jumble goes silent the way a town goes silent when the bank opens its vault.' },
-      { kind: 'robot', who: 'collier', text: 'Game night. Village law: once a week, all work stops. This box is older than any of us — HE built it before he built the first — (a pause, a re-route) —it was built. Long ago. Shell-toss, sand-nine, the memory game with the terrible penalties. Tonight your family hosts. Do not let Bailer bank the shells. He counts cards. He IS cards.' },
+      { kind: 'robot', who: 'collier', text: 'Game night. Village law: once a week, all work stops. This box is older than any of us — HE built it before he built the first — (a pause, a re-route) —it was built. Long ago. Shell-toss, sand-nine, the memory game with the terrible penalties. Tonight your family hosts. Do not let Bailer bank the shells. She counts cards. She IS cards.' },
       { kind: 'robot', who: 'skip', text: '(whispering) You\'re getting GAME NIGHT. It took the seagull two years to get game night.' },
-      { kind: 'narration', text: 'The lesson hides inside the fun, where the best ones live: a family that plays together builds a bank of light moments to spend on the heavy ones. Tonight the island collects deposits. The penalties ARE terrible. The youngest wins everything.' },
+      { kind: 'narration', text: 'The lesson hides inside the fun, where the best ones live: a family that plays together builds a bank of light moments to spend on the heavy ones. Tonight the island collects deposits. The penalties ARE terrible. The one nobody expected wins everything.' },
     ],
     instrument: {
       toolId: 'ships_calendar', toolName: 'The Ship\'s Calendar',
@@ -370,7 +370,7 @@ export const MILESTONES: Milestone[] = [
     ],
     instrument: {
       toolId: 'passage_chart', toolName: 'The Passage Chart',
-      why: 'Plot the family\'s real milestones — where you\'ve actually sailed, told around the fire, entered on the chart. The story circle becomes a map the youngest can hold.',
+      why: 'Plot the family\'s real milestones — where you\'ve actually sailed, told around the fire, entered on the chart. The story circle becomes a map small enough for any hand to hold.',
       conjoint: true,
     },
     planks: 1,
@@ -515,16 +515,19 @@ export const MILESTONES: Milestone[] = [
     title: 'The Flooded Camp',
     first: 'A storm takes the cook-pit — and the crew learns the PAUSE signal.',
     opening: [
-      { art: '/story/act4/26_search_line.jpg', kind: 'narration', text: 'The storm\'s tail floods the creek at dusk, and in the scramble to move the camp uphill, the count comes up short. One head. The youngest. Gone — and the sand by the north path says WHERE, and the where stops every heart in the camp: small footprints, heading inland. Toward the quiet camp. Toward the compass\'s heading. Looking for Mr. Bauer.' },
-      { kind: 'robot', who: 'skip', text: '(already moving, already shouting over his shoulder) JUMBLE! ALL LANTERNS! THE LITTLE ONE\'S GONE TOWARD THE FALLS — (and then, to the family, his knot-eyes fierce) Together. You hear me? The island only yields to together — TONIGHT MORE THAN EVER. Nobody searches alone. NOBODY.' },
-      { kind: 'choice', id: 's4_search', prompt: 'Dark. Flood water rising. The search parties form — where does the family line hold?',
+      { art: '/story/act4/26_search_line.jpg', when: { flag: 'composition', is: 'family' }, kind: 'narration', text: 'The storm\'s tail floods the creek at dusk, and in the scramble to move the camp uphill, the count comes up short. One head. The youngest. Gone — and the sand by the north path says WHERE, and the where stops every heart in the camp: small footprints, heading inland. Toward the quiet camp. Toward the compass\'s heading. Looking for Mr. Bauer.' },
+      { art: '/story/act4/26_search_line.jpg', when: { flag: 'composition', is: 'couple' }, kind: 'narration', text: 'The storm\'s tail floods the creek at dusk, and in the scramble to move the camp uphill, a voice goes missing. Skip. The little robot who narrates EVERYTHING — silent. And the mud by the north path says WHERE, and the where stops both your hearts: small wooden footprints, heading inland. Toward the quiet camp. Toward the compass\'s heading. Looking for Mr. Bauer.' },
+      { when: { flag: 'composition', is: 'family' }, kind: 'robot', who: 'skip', text: '(already moving, already shouting over his shoulder) JUMBLE! ALL LANTERNS! THE LITTLE ONE\'S GONE TOWARD THE FALLS — (and then, to the family, his knot-eyes fierce) Together. You hear me? The island only yields to together — TONIGHT MORE THAN EVER. Nobody searches alone. NOBODY.' },
+      { when: { flag: 'composition', is: 'couple' }, kind: 'robot', who: 'hollow', text: '(at the camp\'s edge, lantern already lit — the tall quiet one suddenly neither tall nor quiet) The little one is gone toward the falls. He is ninety percent driftwood and the creek is RISING. (he puts the lantern in your hands) Together. You two. The island only yields to together — TONIGHT MORE THAN EVER. Nobody searches alone. NOBODY.' },
+      { kind: 'choice', id: 's4_search', prompt: 'Dark. Flood water rising. The search parties form — where does the search line hold?',
         options: [
           { id: 'pairs', label: 'Split in pairs with lanterns — cover both paths' },
           { id: 'oneline', label: 'One line, hands linked, straight up the compass heading' },
         ] },
-      { kind: 'narration', when: { flag: 's4_search', is: 'pairs' }, text: 'Pairs, lanterns, whistles — the Jumble takes the ridge, the family takes the paths. It\'s Echo-2 who catches it on the wind: a small voice, singing to itself to be brave, somewhere behind the sound of falling water.' },
+      { kind: 'narration', when: { flag: 's4_search', is: 'pairs' }, text: 'Pairs, lanterns, whistles — the Jumble takes the ridge, you take the paths. It\'s Echo-2 who catches it on the wind: a small voice, singing to itself to be brave, somewhere behind the sound of falling water.' },
       { kind: 'narration', when: { flag: 's4_search', is: 'oneline' }, text: 'One line, hands linked — the mast line all over again, Bauer\'s last order made flesh. The line walks the compass heading through the dark, nobody let go of, until the sound of falling water grows a second sound inside it: a small voice, singing to itself to be brave.' },
-      { kind: 'narration', text: 'THE WATERFALL. And behind the water, where no map on this island ever put anything: a glow. Warm. Steady. Firelight — coming from inside the falls. The youngest\'s voice is coming from the light. And the youngest\'s voice says the impossible thing, clear over the water: "IT\'S OKAY! COME SEE! IT\'S MISTER BAUER\'S HOUSE!"' },
+      { when: { flag: 'composition', is: 'family' }, kind: 'narration', text: 'THE WATERFALL. And behind the water, where no map on this island ever put anything: a glow. Warm. Steady. Firelight — coming from inside the falls. The youngest\'s voice is coming from the light. And the youngest\'s voice says the impossible thing, clear over the water: "IT\'S OKAY! COME SEE! IT\'S MISTER BAUER\'S HOUSE!"' },
+      { when: { flag: 'composition', is: 'couple' }, kind: 'narration', text: 'THE WATERFALL. And behind the water, where no map on this island ever put anything: a glow. Warm. Steady. Firelight — coming from inside the falls. Skip\'s voice is coming from the light — small, and for once not narrating, just calling. And then the impossible thing, clear over the water: "IT\'S OKAY! COME SEE! IT\'S MISTER BAUER\'S HOUSE! I FOUND THE BEFORE!"' },
     ],
     instrument: {
       toolId: 'barometer', toolName: 'The Barometer',
@@ -538,7 +541,8 @@ export const MILESTONES: Milestone[] = [
     title: 'Riding It Out Together',
     first: 'The season\'s last storm is ridden, start to finish, with every tool on the belt.',
     opening: [
-      { art: '/story/act4/28_workshop.jpg', kind: 'narration', text: 'Behind the waterfall: a cave the size of a chapel, dry as a kept promise. A cot. A workbench. Tools worn to the shape of one man\'s hands. Shelf after shelf of carved driftwood — practice arms, test legs, knot-eyes in rows like a choir. And the youngest, wrapped in an old oilskin coat, safe by a fire pit that was laid ready — laid YEARS ago — with dry wood that only needed a spark.' },
+      { art: '/story/act4/28_workshop.jpg', when: { flag: 'composition', is: 'family' }, kind: 'narration', text: 'Behind the waterfall: a cave the size of a chapel, dry as a kept promise. A cot. A workbench. Tools worn to the shape of one man\'s hands. Shelf after shelf of carved driftwood — practice arms, test legs, knot-eyes in rows like a choir. And the youngest, wrapped in an old oilskin coat, safe by a fire pit that was laid ready — laid YEARS ago — with dry wood that only needed a spark.' },
+      { art: '/story/act4/28_workshop.jpg', when: { flag: 'composition', is: 'couple' }, kind: 'narration', text: 'Behind the waterfall: a cave the size of a chapel, dry as a kept promise. A cot. A workbench. Tools worn to the shape of one man\'s hands. Shelf after shelf of carved driftwood — practice arms, test legs, knot-eyes in rows like a choir. And Skip, wrapped in an old oilskin coat three sizes too big, safe by a fire pit that was laid ready — laid YEARS ago — with dry wood he was too shaken to spark. "I wasn\'t running away," he says the second he sees you. "I was running TO. There\'s a difference. He taught me the difference."' },
       { kind: 'narration', text: 'On the workbench wall, burned into a plank in a steady hand, the words the family has been living without knowing it: A FAMILY THAT LOVES TOGETHER. A FAMILY THAT WORKS TOGETHER. A FAMILY THAT SURVIVES TOGETHER. And beneath the plank, a photograph — the same four sun-squinting faces from the tackle box. And beside it, a ledger, and the ledger tells the whole story to whoever reads page one.' },
       { kind: 'robot', who: 'hollow', text: '(from the cave mouth — the whole Jumble crowding behind him, and none of them surprised) …So. You found the Before. (he steps in, and for once the tall quiet one talks long) His name was Bauer. He wrecked here first — years before any of you — with everything he loved already lost to him back on the mainland. A family that came apart in the ordinary way: too busy, too proud, too late. He built US from the storm-wood. One of us for each of them. He taught us fire and the spiral and the oils and the games — every lesson he wished he\'d taught THEM. And when he\'d built us whole, he sailed home to try again with the living. He came back every season after. Tours, he called them. Families, he brought. YOURS was the twelfth.' },
       { kind: 'robot', who: 'skip', text: '(very small) The signal fire is his. We keep it lit-ready so he can always find the way back in. He made me LAST. Out of the leftover pieces. He said— (the wooden-crack voice) —he said the smallest scraps hold the most love per splinter, because you have to choose every single one.' },
@@ -575,7 +579,7 @@ export const MILESTONES: Milestone[] = [
     title: 'The Load Test',
     first: 'Before launch: the raft carries the HEAVIEST cargo once, on purpose, in the shallows.',
     opening: [
-      { kind: 'narration', text: 'Trial two, and the Collier is merciless the way only love gets: THE LOAD TEST. The raft goes in the cove water, and then the family goes ON it — all of them at once, then in every combination, while the Jumble watches from the rocks with clipboards. (Bailer has an actual clipboard. Nobody knows where he got a clipboard.)' },
+      { kind: 'narration', text: 'Trial two, and the Collier is merciless the way only love gets: THE LOAD TEST. The raft goes in the cove water, and then the family goes ON it — all of them at once, then in every combination, while the Jumble watches from the rocks with clipboards. (Bailer has an actual clipboard. Nobody knows where she got a clipboard.)' },
       { kind: 'robot', who: 'bailer', text: 'A raft that holds ONE of you is driftwood. A raft that holds ALL of you is a VESSEL. We test where it flexes when the weight shifts — because weight ALWAYS shifts. Someone gets sick. Someone gets sad. Someone gets a promotion in a city far away, hypothetically. The lashings that hold are the ones you tied TOGETHER. Shift the load. Again. AGAIN.' },
       { kind: 'robot', who: 'echo2', text: '(as the family scrambles, laughing, re-balancing) …Notice what you\'re doing without being told: calling the shift OUT LOUD before you move. "Coming to your side." "Take my corner." That\'s the whole test. The raft was never being tested.' },
       { kind: 'narration', text: 'By sundown the vessel holds every combination — even the silly ones, even everyone-on-one-corner while Skip shrieks about physics. It holds. The family knew it would. That\'s new, that knowing. That\'s the trial passed.' },
@@ -593,7 +597,7 @@ export const MILESTONES: Milestone[] = [
     first: 'Each member writes to the family a year out — sealed, launched, trusted to the tide.',
     opening: [
       { kind: 'narration', text: 'Trial three is not a trial, the Jumble admits — it\'s a FEAST, the biggest the village has thrown since the Before: the acceptance feast, fires doubled, the volley ball retrieved from its tree, the game box open, every small thing on the long table. And at the head of the table, one empty chair with an oilskin coat over it, because this village knows how to hold a feast and a missing person in the same heart.' },
-      { kind: 'robot', who: 'skip', text: 'Trial three is the letters. Everyone writes one — that\'s the rule from HIS book. To someone who isn\'t here, or someone who is, or someone you were. The sea delivers. It always has. (he pats the youngest\'s shoulder with his spliced hand) You can dictate. I write very fast and only some letters backward.' },
+      { kind: 'robot', who: 'skip', text: 'Trial three is the letters. Everyone writes one — that\'s the rule from HIS book. To someone who isn\'t here, or someone who is, or someone you were. The sea delivers. It always has. (he pats the nearest shoulder with his spliced hand) You can dictate. I write very fast and only some letters backward.' },
       { kind: 'choice', id: 's5_letter', prompt: 'The feast quiets. The bottles wait. Who does your family write to?',
         options: [
           { id: 'bauer', label: 'To Mr. Bauer — the thank-you he sailed away before hearing' },
@@ -639,7 +643,7 @@ export const MILESTONES: Milestone[] = [
           { id: 'together', label: 'THE TOGETHER — the island\'s one law, made a vessel' },
           { id: 'skip', label: 'THE SKIP — the smallest scraps hold the most love per splinter' },
         ] },
-      { kind: 'narration', when: { flag: 's5_boat_name', is: 'bauer' }, text: 'THE MR. BAUER, painted along the hull in the youngest\'s best letters. The Collier has to oil something that isn\'t squeaking. Twice.' },
+      { kind: 'narration', when: { flag: 's5_boat_name', is: 'bauer' }, text: 'THE MR. BAUER, painted along the hull in somebody\'s very best letters. The Collier has to oil something that isn\'t squeaking. Twice.' },
       { kind: 'narration', when: { flag: 's5_boat_name', is: 'together' }, text: 'THE TOGETHER, painted along the hull — the law made a vessel. Echo-2 repeats the name back exactly as spoken, which she has never once done, because there was no kinder way to say it.' },
       { kind: 'narration', when: { flag: 's5_boat_name', is: 'skip' }, text: 'THE SKIP. The little robot reads his own name on a hull built from a family\'s survived things, and sits down right there on the sand, and the whole village pretends not to notice the smallest scrap of the Jumble holding his spliced hand over his knot-eyes.' },
       { kind: 'narration', text: 'The rescue boat anchors off the cove. And at the water\'s edge, Skip presses something into the family\'s hands: the compass. Polished. The needle swings once, twice — and settles, pointing not at the island, not at the boat, but square at the middle of the family standing together on the sand. "He fixed it years ago," Skip says. "It never pointed north. It points HOME. That\'s why it kept pointing at the village — and look what it points at now." The family that boards the boat is not the family that fell off one. Behind them the signal fire burns tall — lit-ready, always, for whoever wrecks next. A family that loves together. A family that works together. A family that survives together. THE END — and the beginning, which is the same thing, on this island.' },

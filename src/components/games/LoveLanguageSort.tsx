@@ -70,7 +70,7 @@ export default function LoveLanguageSort({ onClose }: { onClose: () => void }) {
           <div className="max-w-sm mx-auto w-full text-center flex flex-col gap-4">
             <p className="text-white/90 text-sm font-bold">Which fills your tank the most?</p>
             <p className="text-[11px] text-white/70 italic leading-relaxed">
-              Each of you picks the one way you most feel loved — then guesses the other's before it's revealed. Most people love in the language THEY speak; this shows you your partner's. No score — just the map.
+              Each of you picks the one way you most feel loved — then guesses the other's before it's revealed. Most people love in the language THEY speak; this shows you theirs. No score — just the map.
             </p>
             <button onClick={() => setPhase('sortA')} className="bg-gradient-to-r from-fuchsia-500 to-amber-500 text-white font-black rounded-xl py-3 text-sm">Start · {a} picks first →</button>
           </div>

@@ -32,7 +32,7 @@ const UNDERS = [
 const GATE = 18; // the Deep Water law — same sill as the Fire Quiz's deepest tier
 
 const CARE =
-  'This one goes under the surface — the moves you each make when it gets hard, and the softer thing underneath them. No blame lives here: the cycle is the enemy, never your partner. If tonight is not the night, close this and lay easier logs; the undertow will still be here when you are ready.';
+  'This one goes under the surface — the moves you each make when it gets hard, and the softer thing underneath them. No blame lives here: the cycle is the enemy, never each other. If tonight is not the night, close this and lay easier logs; the undertow will still be here when you are ready.';
 
 export default function NamingTheUndertow({ onClose }: { onClose: () => void }) {
   const me = activeCastaway();

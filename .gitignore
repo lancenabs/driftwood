@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# transient co-op camp relay state (per-session test + runtime artifacts)
+store/gatherings/

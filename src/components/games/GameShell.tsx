@@ -1,6 +1,7 @@
 import React from 'react';
 import { appendEvent } from '../../lib/world';
 import { activeCastaway } from '../../lib/castaways';
+import { partnerWord } from '../../lib/voice';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  GAME SHELL — the shared chrome every reconnection mini-game plugs into
@@ -16,12 +17,17 @@ export function feedTogether(game: string, payload: Record<string, unknown> = {}
   appendEvent(me.id, 'fire_quiz_played', { game, ...payload });
 }
 export function partnerName(fallback = 'Partner') {
-  // the other claimed castaway, or a gentle default (couple mode, one device)
+  // The other claimed human castaway by NAME (the most inclusive address there
+  // is). One device / no second castaway falls back to the family's chosen
+  // relationship words ("your wife" / "your husband" / "your partner"), never
+  // a bare "Partner" unless nothing was chosen (2026-07-12 inclusivity law).
   try {
     const crew = JSON.parse(localStorage.getItem('driftwood_castaways_v1') || '[]');
     const me = activeCastaway();
-    const other = crew.find((c: any) => c.slotId !== me.id);
-    return other?.name || fallback;
+    const other = crew.find((c: any) => c.slotId !== me.id && c.kind !== 'ai');
+    if (other?.name) return other.name;
+    const word = partnerWord(me.name);
+    return word === 'your person' ? fallback : word;
   } catch { return fallback; }
 }
 

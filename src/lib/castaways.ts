@@ -28,10 +28,19 @@ export interface ClaimedCastaway {
   name: string;               // first name / nickname — optional PHI-light
   claimedAt: string;
   kind: 'human' | 'ai';       // the honest roster
+  // THE INCLUSIVITY MODEL (2026-07-12): the crew composes itself; the app
+  // never asks what kind of family this is. `age` is the one quiet toggle
+  // (it powers the couple/family story framing AND the kid-safe register);
+  // `tint` is a chosen skin tone for the island avatar; `avatarKind` the
+  // chosen mesh. All optional, all theirs.
+  age?: 'adult' | 'young';
+  tint?: string;              // hex — pre-seeds the 3D avatar's skin tone
+  avatarKind?: string;        // island mesh id (driftwood_avatar_v1 mirrors it)
 }
 
 const KEY = 'driftwood_castaways_v1';
 const ACTIVE_KEY = 'driftwood_active_castaway_v1';
+const REL_KEY = 'driftwood_relationship_v1';
 
 export function readCrew(): ClaimedCastaway[] {
   try {
@@ -40,11 +49,46 @@ export function readCrew(): ClaimedCastaway[] {
   } catch { return []; }
 }
 
-export function claimSlot(slotId: string, name: string): ClaimedCastaway[] {
+export function claimSlot(slotId: string, name: string, extra?: Pick<ClaimedCastaway, 'age' | 'tint' | 'avatarKind'>): ClaimedCastaway[] {
   const crew = readCrew().filter(c => c.slotId !== slotId);
-  crew.push({ slotId, name: name.trim() || 'Castaway', claimedAt: new Date().toISOString(), kind: 'human' });
+  crew.push({ slotId, name: name.trim() || 'Castaway', claimedAt: new Date().toISOString(), kind: 'human', age: extra?.age ?? 'adult', ...(extra?.tint ? { tint: extra.tint } : {}), ...(extra?.avatarKind ? { avatarKind: extra.avatarKind } : {}) });
   localStorage.setItem(KEY, JSON.stringify(crew));
   return crew;
+}
+
+// ── THE FRAMING (the bible's promised field, real at last) ──────────────────
+// 'couple' iff exactly two claimed humans, both adults; every other shape —
+// kids present, three generations, a crew of adults — is 'family'. Derived,
+// never asked; a low-key mirror of who actually boarded.
+export function composition(): 'couple' | 'family' {
+  const humans = readCrew().filter(c => c.kind === 'human');
+  return humans.length === 2 && humans.every(c => (c.age ?? 'adult') === 'adult') ? 'couple' : 'family';
+}
+
+/** The kid-safe register signal: any young castaway aboard. */
+export function hasYoungCastaways(): boolean {
+  return readCrew().some(c => c.kind === 'human' && c.age === 'young');
+}
+
+/** The youngest claimed young castaway's name — null means the story's
+ *  child-shaped role belongs to Skip (couple mode, the little one himself). */
+export function youngestName(): string | null {
+  const young = readCrew().filter(c => c.kind === 'human' && c.age === 'young');
+  return young.length ? young[young.length - 1].name : null;
+}
+
+// ── THE RELATIONSHIP LANGUAGE (asked once, warmly: "how should the island
+// speak about you?") — a words choice, not a category. Default: names only.
+export type RelationshipLabel = 'husbands' | 'wives' | 'husband-wife' | 'partners' | 'names-only';
+export function readRelationship(): RelationshipLabel {
+  try {
+    const r = JSON.parse(localStorage.getItem(REL_KEY) || 'null');
+    if (r?.label) return r.label;
+  } catch { /* names */ }
+  return 'names-only';
+}
+export function writeRelationship(label: RelationshipLabel) {
+  try { localStorage.setItem(REL_KEY, JSON.stringify({ label })); } catch { /* best-effort */ }
 }
 
 /** The unclaimed slots, as the honest AI roster (the Washed-Ashore lend hands). */

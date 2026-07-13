@@ -5,7 +5,7 @@ import { CRAFT } from '../data/milestoneCraft';
 import { TOOL_COMPLETION, readSaveSignature } from '../lance/components/LANCEGame/challengeCompletion';
 import { appendEvent } from '../lib/world';
 import { driftBell, tideCreak, emberPop } from '../lib/shoreSounds';
-import { activeCastaway, readCrew } from '../lib/castaways';
+import { activeCastaway, readCrew, composition } from '../lib/castaways';
 import { useGame } from '../lance/components/LANCEGame/LANCEGameContext';
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -267,7 +267,11 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
   // ── Beat renderer ──────────────────────────────────────────────────────────
   const Beats = ({ beats, onDone, doneLabel }: { beats: Beat[]; onDone: () => void; doneLabel: string }) => {
     const [flags, setFlags] = React.useState(() => readStoryChoices());
-    const activeBeats = beats.filter(b => !b.when || flags[b.when.flag] === b.when.is);
+    // THE FRAMING FLAG (inclusivity law, 2026-07-12): `composition` is a
+    // virtual story flag derived from who actually boarded — couple beats and
+    // family beats branch on it exactly like any authored choice.
+    const allFlags: Record<string, string> = { ...flags, composition: composition() };
+    const activeBeats = beats.filter(b => !b.when || allFlags[b.when.flag] === b.when.is);
     const visible = activeBeats.slice(0, beatIdx + 1);
     const atEnd = beatIdx >= activeBeats.length - 1;
     const current = visible[visible.length - 1];

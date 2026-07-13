@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, Zap, Heart, SkipForward, Plus, Check } from 'lucide-react';
-import { THE_SEVEN, claimSlot, setActiveCastaway, readCrew } from '../lib/castaways';
+import { THE_SEVEN, claimSlot, setActiveCastaway, readCrew, writeRelationship } from '../lib/castaways';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE BOARDING — Driftwood's opening, on the L.A.N.C.E. onboarding template
@@ -168,23 +168,31 @@ function SceneBackdrop({ video, art }: { video: string; art?: string }) {
   );
 }
 
-type Phase = 'splash' | 'cinematic' | 'crew' | 'mode';
-interface Member { slotId: string; name: string }
+type Phase = 'splash' | 'cinematic' | 'crew' | 'language' | 'mode';
+interface Member { slotId: string; name: string; age: 'adult' | 'young'; tint?: string }
+
+// Skin tones for the island avatar — chosen per member, never asked in words.
+// The first chip is "island light" (no tint: the mesh's own material).
+const SKIN_TONES = ['#F6D7C4', '#E8B98F', '#C98E5A', '#A26B3F', '#7A4B2A', '#4A2F20'];
 
 export default function BoardingStory({ onStart }: { onStart: () => void }) {
   const [phase, setPhase] = useState<Phase>('splash');
   const [beat, setBeat] = useState(0);
-  const [members, setMembers] = useState<Member[]>([{ slotId: THE_SEVEN[0].id, name: '' }]);
+  const [members, setMembers] = useState<Member[]>([{ slotId: THE_SEVEN[0].id, name: '', age: 'adult' }]);
 
-  const phaseIndex: Record<Phase, number> = { splash: 0, cinematic: 1, crew: 2, mode: 3 };
-  const totalDots = 4;
+  const phaseIndex: Record<Phase, number> = { splash: 0, cinematic: 1, crew: 2, language: 3, mode: 4 };
+  const totalDots = 5;
 
   const claimAll = () => {
     const named = members.filter(m => m.name.trim());
-    for (const m of named) claimSlot(m.slotId, m.name.trim());
+    for (const m of named) claimSlot(m.slotId, m.name.trim(), { age: m.age, tint: m.tint });
     if (named.length) setActiveCastaway(named[0].slotId);
     else if (!readCrew().length) { claimSlot(THE_SEVEN[0].id, 'Castaway'); setActiveCastaway(THE_SEVEN[0].id); }
   };
+  // the language step only exists where relationship words could apply:
+  // two or more named adults (a couple, or the couple inside a family)
+  const adultsNamed = members.filter(m => m.name.trim() && m.age === 'adult').length;
+  const afterCrew = () => { claimAll(); setPhase(adultsNamed >= 2 ? 'language' : 'mode'); };
   const finish = (mode: 'checkin' | 'story') => {
     try { localStorage.setItem('driftwood_mode', mode); } catch { /* choice still applies this session */ }
     onStart();
@@ -206,7 +214,7 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
           ))}
         </div>
         {phase !== 'mode' && (
-          <button onClick={() => setPhase(phase === 'crew' ? 'mode' : 'crew')}
+          <button onClick={() => setPhase(phase === 'crew' || phase === 'language' ? 'mode' : 'crew')}
             className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-white/50 cursor-pointer">
             <SkipForward className="w-3 h-3" /> skip
           </button>
@@ -268,10 +276,32 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
                           placeholder={i === 0 ? 'First name (you)' : 'First name'}
                           maxLength={24}
                           className="flex-1 px-3 py-2.5 rounded-xl bg-white/10 border border-white/20 text-sm font-bold text-white placeholder:text-white/35 focus:outline-none focus:border-amber-300" />
+                        {/* the one quiet toggle — it frames the story and keeps
+                            the register kid-safe; never a bigger question */}
+                        <div className="flex rounded-xl border border-white/20 overflow-hidden shrink-0" data-testid={`age-toggle-${i}`}>
+                          <button onClick={() => setMembers(ms => ms.map((x, j) => j === i ? { ...x, age: 'adult' } : x))}
+                            title="Adult castaway"
+                            className={`px-2.5 text-sm cursor-pointer ${m.age === 'adult' ? 'bg-amber-300/25' : 'bg-white/5 opacity-50'}`}>🧑</button>
+                          <button onClick={() => setMembers(ms => ms.map((x, j) => j === i ? { ...x, age: 'young' } : x))}
+                            title="Young castaway"
+                            className={`px-2.5 text-sm cursor-pointer ${m.age === 'young' ? 'bg-amber-300/25' : 'bg-white/5 opacity-50'}`}>🧒</button>
+                        </div>
                         {members.length > 1 && (
                           <button onClick={() => setMembers(ms => ms.filter((_, j) => j !== i))}
                             className="px-3 rounded-xl text-white/40 text-xs font-black cursor-pointer">✕</button>
                         )}
+                      </div>
+                      {/* skin tone for the island avatar — a look you pick,
+                          never a question you answer. Optional. */}
+                      <div className="flex items-center gap-1.5" data-testid={`tone-row-${i}`}>
+                        <span className="text-[8px] font-black uppercase tracking-widest text-white/40 mr-0.5">island look</span>
+                        {SKIN_TONES.map(t => (
+                          <button key={t}
+                            onClick={() => setMembers(ms => ms.map((x, j) => j === i ? { ...x, tint: x.tint === t ? undefined : t } : x))}
+                            title="Skin tone for your island avatar"
+                            className="w-5 h-5 rounded-full cursor-pointer transition-transform"
+                            style={{ background: t, border: m.tint === t ? '2px solid #FCD34D' : '2px solid rgba(255,255,255,0.25)', transform: m.tint === t ? 'scale(1.2)' : 'none' }} />
+                        ))}
                       </div>
                       <div className="flex gap-1.5 overflow-x-auto pb-1">
                         {THE_SEVEN.map(s => {
@@ -295,19 +325,55 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
                 {members.length < THE_SEVEN.length && (
                   <button onClick={() => {
                     const free = THE_SEVEN.find(s => !usedSlots.has(s.id));
-                    if (free) setMembers(ms => [...ms, { slotId: free.id, name: '' }]);
+                    if (free) setMembers(ms => [...ms, { slotId: free.id, name: '', age: 'adult' }]);
                   }}
                     className="w-full py-2.5 rounded-xl border border-dashed border-white/25 text-[11px] font-black text-white/60 flex items-center justify-center gap-1.5 cursor-pointer">
                     <Plus className="w-3.5 h-3.5" /> Add a family member
                   </button>
                 )}
                 <motion.button whileTap={{ scale: 0.97 }}
-                  onClick={() => { claimAll(); setPhase('mode'); }}
+                  onClick={afterCrew}
                   disabled={!members.some(m => m.name.trim())}
                   className="w-full py-4 rounded-2xl font-black text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40"
                   style={{ background: 'linear-gradient(135deg,#0E7C7C,#2E96B5)', boxShadow: '0 4px 28px rgba(14,124,124,0.45)' }}>
                   <Check className="w-4 h-4" /> Make landfall
                 </motion.button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── THE WORDS — how the island speaks about you (a language choice,
+              chosen once, changeable in Settings; never a category) ── */}
+          {phase === 'language' && (
+            <motion.div key="language" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              style={{ background: 'rgba(8,14,12,0.97)', backdropFilter: 'blur(24px)', borderTop: '2px solid rgba(242,166,90,0.35)' }}>
+              <div style={{ height: 2, background: 'linear-gradient(90deg,transparent,#F2A65ABB,transparent)' }} />
+              <div className="px-5 pt-4 pb-8 space-y-3">
+                <div className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-200/60">THE ISLAND LEARNS YOUR WORDS</div>
+                <h2 className="text-lg font-black text-white">How should the island speak about you?</h2>
+                <p className="text-[11px] text-white/60 leading-relaxed">
+                  The robots will use whichever words are yours. This only changes language — nothing else.
+                </p>
+                <div className="grid grid-cols-1 gap-2" data-testid="language-choices">
+                  {([
+                    { label: 'husbands' as const,     line: 'Husbands',        sub: '"…and tell your husband what you noticed."' },
+                    { label: 'wives' as const,        line: 'Wives',           sub: '"…and tell your wife what you noticed."' },
+                    { label: 'husband-wife' as const, line: 'Husband & wife',  sub: 'the island uses each of your words for the other' },
+                    { label: 'partners' as const,     line: 'Partners',        sub: '"…and tell your partner what you noticed."' },
+                    { label: 'names-only' as const,   line: 'Just our names',  sub: 'the island only ever calls you by name' },
+                  ]).map(opt => (
+                    <button key={opt.label}
+                      onClick={() => { writeRelationship(opt.label); setPhase('mode'); }}
+                      className="w-full text-left rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 px-4 py-3 cursor-pointer transition-colors">
+                      <div className="text-sm font-black text-white">{opt.line}</div>
+                      <div className="text-[10px] text-white/50 italic mt-0.5">{opt.sub}</div>
+                    </button>
+                  ))}
+                </div>
+                <button onClick={() => { writeRelationship('names-only'); setPhase('mode'); }}
+                  className="w-full text-center text-[10px] font-bold text-white/40 py-1 cursor-pointer">
+                  Skip — names are enough
+                </button>
               </div>
             </motion.div>
           )}

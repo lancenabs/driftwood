@@ -19,6 +19,7 @@ import {
   Play
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { composition } from '../lib/castaways';
 
 // Static Data for EFT Mapper Wizard
 const COMMON_TRIGGERS = [
@@ -223,7 +224,12 @@ export default function EftCycleMapper({ onBack }: { onBack?: () => void }) {
             </div>
 
             <p className="font-sans text-[11px] leading-relaxed text-on-surface-variant">
-              In Emotionally Focused Therapy (EFT), relationship distress is seen as an **interactive dance**. Surface arguments (such as chores, money, or tone) trigger deep **attachment vulnerabilities**. When we lash out (pursue) or stay quiet (withdraw), we accidentally trigger our partner’s core fears, fueling an endless feedback loop.
+              In Emotionally Focused Therapy (EFT), the distress in any close bond is seen as an **interactive dance**. Surface arguments (such as chores, money, or tone) trigger deep **attachment vulnerabilities**. When we lash out (pursue) or stay quiet (withdraw), we accidentally trigger the other person’s core fears, fueling an endless feedback loop.
+            </p>
+            <p className="font-sans text-[10px] leading-relaxed text-on-surface-variant/80 italic">
+              {composition() === 'couple'
+                ? 'Chart the cycle between the two of you — the enemy is the pattern, never each other.'
+                : 'Chart the cycle between any two people in the family — partners, a parent and a child, two siblings. The enemy is the pattern, never each other.'}
             </p>
 
             <button
