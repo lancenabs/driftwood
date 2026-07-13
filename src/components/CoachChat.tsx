@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import LiquidOrb from './LiquidOrb';
 import { 
   MessageSquare, 
   Send, 
@@ -246,9 +247,11 @@ Ask me about communication blocks, repair scripts, attachment styles, or how to 
         <div className="absolute right-0 top-0 w-32 h-32 bg-[#FF6EA7]/10 rounded-full blur-2xl pointer-events-none"></div>
 
         <div className="flex items-center gap-3 relative">
-          <img src="/robots/echo2.webp" alt="Echo-2, the listening robot"
-            className="w-10 h-10 rounded-2xl object-cover shadow-md border border-white/20"
-            onError={e => { const el = e.target as HTMLImageElement; el.outerHTML = '<div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#FF6EA7] to-secondary flex items-center justify-center text-xl shadow-md">💬</div>'; }} />
+          {/* The guide's face — the ecosystem's shared orb, in Driftwood's warm-wood
+              alloy. It churns while the coach is thinking. */}
+          <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-md border border-white/20 grid place-items-center bg-[#2a1a0e]">
+            <LiquidOrb size={40} tint="wood" busy={isLoading} />
+          </div>
           <div>
             <span className="text-[8px] font-black uppercase tracking-widest text-[#FF6EA7]">Evidence-Based Advisory</span>
             <h4 className="font-display font-black text-sm text-white leading-tight mt-0.5">Clinical CoachChat</h4>
