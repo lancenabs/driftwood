@@ -320,6 +320,75 @@ for (const r of JUMBLE) {
   scene.add(g);
   robots.push(g);
 }
+
+// ── DRIFTWOOD CITY — the wooden district, stood on ──────────────────────────
+// The 27 places the robots built (the SAME data as the app island + the raised
+// board): one walkable district of driftwood signposts, clustered by region in
+// a ring around the island. Reads /city/driftwood-city.json (same origin,
+// generated from src/data/driftwoodCity.ts) — board · app · headset never drift.
+function cityPlaque(glyph, name, hex, mystery) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 236;
+  const g = c.getContext('2d');
+  g.fillStyle = '#f4ecd8'; g.strokeStyle = hex; g.lineWidth = 12;
+  g.beginPath(); g.roundRect(10, 10, 492, 216, 26); g.fill(); g.stroke();
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = '96px sans-serif'; g.fillText(glyph, 256, 76);
+  g.fillStyle = '#4a3520'; g.font = '800 40px sans-serif';
+  const words = name.split(' '); let line = '', lines = [];
+  for (const w of words) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > 440 && line) { lines.push(line); line = w; } else line = t; }
+  lines.push(line);
+  const yy = lines.length > 1 ? 150 : 166;
+  lines.slice(0, 2).forEach((ln, i) => g.fillText(ln, 256, yy + i * 42));
+  if (mystery) { g.fillStyle = hex; g.font = '700 22px sans-serif'; g.fillText('· a little mystery ·', 256, 214); }
+  return new THREE.CanvasTexture(c);
+}
+function citySign(glyph, name, hex, mystery, x, z, faceY) {
+  const gy = groundY(x, z);
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.11, 1.8, 6), mat(0x8a6a48));
+  post.position.set(x, gy + 0.9, z);
+  const plaque = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.2),
+    new THREE.MeshBasicMaterial({ map: cityPlaque(glyph, name, hex, mystery), transparent: true, alphaTest: 0.02, side: THREE.DoubleSide }));
+  plaque.position.set(x, gy + 2.05, z);
+  plaque.rotation.y = faceY;
+  scene.add(post, plaque);
+}
+fetch('/city/driftwood-city.json').then(r => r.json()).then(data => {
+  const regions = data.regions;
+  const RING = 70;                                  // district ring radius (island_r 110)
+  regions.forEach((region, ri) => {
+    const th = (ri / regions.length) * Math.PI * 2;
+    const cx = Math.cos(th) * RING, cz = Math.sin(th) * RING;
+    const faceCenter = Math.atan2(-cx, -cz);        // plaques face the island's heart
+    const places = data.places.filter(p => p.region === region.id);
+    // a small wooden sign-plateau marker at the cluster heart
+    const heart = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.3, 0.4, 16),
+      new THREE.MeshLambertMaterial({ color: new THREE.Color(region.color) }));
+    heart.position.set(cx, groundY(cx, cz) + 0.2, cz); scene.add(heart);
+    places.forEach((p, pi) => {
+      const off = (pi - (places.length - 1) / 2) * 4.2;   // fan perpendicular to the radius
+      const px = cx + Math.cos(th + Math.PI / 2) * off;
+      const pz = cz + Math.sin(th + Math.PI / 2) * off;
+      citySign(p.glyph, p.name, region.color, p.mystery, px, pz, faceCenter);
+    });
+  });
+  // The grand gateway sign, tall, at the island's near shore
+  const gx = 0, gz = 92, ggy = groundY(gx, gz);
+  const gc = document.createElement('canvas'); gc.width = 640; gc.height = 200;
+  const gg = gc.getContext('2d');
+  gg.fillStyle = '#7a4f22'; gg.beginPath(); gg.roundRect(6, 6, 628, 188, 24); gg.fill();
+  gg.fillStyle = '#ffe9b0'; gg.textAlign = 'center'; gg.textBaseline = 'middle';
+  gg.font = '700 64px Georgia, serif'; gg.fillText('DRIFTWOOD CITY', 320, 78);
+  gg.fillStyle = '#e8cf9a'; gg.font = '600 30px sans-serif';
+  gg.fillText(`${data.stats.places} places · ${data.stats.regions} regions · somewhere for everyone`, 320, 146);
+  const gsign = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 2.25),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(gc), transparent: true, side: THREE.DoubleSide }));
+  gsign.position.set(gx, ggy + 3.4, gz);
+  const gpostL = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 4.6, 8), mat(0x8a6a48));
+  const gpostR = gpostL.clone();
+  gpostL.position.set(gx - 3.1, ggy + 2.3, gz); gpostR.position.set(gx + 3.1, ggy + 2.3, gz);
+  scene.add(gsign, gpostL, gpostR);
+}).catch(() => { /* the island stands with or without the district JSON */ });
+
 // proximity speech — walk up to a robot and it speaks (a plank over its head)
 const say = document.getElementById('say');
 const lastSpoke = {};
