@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Driftwood City — the board, raised</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #10161a; overflow: hidden; font-family: -apple-system, system-ui, sans-serif; }
+  #hud { position: fixed; top: 12px; left: 12px; color: #f3e7d3; font-size: 12px; z-index: 5; line-height: 1.55;
+         background: rgba(30,20,10,.55); padding: 9px 12px; border-radius: 12px; backdrop-filter: blur(6px); max-width: 320px; }
+  #hud b { font-family: Georgia, serif; letter-spacing: 2px; color: #ffdca0; }
+  #controls { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 6; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  #controls button { background: rgba(40,26,14,.78); color: #f3e7d3; border: 1px solid rgba(184,128,74,.45);
+                     padding: 10px 16px; border-radius: 999px; font-weight: 800; font-size: 12px; cursor: pointer; backdrop-filter: blur(6px); }
+  #controls button.primary { background: rgba(184,128,74,.92); color: #241206; border-color: transparent; }
+</style>
+</head>
+<body>
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     DRIFTWOOD CITY — the raised board (marketing asset + MR piece).
+     The wooden supersystem the Driftwood robots built, as a photographable
+     tabletop object: the island rises from the sea, seven region plateaus ring
+     it, and all 27 places stand as little wooden posts you can read and orbit.
+
+     ONE SOURCE OF TRUTH: it fetches /city/driftwood-city.json, generated from
+     driftwood-app/src/data/driftwoodCity.ts — the SAME data the app island and
+     the VR island read, so the board can never drift from the world.
+
+     TWO JOBS, ONE OBJECT:
+     · PHOTO MODE (any browser): orbit + backdrops + 📸 hi-res PNG (incl. a
+       transparent one for compositing into any ad).
+     · MR MODE (Quest 3): START AR sets the city on your REAL table at tabletop
+       scale — photograph it standing in your actual room.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div id="hud"><b>DRIFTWOOD CITY</b><br/>
+  <span id="mode">drag to orbit · scroll to zoom</span><br/>
+  <span id="sub" style="color:#c8b190">a little wooden city the robots built</span></div>
+<div id="controls">
+  <button id="backdrop">🎨 backdrop</button>
+  <button id="shot" class="primary">📸 photo (PNG)</button>
+  <button id="shotAlpha">📸 transparent</button>
+  <button id="spin">🎡 spin</button>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.134.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { ARButton } from 'three/addons/webxr/ARButton.js';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.02, 60);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setClearColor(0x10161a, 1);
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.xr.enabled = true;
+document.body.appendChild(renderer.domElement);
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+// Warm studio light — the whole city is carved wood, so light it like wood
+scene.add(new THREE.HemisphereLight(0xffe9c8, 0x33240f, 0.7));
+const key = new THREE.DirectionalLight(0xfff1d6, 0.9); key.position.set(2.5, 4, 2); scene.add(key);
+const rim = new THREE.DirectionalLight(0x8fd0ff, 0.35); rim.position.set(-3, 2, -2.5); scene.add(rim);
+
+const board = new THREE.Group();
+scene.add(board);
+const billboards = [];   // labels that always face the camera
+
+// The sea plinth + the wooden island the city stands on
+const sea = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.42, 0.44, 0.022, 64),
+  new THREE.MeshPhysicalMaterial({ color: 0x0e7d8a, roughness: 0.12, metalness: 0.1, clearcoat: 1, clearcoatRoughness: 0.15 })
+);
+sea.position.y = 0.011; board.add(sea);
+const island = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.345, 0.39, 0.032, 48),
+  new THREE.MeshStandardMaterial({ color: 0xb8894f, roughness: 0.95 })
+);
+island.position.y = 0.038; board.add(island);
+
+// A rounded-plaque label texture (glyph + name) tinted to the region
+function plaque(glyph, name, hex) {
+  const cv = document.createElement('canvas'); cv.width = 320; cv.height = 160;
+  const g = cv.getContext('2d');
+  g.fillStyle = 'rgba(28,18,8,0.0)'; g.fillRect(0, 0, 320, 160);
+  // wooden card
+  g.fillStyle = '#f4ecd8'; g.strokeStyle = hex; g.lineWidth = 8;
+  g.beginPath(); g.roundRect(10, 10, 300, 140, 22); g.fill(); g.stroke();
+  g.font = '64px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(glyph, 160, 62);
+  g.fillStyle = '#4a3520'; g.font = '800 30px system-ui';
+  // wrap the name to two lines if needed
+  const words = name.split(' '); let line = '', lines = [];
+  for (const w of words) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > 280 && line) { lines.push(line); line = w; } else line = t; }
+  lines.push(line);
+  const yy = lines.length > 1 ? 108 : 118;
+  lines.slice(0, 2).forEach((ln, i) => g.fillText(ln, 160, yy + i * 30));
+  const tex = new THREE.CanvasTexture(cv); tex.anisotropy = 4; return tex;
+}
+
+// Build one place: a wooden post + a billboarded plaque, plus a gem if it hides
+// a mystery. Returned so we can animate the mysteries' little glow.
+function makePlace(p, x, z, hex) {
+  const grp = new THREE.Group();
+  const post = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.006, 0.008, 0.05, 8),
+    new THREE.MeshStandardMaterial({ color: 0x7a4f22, roughness: 0.8 })
+  );
+  post.position.y = 0.025; grp.add(post);
+  const card = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.07, 0.035),
+    new THREE.MeshBasicMaterial({ map: plaque(p.glyph, p.name, hex), transparent: true, side: THREE.DoubleSide, alphaTest: 0.05 })
+  );
+  card.position.y = 0.07; grp.add(card); billboards.push(card);
+  if (p.mystery) {
+    const gem = new THREE.Mesh(
+      new THREE.OctahedronGeometry(0.008),
+      new THREE.MeshPhysicalMaterial({ color: 0xffd27a, emissive: 0x8a5a12, roughness: 0.2, clearcoat: 1 })
+    );
+    gem.position.y = 0.095; grp.add(gem); grp.userData.gem = gem;
+  }
+  grp.position.set(x, 0.054, z);
+  board.add(grp); return grp;
+}
+
+// A small region plateau tinted to its colour, with a wooden sign post
+function makeRegion(region, cx, cz) {
+  const disc = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.075, 0.08, 0.012, 24),
+    new THREE.MeshStandardMaterial({ color: new THREE.Color(region.color).multiplyScalar(0.9), roughness: 0.85 })
+  );
+  disc.position.set(cx, 0.05, cz); board.add(disc);
+}
+
+const gems = [];
+fetch('/city/driftwood-city.json').then(r => r.json()).then(data => {
+  document.getElementById('sub').textContent =
+    `${data.stats.places} places · ${data.stats.regions} regions · ${data.stats.mysteries} caves with mysteries`;
+  const regions = data.regions;
+  const R = 0.235;                         // ring radius for region centers
+  regions.forEach((region, ri) => {
+    const th = (ri / regions.length) * Math.PI * 2 - Math.PI / 2;
+    const cx = Math.cos(th) * R, cz = Math.sin(th) * R;
+    makeRegion(region, cx, cz);
+    const places = data.places.filter(p => p.region === region.id);
+    places.forEach((p, pi) => {
+      // fan the places out on the plateau, facing outward
+      const spread = (places.length - 1) * 0.03;
+      const off = -spread / 2 + pi * 0.03;
+      const ax = Math.cos(th) * (off * 0) + Math.cos(th + Math.PI / 2) * off;
+      const az = Math.sin(th) * (off * 0) + Math.sin(th + Math.PI / 2) * off;
+      const rr = 0.03 + (pi % 2) * 0.028;   // two rows so plaques don't overlap
+      const g = makePlace(p, cx + ax + Math.cos(th) * rr, cz + az + Math.sin(th) * rr, region.color);
+      if (g.userData.gem) gems.push(g.userData.gem);
+    });
+  });
+});
+
+// Central signpost: DRIFTWOOD CITY
+const signTex = (() => {
+  const cv = document.createElement('canvas'); cv.width = 512; cv.height = 128;
+  const g = cv.getContext('2d');
+  g.fillStyle = 'rgba(122,79,34,0.96)'; g.beginPath(); g.roundRect(2, 2, 508, 124, 20); g.fill();
+  g.fillStyle = '#ffe9b0'; g.font = '700 52px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('DRIFTWOOD CITY', 256, 66);
+  return new THREE.CanvasTexture(cv);
+})();
+const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.04),
+  new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
+sign.position.set(0, 0.11, 0); board.add(sign); billboards.push(sign);
+const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.09, 8),
+  new THREE.MeshStandardMaterial({ color: 0x7a4f22, roughness: 0.8 }));
+mast.position.set(0, 0.06, 0); board.add(mast);
+
+// ── Photo studio ─────────────────────────────────────────────────────────────
+board.position.set(0, -0.08, -0.85);
+let yaw = 0.6, pitch = 0.5, dist = 0.85, dragging = false, px = 0, py = 0;
+function frame() {
+  if (renderer.xr.isPresenting) return;
+  camera.position.set(
+    board.position.x + Math.sin(yaw) * Math.cos(pitch) * dist,
+    board.position.y + Math.sin(pitch) * dist + 0.08,
+    board.position.z + Math.cos(yaw) * Math.cos(pitch) * dist
+  );
+  camera.lookAt(board.position.x, board.position.y + 0.05, board.position.z);
+}
+addEventListener('pointerdown', e => { if (e.target.tagName !== 'BUTTON') { dragging = true; px = e.clientX; py = e.clientY; } });
+addEventListener('pointerup', () => dragging = false);
+addEventListener('pointermove', e => {
+  if (!dragging) return;
+  yaw += (e.clientX - px) * 0.006;
+  pitch = Math.max(0.08, Math.min(1.35, pitch + (e.clientY - py) * 0.004));
+  px = e.clientX; py = e.clientY;
+});
+addEventListener('wheel', e => { dist = Math.max(0.45, Math.min(2.2, dist + e.deltaY * 0.001)); });
+
+const BACKDROPS = [
+  { name: 'studio dark', c: 0x10161a }, { name: 'warm wood', c: 0x3a2614 },
+  { name: 'gallery gray', c: 0x2a2f33 }, { name: 'cream', c: 0xf4ecd8 },
+];
+let bd = 0;
+document.getElementById('backdrop').addEventListener('click', () => {
+  bd = (bd + 1) % BACKDROPS.length; renderer.setClearColor(BACKDROPS[bd].c, 1);
+});
+function savePNG(transparent) {
+  const prev = BACKDROPS[bd].c;
+  if (transparent) renderer.setClearColor(0x000000, 0);
+  renderer.render(scene, camera);
+  const a = document.createElement('a');
+  a.download = `driftwood-city-${transparent ? 'alpha-' : ''}${Date.now()}.png`;
+  a.href = renderer.domElement.toDataURL('image/png'); a.click();
+  if (transparent) renderer.setClearColor(prev, 1);
+}
+document.getElementById('shot').addEventListener('click', () => savePNG(false));
+document.getElementById('shotAlpha').addEventListener('click', () => savePNG(true));
+let spinVel = 0;
+document.getElementById('spin').addEventListener('click', () => { spinVel = 0.3 + Math.random() * 0.3; });
+
+// ── MR: the city on your REAL table ──────────────────────────────────────────
+(async () => {
+  const modeEl = document.getElementById('mode');
+  try {
+    if (navigator.xr && await navigator.xr.isSessionSupported('immersive-ar')) {
+      document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['local-floor'], optionalFeatures: ['hand-tracking'] }));
+      modeEl.textContent = 'drag to orbit · scroll to zoom · START AR puts it on your table';
+      renderer.xr.addEventListener('sessionstart', () => { board.position.set(0, 0.75, -1.0); board.rotation.y = 0; document.body.style.background = 'transparent'; });
+      renderer.xr.addEventListener('sessionend', () => { board.position.set(0, -0.08, -0.85); });
+    }
+  } catch { /* photo mode is the whole story on desktop */ }
+})();
+for (const i of [0, 1]) {
+  const c = renderer.xr.getController(i);
+  c.addEventListener('selectstart', () => {
+    const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(c.quaternion);
+    const pos = new THREE.Vector3().setFromMatrixPosition(c.matrixWorld);
+    board.position.copy(pos).addScaledVector(dir, 0.9);
+    board.position.y = Math.max(0.4, board.position.y);
+  });
+  scene.add(c);
+}
+
+// ── The loop ─────────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta() || 0.016, 0.05);
+  const t = clock.elapsedTime;
+  const camPos = renderer.xr.isPresenting ? renderer.xr.getCamera().position : camera.position;
+  for (const b of billboards) b.lookAt(camPos.x, b.getWorldPosition(new THREE.Vector3()).y, camPos.z);
+  for (const gem of gems) { gem.rotation.y += dt * 1.4; gem.position.y = 0.095 + Math.sin(t * 2.4) * 0.004; }
+  if (!renderer.xr.isPresenting) { board.rotation.y += dt * (spinVel || 0.05) * (dragging ? 0 : 1); spinVel *= 0.985; frame(); }
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,378 @@
+{
+  "generatedFrom": "src/data/driftwoodCity.ts",
+  "stats": {
+    "regions": 7,
+    "places": 27,
+    "mysteries": 2
+  },
+  "regions": [
+    {
+      "id": "harbor",
+      "name": "Driftwood Harbor",
+      "glyph": "⚓",
+      "tagline": "where every crossing begins",
+      "color": "#3ba7d4"
+    },
+    {
+      "id": "hollow",
+      "name": "Driftwood Hollow",
+      "glyph": "🌊",
+      "tagline": "the still, pretty lake",
+      "color": "#4fae9a"
+    },
+    {
+      "id": "canyon",
+      "name": "Driftwood Canyon",
+      "glyph": "🏜️",
+      "tagline": "where the echo answers back",
+      "color": "#c98a3a"
+    },
+    {
+      "id": "mountain",
+      "name": "Mount Driftwood",
+      "glyph": "⛰️",
+      "tagline": "the long climb, together",
+      "color": "#8b9bb0"
+    },
+    {
+      "id": "timber",
+      "name": "Timber Town",
+      "glyph": "🪵",
+      "tagline": "the wooden city the robots built",
+      "color": "#b8804a"
+    },
+    {
+      "id": "green",
+      "name": "The Driftwood Green",
+      "glyph": "🌳",
+      "tagline": "parks, play, and open sky",
+      "color": "#63b34a"
+    },
+    {
+      "id": "wilds",
+      "name": "The Wilds",
+      "glyph": "🍄",
+      "tagline": "ferns, fireflies, and little mysteries",
+      "color": "#7a6cc4"
+    }
+  ],
+  "places": [
+    {
+      "id": "harbor-docks",
+      "name": "The Driftwood Docks",
+      "glyph": "⚓",
+      "region": "harbor",
+      "audience": [
+        "everyone"
+      ],
+      "purpose": "Arrival & orientation — name where you are today.",
+      "mystery": false
+    },
+    {
+      "id": "lighthouse",
+      "name": "The Lighthouse",
+      "glyph": "🗼",
+      "region": "harbor",
+      "audience": [
+        "everyone",
+        "solo"
+      ],
+      "purpose": "Grounding & safety — your steady light when the water is rough.",
+      "mystery": false
+    },
+    {
+      "id": "tidepool-walk",
+      "name": "Tidepool Boardwalk",
+      "glyph": "🐚",
+      "region": "harbor",
+      "audience": [
+        "everyone",
+        "kids",
+        "families"
+      ],
+      "purpose": "Sensory mindfulness — five senses at the water’s edge.",
+      "mystery": false
+    },
+    {
+      "id": "mirror-lake",
+      "name": "Mirror Lake",
+      "glyph": "🪞",
+      "region": "hollow",
+      "audience": [
+        "solo",
+        "couples"
+      ],
+      "purpose": "Reflection — see yourself, and let your partner truly see you.",
+      "mystery": false
+    },
+    {
+      "id": "gratitude-grove",
+      "name": "The Gratitude Grove",
+      "glyph": "🍃",
+      "region": "hollow",
+      "audience": [
+        "everyone",
+        "families"
+      ],
+      "purpose": "Gratitude practice — hang one true thankful thing on the wishing tree.",
+      "mystery": false
+    },
+    {
+      "id": "skipping-shore",
+      "name": "Skipping-Stone Shore",
+      "glyph": "🪨",
+      "region": "hollow",
+      "audience": [
+        "solo",
+        "couples"
+      ],
+      "purpose": "Letting go — write the weight on a stone, then skip it across the water.",
+      "mystery": false
+    },
+    {
+      "id": "hollow-cabins",
+      "name": "The Hollow Cabins",
+      "glyph": "🛖",
+      "region": "hollow",
+      "audience": [
+        "couples"
+      ],
+      "purpose": "Couples’ retreat — an unhurried evening to reconnect.",
+      "mystery": false
+    },
+    {
+      "id": "echo-canyon",
+      "name": "Echo Canyon",
+      "glyph": "📣",
+      "region": "canyon",
+      "audience": [
+        "couples",
+        "families"
+      ],
+      "purpose": "Being heard — say the hard thing; the canyon repeats it back gently.",
+      "mystery": false
+    },
+    {
+      "id": "rope-bridges",
+      "name": "The Rope Bridges",
+      "glyph": "🌉",
+      "region": "canyon",
+      "audience": [
+        "couples",
+        "families"
+      ],
+      "purpose": "Trust — cross together; one holds the rope while the other steps.",
+      "mystery": false
+    },
+    {
+      "id": "whispering-caves",
+      "name": "The Whispering Caves",
+      "glyph": "🕳️",
+      "region": "canyon",
+      "audience": [
+        "solo",
+        "everyone"
+      ],
+      "purpose": "Shadow work — meet the quiet worry you keep in the dark.",
+      "mystery": true
+    },
+    {
+      "id": "sunstone-overlook",
+      "name": "Sunstone Overlook",
+      "glyph": "🌅",
+      "region": "canyon",
+      "audience": [
+        "everyone"
+      ],
+      "purpose": "Perspective & awe — see how small today’s trouble is from up here.",
+      "mystery": false
+    },
+    {
+      "id": "basecamp-meadow",
+      "name": "Basecamp Meadow",
+      "glyph": "⛺",
+      "region": "mountain",
+      "audience": [
+        "everyone",
+        "solo"
+      ],
+      "purpose": "Goal-setting — pack only what you’ll actually carry up.",
+      "mystery": false
+    },
+    {
+      "id": "switchback-trail",
+      "name": "The Switchback Trail",
+      "glyph": "🥾",
+      "region": "mountain",
+      "audience": [
+        "everyone"
+      ],
+      "purpose": "Persistence — the path bends back on itself, and still it climbs.",
+      "mystery": false
+    },
+    {
+      "id": "summit",
+      "name": "The Summit",
+      "glyph": "🏔️",
+      "region": "mountain",
+      "audience": [
+        "everyone",
+        "families"
+      ],
+      "purpose": "Milestone & achievement — plant your flag; the robots ring the bell.",
+      "mystery": false
+    },
+    {
+      "id": "snowdrift-hut",
+      "name": "Snowdrift Hut",
+      "glyph": "🔥",
+      "region": "mountain",
+      "audience": [
+        "solo",
+        "couples"
+      ],
+      "purpose": "Rest & self-care — permission to stop and warm your hands.",
+      "mystery": false
+    },
+    {
+      "id": "gathering-bar",
+      "name": "The Gathering Bar",
+      "glyph": "🍵",
+      "region": "timber",
+      "audience": [
+        "everyone"
+      ],
+      "purpose": "Connection — pull up a stool; the robots pour something warm and listen.",
+      "mystery": false
+    },
+    {
+      "id": "robot-workshop",
+      "name": "The Robot Workshop",
+      "glyph": "🔧",
+      "region": "timber",
+      "audience": [
+        "everyone",
+        "kids"
+      ],
+      "purpose": "Repair & self-compassion — the robots fix what’s broken without shame.",
+      "mystery": false
+    },
+    {
+      "id": "family-hearth",
+      "name": "The Family Hearth",
+      "glyph": "🏡",
+      "region": "timber",
+      "audience": [
+        "families"
+      ],
+      "purpose": "Family time — one table, the day’s highs and lows, no phones.",
+      "mystery": false
+    },
+    {
+      "id": "amphitheater",
+      "name": "The Driftwood Amphitheater",
+      "glyph": "🎭",
+      "region": "timber",
+      "audience": [
+        "families",
+        "kids"
+      ],
+      "purpose": "Expression & play — say it as a song, a skit, a silly voice.",
+      "mystery": false
+    },
+    {
+      "id": "market-square",
+      "name": "Market Square",
+      "glyph": "🏮",
+      "region": "timber",
+      "audience": [
+        "everyone"
+      ],
+      "purpose": "Needs & choices — trade what you have too much of for what you lack.",
+      "mystery": false
+    },
+    {
+      "id": "golf-park",
+      "name": "The Golf Park",
+      "glyph": "⛳",
+      "region": "green",
+      "audience": [
+        "families",
+        "couples"
+      ],
+      "purpose": "Playful challenge — lose gracefully, cheer each other, keep it light.",
+      "mystery": false
+    },
+    {
+      "id": "kite-meadow",
+      "name": "Kite Meadow",
+      "glyph": "🪁",
+      "region": "green",
+      "audience": [
+        "kids",
+        "families"
+      ],
+      "purpose": "Play & letting the wind help — run, release, look up together.",
+      "mystery": false
+    },
+    {
+      "id": "butterfly-garden",
+      "name": "The Butterfly Garden",
+      "glyph": "🦋",
+      "region": "green",
+      "audience": [
+        "kids",
+        "everyone"
+      ],
+      "purpose": "Calm & sensory delight — go slow enough for one to land on you.",
+      "mystery": false
+    },
+    {
+      "id": "lantern-park",
+      "name": "Lantern Park",
+      "glyph": "🏮",
+      "region": "green",
+      "audience": [
+        "couples",
+        "everyone"
+      ],
+      "purpose": "Evening ritual — light one lantern for something you hope for.",
+      "mystery": false
+    },
+    {
+      "id": "fern-hollow",
+      "name": "Fern Hollow",
+      "glyph": "🌿",
+      "region": "wilds",
+      "audience": [
+        "solo",
+        "everyone"
+      ],
+      "purpose": "Nature immersion — a green quiet that lowers the whole nervous system.",
+      "mystery": false
+    },
+    {
+      "id": "firefly-caves",
+      "name": "The Firefly Caves",
+      "glyph": "✨",
+      "region": "wilds",
+      "audience": [
+        "kids",
+        "families"
+      ],
+      "purpose": "Wonder & hope — the dark isn’t empty; it’s full of small lights.",
+      "mystery": true
+    },
+    {
+      "id": "old-root-grove",
+      "name": "The Old-Root Grove",
+      "glyph": "🌳",
+      "region": "wilds",
+      "audience": [
+        "families"
+      ],
+      "purpose": "Heritage & roots — trace the family tree carved into the great trunk.",
+      "mystery": false
+    }
+  ]
+}
