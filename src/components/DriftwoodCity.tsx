@@ -8,6 +8,7 @@ import {
   type Audience,
   type CityPlace,
 } from '../data/driftwoodCity';
+import CityScene from './CityScene';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  DRIFTWOOD CITY — the wooden supersystem the Driftwood robots built, as a
@@ -141,16 +142,12 @@ export default function DriftwoodCity({
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: Math.min(i * 0.03, 0.25), duration: 0.3 }}
-                      className="rounded-2xl bg-white p-3.5 shadow-sm"
+                      className="overflow-hidden rounded-2xl bg-white shadow-sm"
                       style={{ border: '1px solid rgba(122,79,34,.10)' }}
                     >
-                      <div className="flex items-start gap-3">
-                        <span
-                          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-xl"
-                          style={{ background: `${region.color}1a` }}
-                        >
-                          {p.glyph}
-                        </span>
+                      {/* Generative wooden scene — unique per place, tinted to the region */}
+                      <CityScene placeId={p.id} region={p.region} glyph={p.glyph} height={84} />
+                      <div className="flex items-start gap-3 p-3.5 pt-3">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             <h3 className="truncate font-bold text-[14px]" style={{ color: '#4a3520' }}>
