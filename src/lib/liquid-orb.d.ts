@@ -11,7 +11,8 @@ export interface OrbHandle {
   webgl: boolean;
 }
 
-export type OrbTint = 'blue' | 'wood' | 'steel';
+export type OrbTint = 'blue' | 'wood' | 'steel' | (string & {}) | [number, number, number];
+// Named world tint, a '#rrggbb' hex (any per-agent colour), or an [r,g,b] alloy.
 
 export function createLiquidOrb(
   canvas: HTMLCanvasElement,

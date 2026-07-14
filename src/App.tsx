@@ -17,6 +17,7 @@ import { TOOL_COMPLETION, readSaveSignature } from './lance/components/LANCEGame
 import { appendEvent } from './lib/world';
 import { activeCastaway } from './lib/castaways';
 import GamesMenu from './components/games/GamesMenu';
+import DriftwoodCity from './components/DriftwoodCity';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE DRIFTWOOD SHELL — the LANCE bones, whole (the house framework):
@@ -51,6 +52,7 @@ function DriftwoodShell() {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showGames, setShowGames] = useState(false); // campfire games overlay (the games are challenge instruments)
+  const [showCity, setShowCity] = useState(false); // Driftwood City — the wooden supersystem, an overlay from anywhere
   const [isCalmMode, setIsCalmMode] = useState(false);
   const { xp } = useGame(); // the flagship's gold chip — one economy across the fleet
 
@@ -106,13 +108,16 @@ function DriftwoodShell() {
   React.useEffect(() => {
     const toFire = () => setShowGames(true);
     const toChallenges = () => setActiveTab('challenges');
+    const toCity = () => setShowCity(true);
     window.addEventListener('driftwood:open-campfire', toFire);
     window.addEventListener('driftwood:open-challenges', toChallenges);
     window.addEventListener('driftwood:walk-island', toChallenges);
+    window.addEventListener('driftwood:open-city', toCity);
     return () => {
       window.removeEventListener('driftwood:open-campfire', toFire);
       window.removeEventListener('driftwood:open-challenges', toChallenges);
       window.removeEventListener('driftwood:walk-island', toChallenges);
+      window.removeEventListener('driftwood:open-city', toCity);
     };
   }, []);
 
@@ -277,6 +282,15 @@ function DriftwoodShell() {
           </div>
         )}
 
+        {/* Driftwood City — the wooden supersystem, an overlay from anywhere.
+            Places that name a tool open it through the same treaty. */}
+        {showCity && (
+          <DriftwoodCity
+            onClose={() => setShowCity(false)}
+            onOpenTool={(toolId) => { setShowCity(false); openTool(toolId); }}
+          />
+        )}
+
         {/* Settings — the LANCE-style bottom sheet renders its own backdrop */}
         {showSettings && <SettingsScreen onBack={() => setShowSettings(false)} />}
       </main>
@@ -325,9 +339,36 @@ function DriftwoodHome({ onOpenTool }: { onOpenTool: (id: string) => void }) {
   return (
     <div className="pt-3">
       <TheShore onOpenTool={onOpenTool} />
+      <CityDoor />
       <GatheringBar />
       <MyAppsGrid onOpenTool={onOpenTool} />
       <PerspectiveSwap />
     </div>
+  );
+}
+
+// The wooden sign on the shore that opens Driftwood City — the robots' little
+// city, twenty-seven places to go. One tap raises the city overlay from anywhere.
+function CityDoor() {
+  return (
+    <button
+      onClick={() => window.dispatchEvent(new CustomEvent('driftwood:open-city'))}
+      className="mt-3 w-full overflow-hidden rounded-2xl p-4 text-left shadow-sm transition-transform active:scale-[.99]"
+      style={{
+        background: 'linear-gradient(135deg, #b8804a 0%, #9a6a3a 100%)',
+        border: '1px solid rgba(122,79,34,.35)',
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white/15 text-2xl">🪵</span>
+        <div className="min-w-0 flex-1">
+          <p className="font-display text-[15px] font-black tracking-tight text-white">Visit Driftwood City</p>
+          <p className="text-[11.5px] font-medium text-white/85">
+            The canyon, the lake, the golf park, the caves — 27 places the robots built, somewhere for everyone.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold text-white">Explore →</span>
+      </div>
+    </button>
   );
 }

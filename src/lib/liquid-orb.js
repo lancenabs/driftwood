@@ -161,6 +161,36 @@ const CSS_FALLBACKS = {
   steel: 'radial-gradient(circle at 38% 32%, #dfe8f2 0%, #9fb2c6 30%, #5f7488 60%, #2c3947 100%)',
 };
 
+// Turn any colour into an alloy that keeps the chrome punch. The named tints
+// have their brightest channel near ~1.05 (that's what makes the metal pop);
+// so for an arbitrary hex we keep the HUE and rescale so its brightest channel
+// lands at ~1.05. Every agent can have its own colour and it still reads as the
+// same liquid-metal orb — just tinted.
+function hexToAlloy(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex).trim());
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  let r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const max = Math.max(r, g, b, 0.001);
+  const k = 1.05 / max;                 // rescale so the brightest channel pops
+  return [r * k, g * k, b * k];
+}
+
+// tint may be: a name ('blue'|'wood'|'steel'), a hex string ('#ff4b4b'), or an
+// [r,g,b] alloy array (already normalised). Returns { alloy, css }.
+function resolveTint(tint) {
+  if (Array.isArray(tint) && tint.length === 3) {
+    const hex = '#' + tint.map(c => Math.round(Math.min(1, c / 1.05) * 255).toString(16).padStart(2, '0')).join('');
+    return { alloy: tint, css: `radial-gradient(circle at 38% 32%, ${hex} 0%, #0a1020 90%)` };
+  }
+  if (typeof tint === 'string' && tint[0] === '#') {
+    const alloy = hexToAlloy(tint);
+    if (alloy) return { alloy, css: `radial-gradient(circle at 38% 32%, ${tint} 0%, #0a1020 90%)` };
+  }
+  const name = (typeof tint === 'string' && TINTS[tint]) ? tint : 'blue';
+  return { alloy: TINTS[name], css: CSS_FALLBACKS[name] };
+}
+
 function compile(gl, type, src) {
   const s = gl.createShader(type);
   gl.shaderSource(s, src);
@@ -182,9 +212,9 @@ export function createLiquidOrb(canvas, opts) {
   // She is expensive per-pixel. Cap the pixel ratio — nobody can see the
   // difference on a sphere and the fans stay quiet.
   const dpr = Math.min((opts && opts.dpr) || window.devicePixelRatio || 1, 1.5);
-  const tintName = (opts && opts.tint) || 'blue';
-  const tint = TINTS[tintName] || TINTS.blue;
-  const cssFallback = CSS_FALLBACKS[tintName] || CSS_FALLBACKS.blue;
+  const resolved = resolveTint(opts && opts.tint);
+  const tint = resolved.alloy;
+  const cssFallback = resolved.css;
 
   canvas.width = Math.round(size * dpr);
   canvas.height = Math.round(size * dpr);
