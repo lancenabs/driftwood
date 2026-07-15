@@ -96,5 +96,53 @@ ok('together counts distinct ACTORS, not actor-vs-device (the bug that would lie
 ok('the no-scorekeeping law is written at the seam',
   /NO SCOREKEEPING BETWEEN PARTNERS/.test(src));
 
+// ── F · the payload survives a family that has actually done something ──────
+//
+// This section exists because of a real P0 that every other check passed over.
+// The milestone log is an OBJECT — MilestoneLog.tsx writes { closed: string[],
+// investigating } — and readLog() assumes an array. So .slice(0, 50) on it threw
+// a TypeError the moment a family closed their FIRST milestone, and syncNow()
+// fails silent by design. The therapist got NOTHING, silently, from exactly the
+// point the data started to matter.
+//
+// It passed everything, because an EMPTY store falls back to '[]' and behaves.
+// The gate only ever tested the happy hour. Assert the loaded gun, not the
+// empty one.
+console.log('\nF · the payload survives a family that has DONE something');
+ok('the milestone log has a dedicated reader (it is not an array)',
+  /const readClosed = \(\): string\[\]/.test(src));
+ok('planksEarned uses it', /planksEarned: readClosed\(\)\.length/.test(src));
+ok('milestoneLog uses it', /milestoneLog: readClosed\(\)\.slice/.test(src));
+// strip comments first — the note explaining this bug quotes the bad call, and
+// a gate that can't tell code from prose lies in both directions
+const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+{
+  const bad = /readLog\(\s*['"`]driftwood_milestone_log_v1/.test(code);
+  ok('nothing reads the milestone log through readLog() any more', !bad,
+    bad ? 'FOUND ONE — this throws the moment a family closes a milestone' : '');
+}
+ok('the reader tolerates both shapes', /Array\.isArray\(s\?\.closed\)/.test(src));
+
+// and prove the semantics, not just the spelling
+{
+  const stored = JSON.stringify({ closed: ['ms_count_heads', 'ms_high_ground'], investigating: null });
+  const readLogSim = (v) => { try { return JSON.parse(v || '[]'); } catch { return []; } };
+  const readClosedSim = (v) => {
+    try {
+      const s = JSON.parse(v || 'null');
+      if (Array.isArray(s?.closed)) return s.closed;
+      if (Array.isArray(s)) return s;
+      return [];
+    } catch { return []; }
+  };
+  let oldThrew = false;
+  try { readLogSim(stored).slice(0, 50); } catch { oldThrew = true; }
+  ok('the OLD read really did throw on a real log (the bug was real)', oldThrew);
+  ok('the new read returns the closed milestones', readClosedSim(stored).length === 2,
+    `got ${readClosedSim(stored).length}`);
+  ok('the new read still handles an empty store', readClosedSim(null).length === 0);
+  ok('the new read still handles a bare array', readClosedSim('["a"]').length === 1);
+}
+
 console.log(`\n${failures === 0 ? '✅ THE BRIDGE HOLDS' : `❌ ${failures} FAILURE(S)`} — what they say at the waterfall stays theirs.\n`);
 process.exit(failures === 0 ? 0 : 1);

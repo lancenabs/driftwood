@@ -62,317 +62,398 @@
       "name": "The Driftwood Docks",
       "glyph": "⚓",
       "region": "harbor",
+      "x": -29,
+      "z": 5,
       "audience": [
         "everyone"
       ],
       "purpose": "Arrival & orientation — name where you are today.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 4
     },
     {
       "id": "lighthouse",
       "name": "The Lighthouse",
       "glyph": "🗼",
       "region": "harbor",
+      "x": -24,
+      "z": 14,
       "audience": [
         "everyone",
         "solo"
       ],
       "purpose": "Grounding & safety — your steady light when the water is rough.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 6
     },
     {
       "id": "tidepool-walk",
       "name": "Tidepool Boardwalk",
       "glyph": "🐚",
       "region": "harbor",
+      "x": -19,
+      "z": 5,
       "audience": [
         "everyone",
         "kids",
         "families"
       ],
       "purpose": "Sensory mindfulness — five senses at the water’s edge.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 5
     },
     {
       "id": "mirror-lake",
       "name": "Mirror Lake",
       "glyph": "🪞",
       "region": "hollow",
+      "x": -39,
+      "z": 24,
       "audience": [
         "solo",
         "couples"
       ],
       "purpose": "Reflection — see yourself, and let your partner truly see you.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 19
     },
     {
       "id": "gratitude-grove",
       "name": "The Gratitude Grove",
       "glyph": "🍃",
       "region": "hollow",
+      "x": -36,
+      "z": 35,
       "audience": [
         "everyone",
         "families"
       ],
       "purpose": "Gratitude practice — hang one true thankful thing on the wishing tree.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 14
     },
     {
       "id": "skipping-shore",
       "name": "Skipping-Stone Shore",
       "glyph": "🪨",
       "region": "hollow",
+      "x": -25,
+      "z": 32,
       "audience": [
         "solo",
         "couples"
       ],
       "purpose": "Letting go — write the weight on a stone, then skip it across the water.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 24
     },
     {
       "id": "hollow-cabins",
       "name": "The Hollow Cabins",
       "glyph": "🛖",
       "region": "hollow",
+      "x": -28,
+      "z": 21,
       "audience": [
         "couples"
       ],
       "purpose": "Couples’ retreat — an unhurried evening to reconnect.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 8
     },
     {
       "id": "echo-canyon",
       "name": "Echo Canyon",
       "glyph": "📣",
       "region": "canyon",
+      "x": 1,
+      "z": -10,
       "audience": [
         "couples",
         "families"
       ],
       "purpose": "Being heard — say the hard thing; the canyon repeats it back gently.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 11
     },
     {
       "id": "rope-bridges",
       "name": "The Rope Bridges",
       "glyph": "🌉",
       "region": "canyon",
+      "x": 4,
+      "z": -1,
       "audience": [
         "couples",
         "families"
       ],
       "purpose": "Trust — cross together; one holds the rope while the other steps.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 12
     },
     {
       "id": "whispering-caves",
       "name": "The Whispering Caves",
       "glyph": "🕳️",
       "region": "canyon",
+      "x": 13,
+      "z": -4,
       "audience": [
         "solo",
         "everyone"
       ],
       "purpose": "Shadow work — meet the quiet worry you keep in the dark.",
-      "mystery": true
+      "mystery": true,
+      "lightsAt": 20
     },
     {
       "id": "sunstone-overlook",
       "name": "Sunstone Overlook",
       "glyph": "🌅",
       "region": "canyon",
+      "x": 10,
+      "z": -13,
       "audience": [
         "everyone"
       ],
       "purpose": "Perspective & awe — see how small today’s trouble is from up here.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 29
     },
     {
       "id": "basecamp-meadow",
       "name": "Basecamp Meadow",
       "glyph": "⛺",
       "region": "mountain",
+      "x": 19,
+      "z": 11,
       "audience": [
         "everyone",
         "solo"
       ],
       "purpose": "Goal-setting — pack only what you’ll actually carry up.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 28
     },
     {
       "id": "switchback-trail",
       "name": "The Switchback Trail",
       "glyph": "🥾",
       "region": "mountain",
+      "x": 28,
+      "z": 10,
       "audience": [
         "everyone"
       ],
       "purpose": "Persistence — the path bends back on itself, and still it climbs.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 23
     },
     {
       "id": "summit",
       "name": "The Summit",
       "glyph": "🏔️",
       "region": "mountain",
+      "x": 27,
+      "z": 1,
       "audience": [
         "everyone",
         "families"
       ],
       "purpose": "Milestone & achievement — plant your flag; the robots ring the bell.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 17
     },
     {
       "id": "snowdrift-hut",
       "name": "Snowdrift Hut",
       "glyph": "🔥",
       "region": "mountain",
+      "x": 18,
+      "z": 2,
       "audience": [
         "solo",
         "couples"
       ],
       "purpose": "Rest & self-care — permission to stop and warm your hands.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 26
     },
     {
       "id": "gathering-bar",
       "name": "The Gathering Bar",
       "glyph": "🍵",
       "region": "timber",
+      "x": -16,
+      "z": 14,
       "audience": [
         "everyone"
       ],
       "purpose": "Connection — pull up a stool; the robots pour something warm and listen.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 22
     },
     {
       "id": "robot-workshop",
       "name": "The Robot Workshop",
       "glyph": "🔧",
       "region": "timber",
+      "x": -15,
+      "z": 24,
       "audience": [
         "everyone",
         "kids"
       ],
       "purpose": "Repair & self-compassion — the robots fix what’s broken without shame.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 7
     },
     {
       "id": "family-hearth",
       "name": "The Family Hearth",
       "glyph": "🏡",
       "region": "timber",
+      "x": -4,
+      "z": 26,
       "audience": [
         "families"
       ],
       "purpose": "Family time — one table, the day’s highs and lows, no phones.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 10
     },
     {
       "id": "amphitheater",
       "name": "The Driftwood Amphitheater",
       "glyph": "🎭",
       "region": "timber",
+      "x": 1,
+      "z": 17,
       "audience": [
         "families",
         "kids"
       ],
       "purpose": "Expression & play — say it as a song, a skit, a silly voice.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 16
     },
     {
       "id": "market-square",
       "name": "Market Square",
       "glyph": "🏮",
       "region": "timber",
+      "x": -6,
+      "z": 9,
       "audience": [
         "everyone"
       ],
       "purpose": "Needs & choices — trade what you have too much of for what you lack.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 9
     },
     {
       "id": "golf-park",
       "name": "The Golf Park",
       "glyph": "⛳",
       "region": "green",
+      "x": -16,
+      "z": 33,
       "audience": [
         "families",
         "couples"
       ],
       "purpose": "Playful challenge — lose gracefully, cheer each other, keep it light.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 15
     },
     {
       "id": "kite-meadow",
       "name": "Kite Meadow",
       "glyph": "🪁",
       "region": "green",
+      "x": -18,
+      "z": 40,
       "audience": [
         "kids",
         "families"
       ],
       "purpose": "Play & letting the wind help — run, release, look up together.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 21
     },
     {
       "id": "butterfly-garden",
       "name": "The Butterfly Garden",
       "glyph": "🦋",
       "region": "green",
+      "x": -10,
+      "z": 47,
       "audience": [
         "kids",
         "everyone"
       ],
       "purpose": "Calm & sensory delight — go slow enough for one to land on you.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 18
     },
     {
       "id": "lantern-park",
       "name": "Lantern Park",
       "glyph": "🏮",
       "region": "green",
+      "x": -6,
+      "z": 37,
       "audience": [
         "couples",
         "everyone"
       ],
       "purpose": "Evening ritual — light one lantern for something you hope for.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 31
     },
     {
       "id": "fern-hollow",
       "name": "Fern Hollow",
       "glyph": "🌿",
       "region": "wilds",
+      "x": -27,
+      "z": 39,
       "audience": [
         "solo",
         "everyone"
       ],
       "purpose": "Nature immersion — a green quiet that lowers the whole nervous system.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 27
     },
     {
       "id": "firefly-caves",
       "name": "The Firefly Caves",
       "glyph": "✨",
       "region": "wilds",
+      "x": -29,
+      "z": 50,
       "audience": [
         "kids",
         "families"
       ],
       "purpose": "Wonder & hope — the dark isn’t empty; it’s full of small lights.",
-      "mystery": true
+      "mystery": true,
+      "lightsAt": 25
     },
     {
       "id": "old-root-grove",
       "name": "The Old-Root Grove",
       "glyph": "🌳",
       "region": "wilds",
+      "x": -19,
+      "z": 46,
       "audience": [
         "families"
       ],
       "purpose": "Heritage & roots — trace the family tree carved into the great trunk.",
-      "mystery": false
+      "mystery": false,
+      "lightsAt": 13
     }
   ]
 }

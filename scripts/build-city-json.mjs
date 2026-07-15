@@ -14,9 +14,14 @@ const payload = {
   generatedFrom: 'src/data/driftwoodCity.ts',
   stats: cityStats,
   regions: CITY_REGIONS,
+  // x/z are the ONE geography — island3d, VR and the board all read these.
+  // Lance's call 2026-07-14: one island. Before this each world placed the city
+  // itself and they had already drifted to sharing almost nothing.
   places: CITY_PLACES.map(p => ({
     id: p.id, name: p.name, glyph: p.glyph, region: p.region,
+    x: p.x, z: p.z,
     audience: p.audience, purpose: p.purpose, mystery: !!p.mystery,
+    lightsAt: p.lightsAt,
   })),
 };
 

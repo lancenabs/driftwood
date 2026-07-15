@@ -1477,9 +1477,16 @@ const fallsAnim = [];
   g.add(post);
 
   // one carved band per milestone the family closed together
+  // The log is an OBJECT — { closed: string[], investigating } — not an array.
+  // Reading it as an array gives undefined, the band loop never runs, and the
+  // totem stays bare forever while looking exactly like a totem that is simply
+  // waiting for the family to do something. Line 1839 and VR always had this
+  // right; this didn't. Verified against MilestoneLog.tsx, which writes it.
   let closed = 0;
-  try { closed = (JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || '[]') || []).length; }
-  catch { closed = 0; }
+  try {
+    const s = JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || 'null');
+    closed = Array.isArray(s?.closed) ? s.closed.length : Array.isArray(s) ? s.length : 0;
+  } catch { closed = 0; }
   for (let i = 0; i < Math.min(closed, 12); i++) {
     const band = new THREE.Mesh(new THREE.TorusGeometry(0.56, 0.09, 6, 14), mat(0xC8A96E));
     band.rotation.x = Math.PI / 2;

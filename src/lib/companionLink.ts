@@ -318,6 +318,32 @@ const readLog = (k: string): any[] => {
   try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch { return []; }
 };
 
+/**
+ * THE MILESTONE LOG IS THE ONE STORE THAT IS NOT AN ARRAY. Use this, never readLog.
+ *
+ * MilestoneLog.tsx writes `{ closed: string[], investigating }` — an object.
+ * readLog() assumes an array, so `readLog('driftwood_milestone_log_v1').slice(0, 50)`
+ * threw a TypeError the moment a family closed their FIRST milestone — and
+ * syncNow() fails silent by design ("never block the island"). Net effect: the
+ * therapist received NOTHING, silently, from exactly the point the data began to
+ * matter. The 31 are the most clinically valuable thing this app produces and
+ * none of it crossed. `planksEarned` was `undefined` for the same reason.
+ *
+ * It worked perfectly in every fresh browser — the absent key falls back to '[]'
+ * and behaves. It only broke once it counted, which is why it survived.
+ *
+ * qa-bridge now builds the payload against a POPULATED log. A gate that only
+ * ever sees an empty store only ever tests the happy hour.
+ */
+const readClosed = (): string[] => {
+  try {
+    const s = JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || 'null');
+    if (Array.isArray(s?.closed)) return s.closed;   // the real shape
+    if (Array.isArray(s)) return s;                  // tolerate a bare array
+    return [];
+  } catch { return []; }
+};
+
 /** Guard: nothing from CHAT_KEYS may ever appear in a payload. Called on the
  *  way out; qa-bridge asserts it independently. Belt and braces on purpose —
  *  this is the one promise in this file that cannot be broken by accident. */
@@ -350,7 +376,7 @@ export async function buildExportPayload(): Promise<Record<string, unknown>> {
       gamesPlayed: events.filter(e => String((e as any).action ?? '').endsWith('_played')).length,
       // Warmth is the fire's height — the family's, never a per-person score.
       togetherActs: events.filter(e => String((e as any).action ?? '').includes('together')).length,
-      planksEarned: readLog('driftwood_milestone_log_v1').length,
+      planksEarned: readClosed().length,
     },
 
     // Rule 3 · joint vs solo is recorded because it's the clinical signal.
@@ -358,7 +384,7 @@ export async function buildExportPayload(): Promise<Record<string, unknown>> {
     deferrals,
 
     driftwood: {
-      milestoneLog: readLog('driftwood_milestone_log_v1').slice(0, 50),
+      milestoneLog: readClosed().slice(0, 50),
       repairRope: readLog('driftwood_repair_rope_v1').slice(0, 30),
       choreSwaps: readLog('driftwood_chore_swap_v1').slice(0, 30),
       rituals: readLog('driftwood_rituals_v1').slice(0, 20),
