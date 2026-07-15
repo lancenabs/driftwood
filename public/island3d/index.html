@@ -1459,6 +1459,33 @@ const fallsAnim = [];
   scratch.position.set(0, lg(0, -11.45) + 1.35, -11.4);
   g.add(scratch);
 
+  // BARNACLE, still here. He sticks to whoever is having the worst day and cannot
+  // be pried off with a bar — Elias built one friend who could not be given back.
+  // He kept Bauer alive in this cave one long night in '54, and he never left. He
+  // is why the fire is always laid ready: he waits by it for whoever the sea sends
+  // next. A small wooden robot, tending, patient. Walk behind the water and he's
+  // there — the milestone-25 beat, standing, no dialogue needed.
+  {
+    const bg = new THREE.Group();
+    const bx = 1.35, bz = -8.4, by = lg(bx, bz);
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.8, 0.6), mat(0x6E5636));
+    body.position.y = 0.5; bg.add(body);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.5, 0.5), mat(0x7A5E3C));
+    head.position.y = 1.12; bg.add(head);
+    for (const ex of [-0.13, 0.13]) {            // green bottle-glass knot-eyes
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 6),
+        new THREE.MeshBasicMaterial({ color: 0x6FBF73 }));
+      eye.position.set(ex, 1.16, 0.26); bg.add(eye);
+    }
+    for (const ax of [-0.45, 0.45]) {            // stubby arms, one reaching to the warmth
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.5, 0.16), mat(0x6E5636));
+      arm.position.set(ax, 0.55, 0.1); arm.rotation.x = -0.5; bg.add(arm);
+    }
+    bg.position.set(bx, by, bz);
+    bg.lookAt(0, by + 0.5, -8.8);                 // turned toward his fire
+    g.add(bg);
+  }
+
   scene.add(g);
 }
 // ── DRIFTWOOD CITY ──────────────────────────────────────────────────────────
