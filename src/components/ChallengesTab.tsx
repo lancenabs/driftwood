@@ -5,6 +5,7 @@ import { matchesHeld, rationsHeld } from '../lib/world';
 import { useGame } from '../lance/components/LANCEGame/LANCEGameContext';
 import MilestoneLog from './MilestoneLog';
 import TideChart from './TideChart';
+import { consumeRallyTarget } from '../lib/invite';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE ISLAND TAB — island-only law (2026-07-12): "the island IS the
@@ -62,9 +63,20 @@ export default function ChallengesTab({ onOpenTool, onOpenGames, onLeaveIsland }
   const season = next ? SEASONS.find(s => s.n === next.season)! : SEASONS[SEASONS.length - 1];
   const pct = Math.round((closed.length / MILESTONES.length) * 100);
 
+  // If we arrived from an invite ("meet me at the waterfall"), hand the place to
+  // the island via the iframe hash. One-shot: computed once at mount so a
+  // re-render can't reload the iframe and yank someone off the shore.
+  const islandSrc = React.useMemo(() => {
+    const target = consumeRallyTarget();
+    if (!target) return '/island3d/index.html';
+    const h = new URLSearchParams({ at: target.place });
+    if (target.milestone) h.set('ms', String(target.milestone));
+    return `/island3d/index.html#${h.toString()}`;
+  }, []);
+
   return (
     <div className="absolute inset-0 bg-[#BEE3F0]">
-      <iframe src="/island3d/index.html" title="The Island in three dimensions" className="w-full h-full border-0" allow="fullscreen" />
+      <iframe src={islandSrc} title="The Island in three dimensions" className="w-full h-full border-0" allow="fullscreen" />
 
       {/* Quiet progress pill — insight, not a shortcut; nothing here opens anything */}
       <div className="absolute left-3 z-10 flex items-center gap-2 rounded-full pointer-events-none"

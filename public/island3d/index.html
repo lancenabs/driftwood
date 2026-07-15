@@ -1820,7 +1820,24 @@ rallyEl.onclick = () => {
   if (!nearLandmark) return;
   postRallyEvent('rally_called', { spot: nearLandmark.id, spotName: nearLandmark.name, name: me.name });
   raiseRally(nearLandmark.id, null);
-  sayLine(me.name || 'You', `📣 The family's phones just heard it: meet at ${nearLandmark.name}.`, 4500);
+  // "meet me at the waterfall" — the actual sentence Lance described. If we're
+  // in a camp, hand the caller a link to TEXT: this is the bridge from the app
+  // to a real couple's Messages thread. navigator.share on a phone; clipboard on
+  // a desktop. Same-origin iframe, so both are allowed; the click is the gesture.
+  if (campCode) {
+    const url = `${location.origin}/?meet=${campCode}&at=${nearLandmark.id}`;
+    const text = `Meet me at ${nearLandmark.name} ${nearLandmark.emoji}. Tap to walk over:`;
+    const shared = (navigator.share
+      ? navigator.share({ title: 'Driftwood', text, url }).then(() => true).catch(() => false)
+      : Promise.resolve(false));
+    shared.then(ok => {
+      if (ok) return;
+      navigator.clipboard?.writeText(`${text} ${url}`).catch(() => {});
+      sayLine(me.name || 'You', `📲 Invite link copied — text it to your family.`, 4500);
+    });
+  } else {
+    sayLine(me.name || 'You', `📣 The family's phones just heard it: meet at ${nearLandmark.name}.`, 4500);
+  }
 };
 
 // the QA hatch (same spirit as _circleDebug): teleport + rally introspection
@@ -1988,6 +2005,23 @@ if (campCode) {
     for (const [k, o] of others) if (Date.now() - (o.at ?? 0) > 9000) { scene.remove(o.rig); others.delete(k); }
   }, 3000);
 }
+
+// THE INVITE ARRIVES. The husband tapped "meet me at the waterfall"; the React
+// shell joined the wife's camp and set this iframe's hash to #at=waterfall. Raise
+// the beacon from the URL, immediately — belt. The camp's backlog replay (above)
+// is braces: if she called a live rally, that raises it too. Either way he lands
+// on the shore and sees where to walk. The place is the source of truth, not a
+// race with the relay.
+(function invitedBeacon() {
+  const h = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+  const at = (h.get('at') || '').toLowerCase();
+  if (!at || !LANDMARKS.some(l => l.id === at)) return;
+  const ms = h.get('ms');
+  raiseRally(at, 'your family');
+  const lm = LANDMARKS.find(l => l.id === at);
+  sayLine('your family', `Meet me at ${lm.name} ${lm.emoji}${ms ? ` — let's finish challenge ${ms}` : ''}. I'll wait for you there!`, 7000);
+}());
+
 let lastSent = 0;
 function broadcastPos() {
   if (!campCode) return;

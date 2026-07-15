@@ -16,6 +16,7 @@ import PerspectiveSwap from './components/PerspectiveSwap';
 import { TOOL_COMPLETION, readSaveSignature } from './lance/components/LANCEGame/challengeCompletion';
 import { appendEvent } from './lib/world';
 import { activeCastaway } from './lib/castaways';
+import { parseInvite, acceptInvite, clearInviteFromURL } from './lib/invite';
 import GamesMenu from './components/games/GamesMenu';
 import DriftwoodCity from './components/DriftwoodCity';
 
@@ -65,6 +66,20 @@ function DriftwoodShell() {
     };
     window.addEventListener('driftwood:open-tool', openTool as EventListener);
     return () => window.removeEventListener('driftwood:open-tool', openTool as EventListener);
+  }, []);
+
+  // THE INVITE lands here: "meet me at the waterfall" was a texted link, and the
+  // husband just tapped it. Join the wife's camp, hand the island the place, and
+  // put him on the shore. Runs once, before anything else claims the tab.
+  React.useEffect(() => {
+    const inv = parseInvite();
+    if (!inv) return;
+    (async () => {
+      await acceptInvite(inv);          // join the camp + stash the beacon target
+      clearInviteFromURL();             // a refresh shouldn't re-fire; the URL isn't a live code
+      try { localStorage.setItem('driftwood_mode', 'story'); } catch { /* fine */ }
+      setActiveTab('challenges');       // the island itself — where the beacon waits
+    })();
   }, []);
 
   // Real work lights lanterns: snapshot the tool's save keys on open; if the

@@ -12,9 +12,10 @@
     "qa:crisis": "node scripts/qa-crisis-check.mjs",
     "qa:crawl": "node scripts/qa-full-crawl.mjs",
     "qa:gathering": "node scripts/qa-gathering.mjs",
-    "qa:all": "npm run lint && npm run qa:crisis && npm run qa:island-mirror && npm run qa:crawl && npm run qa:gathering && npm run qa:bridge",
+    "qa:all": "npm run lint && npm run qa:crisis && npm run qa:island-mirror && npm run qa:invite && npm run qa:crawl && npm run qa:gathering && npm run qa:bridge",
     "qa:bridge": "node scripts/qa-bridge.mjs",
-    "qa:island-mirror": "node scripts/qa-island-mirror.mjs"
+    "qa:island-mirror": "node scripts/qa-island-mirror.mjs",
+    "qa:invite": "node scripts/qa-invite.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
