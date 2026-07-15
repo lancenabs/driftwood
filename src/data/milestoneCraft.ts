@@ -40,6 +40,39 @@ export const SEASON_CIRCLES: Record<number, { x: number; z: number; name: string
   5: { x: -58, z: 58, name: 'the west tide line' },
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  THE ADDRESS BOOK
+//
+//  Lance described what this app is for in one sentence: a couple call each
+//  other mid-week and say "let's meet at the waterfall and finish challenge 10."
+//  That sentence needs a challenge to HAVE a place. Until now none of them did —
+//  milestoneSpot() scattered all 31 along the season's trail with a golden-angle
+//  jitter, so every challenge stood wherever the arithmetic dropped it.
+//
+//  These eight name their own address; the story put them there before the map
+//  did. Milestone 4 was already written as "Skip appears at dawn with his
+//  bandaged hand... 'I know where water is. I am NOT showing you. Follow me
+//  while I don't show you.'" — he has been walking families to the waterfall
+//  since long before the waterfall existed.
+//
+//  The other twenty-three still meander along the trail, and that's right: not
+//  every milestone is a destination, and a world where everything is a landmark
+//  has none.
+//
+//  Values are landmark ids from island3d's LANDMARKS. qa:island-mirror asserts
+//  every one resolves, so a typo here fails the gate instead of the couple.
+// ─────────────────────────────────────────────────────────────────────────────
+export const MILESTONE_PLACE: Record<string, string> = {
+  ms_high_ground:   'lookout',      // 2  · the high ground IS the lookout
+  ms_fresh_water:   'waterfall',    // 4  · Skip's secret. The spring.
+  ms_salvage:       'wreck_beach',  // 5  · what the sea gave back
+  ms_signal_fire:   'lookout',      // 17 · seen from the sea lane
+  ms_quiet_cove:    'quiet_cove',   // 19 · named for it
+  ms_apology_forge: 'forge',        // 24 · named for it
+  ms_every_plank:   'workshop',     // 27 · every tool in there has a name on it
+  ms_naming_boat:   'wreck_beach',  // 31 · the raft launches where they landed
+};
+
 export const CRAFT: Record<string, MilestoneCraft> = {
   // ═══ SEASON I · THE WRECK — safety & co-regulation ═══
   ms_count_heads: {

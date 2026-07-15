@@ -1797,7 +1797,29 @@ const MS = [{"id":"ms_count_heads","n":1,"s":1,"t":"Count Heads"},{"id":"ms_high
 // the island"). One spot per milestone, deterministic on every device.
 const SEASON_CIRCLES = { 1: {x:-6, z:96}, 2: {x:14, z:66}, 3: {x:58, z:18}, 4: {x:-34, z:-44}, 5: {x:-58, z:58} };
 const TRAIL_END = { x: -20, z: 88 }; // S5 walks back toward the wreck beach — the raft launches where they landed
+// MIRROR of src/data/milestoneCraft.ts MILESTONE_PLACE — qa:island-mirror fails
+// if these two ever disagree. See the note there for why these eight and not 31.
+const MS_PLACE = {
+  ms_high_ground: 'lookout', ms_fresh_water: 'waterfall', ms_salvage: 'wreck_beach',
+  ms_signal_fire: 'lookout', ms_quiet_cove: 'quiet_cove', ms_apology_forge: 'forge',
+  ms_every_plank: 'workshop', ms_naming_boat: 'wreck_beach',
+};
 function milestoneSpot(m) {
+  // An addressed milestone stands at its place. This is the line that makes
+  // "meet me at the waterfall and finish challenge 4" a sentence the app can
+  // honour, instead of a nice idea about a challenge the jitter put in a bush.
+  const addr = MS_PLACE[m.id];
+  if (addr) {
+    const lm = LANDMARKS.find(l => l.id === addr);
+    if (lm) {
+      // stand off the landmark toward the island's heart, so the circle marks
+      // the place instead of swallowing it
+      const d = Math.hypot(lm.x, lm.z) || 1;
+      let x = lm.x - (lm.x / d) * 5.5, z = lm.z - (lm.z / d) * 5.5;
+      for (let k = 0; k < 24 && islandHeight(x, z) < 0.25; k++) { x *= 0.94; z *= 0.94; }
+      return { x, z };
+    }
+  }
   const a = SEASON_CIRCLES[m.s];
   const b = m.s < 5 ? SEASON_CIRCLES[m.s + 1] : TRAIL_END;
   const legMs = MS.filter(x => x.s === m.s);
