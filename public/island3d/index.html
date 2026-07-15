@@ -1733,28 +1733,101 @@ window.addEventListener('storage', raiseCityLights);
   const lm = LANDMARKS.find(l => l.id === 'workshop');
   const base = groundY(lm.x, lm.z);
   const g = new THREE.Group();
-  g.position.set(lm.x, base, lm.z);
-  g.rotation.y = 0.5;
+  g.position.set(lm.x, base, lm.z);   // NOT rotated: local x/z = world, so lg() is honest
+  const lg = (dx, dz) => groundY(lm.x + dx, lm.z + dz) - base;
+  const WOOD = mat(0x6B5236), DIM = mat(0x3E3020), DUSK = mat(0x2C2216);
 
-  // sunk 0.3 into the ramp so no corner floats — the ground here is never level
-  const walls = new THREE.Mesh(new THREE.BoxGeometry(5, 3, 4.2), mat(0x7A5C3E));
-  walls.position.y = 1.2;
-  g.add(walls);
-  const roof = new THREE.Mesh(new THREE.ConeGeometry(4.1, 1.6, 4), mat(0x5C4530));
-  roof.position.y = 3.5; roof.rotation.y = Math.PI / 4;
-  g.add(roof);
-  // the doorway, dark, always open — he never had a lock
-  const door = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.2, 0.2), mat(0x241A12));
-  door.position.set(0, 0.8, 2.15);
-  g.add(door);
-  // the carving over the door, cut an inch deep
+  // THE SHELL — a walkable shed, not a solid block. Four walls with a doorway
+  // gap on the +z face (the downhill approach), tall enough to bridge the ramp,
+  // dark inside because there are no shadow maps and an unpainted interior is lit
+  // like the hillside. You walk in on the island's own ground.
+  // height 6, centred low so the bottom (y -2) is buried below the lowest corner
+  // of this ramp — no floating downhill wall, no sea showing under the sill
+  for (const [w, h, d, x, y, z] of [
+    [7, 6, 0.3, 0, 1.0, -3],        // back
+    [0.3, 6, 6, -3.4, 1.0, 0],      // left
+    [0.3, 6, 6, 3.4, 1.0, 0],       // right
+    [2.6, 6, 0.3, -2.2, 1.0, 3],    // front-left of the doorway
+    [2.6, 6, 0.3, 2.2, 1.0, 3],     // front-right of the doorway
+  ]) {
+    const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), WOOD);
+    wall.position.set(x, y, z);
+    g.add(wall);
+  }
+  const ceil = new THREE.Mesh(new THREE.BoxGeometry(7, 0.3, 6.3), DUSK);
+  ceil.position.set(0, 3.4, 0); g.add(ceil);
+  // a plank floor that rides the ramp — hides the sea showing through the sloped
+  // ground under the sill, and reads as a swept shop rather than a dirt lip
+  {
+    const fg = new THREE.PlaneGeometry(6.8, 6, 8, 8);
+    fg.rotateX(-Math.PI / 2);
+    const pa = fg.attributes.position;
+    for (let i = 0; i < pa.count; i++) pa.setY(i, lg(pa.getX(i), pa.getZ(i)) + 0.04);
+    fg.computeVertexNormals();
+    const floor = new THREE.Mesh(fg, mat(0x4A3A26));
+    g.add(floor);
+  }
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(5.2, 1.8, 4), mat(0x4A3726));
+  roof.position.y = 4.3; roof.rotation.y = Math.PI / 4; g.add(roof);
+
+  // over the door, cut an inch deep — the sentence Malakor found here and spent
+  // the rest of his life saying as if it were his own
   const carving = carvedText('THE TOOLS WILL ANSWER', '#E8D9B5', 24);
-  carving.position.set(0, 2.35, 2.12);
-  g.add(carving);
-  // the lamp he left on
-  const lamp = new THREE.PointLight(0xFFC98A, 0.9, 10);
-  lamp.position.set(0, 2, 1);
-  g.add(lamp);
+  carving.position.set(0, 3.0, 3.16); g.add(carving);
+
+  // ── inside: a boy's whole life, and the shape of what was taken ──
+  // the workbench, along the back wall
+  const bench = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.9, 1.1), DIM);
+  bench.position.set(-0.6, lg(-0.6, -2.2) + 0.45, -2.2); g.add(bench);
+  const benchTop = lg(-0.6, -2.2) + 0.92;
+
+  // THE THEFT, told without a word: everything on the bench is furred with dust
+  // except one clean rectangle, the exact size of a roll of plans, lifted and
+  // never set back down. A player who finished L.A.N.C.E. knows whose hand did it.
+  const cleanSpot = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.85),
+    new THREE.MeshBasicMaterial({ color: 0x8A7350 }));
+  cleanSpot.rotation.x = -Math.PI / 2;
+  cleanSpot.position.set(-1.4, benchTop + 0.01, -2.2); g.add(cleanSpot);
+
+  // the 97, each a portrait of a friend: carved practice-limbs in rows on the
+  // right-wall shelf, "knot-eyes in rows like a choir"
+  for (let s = 0; s < 2; s++) {
+    const shelf = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.12, 5), mat(0x53412C));
+    shelf.position.set(3.1, lg(3.1, 0) + 1.1 + s * 1.0, -0.2); g.add(shelf);
+    for (let i = 0; i < 6; i++) {
+      const limb = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.5 + (i % 3) * 0.14, 0.22), mat(0x7A5E3C));
+      limb.position.set(3.0, lg(3.1, 0) + 1.4 + s * 1.0, -2.4 + i * 0.86);
+      limb.rotation.z = (i % 2 ? 0.12 : -0.1); g.add(limb);
+    }
+  }
+
+  // the crate he came ashore with, still stencilled with the boat that failed him
+  const crate = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.2, 1.2), mat(0x6E5636));
+  crate.position.set(2.2, lg(2.2, 1.6) + 0.6, 1.6); g.add(crate);
+  const crateTag = nameTag('GULLHAVEN', '#3E2E1A');
+  crateTag.position.set(2.2, lg(2.2, 1.6) + 0.75, 2.22); crateTag.scale.setScalar(0.62); g.add(crateTag);
+
+  // the notebooks — the 31 lessons and the 97 tools, going back to 1930, the
+  // early ones a child's. Malakor took the plans; he left these. He couldn't
+  // read a boy out of them.
+  for (let i = 0; i < 5; i++) {
+    const bk = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.12, 0.5), mat(i % 2 ? 0x8B6B3A : 0x6B4E2C));
+    bk.position.set(1.3 - i * 0.03, benchTop + 0.07 + i * 0.13, -2.3); bk.rotation.y = 0.1 + i * 0.04; g.add(bk);
+  }
+
+  // his own mark, low on the back wall, where a boy signs a thing he's proud of.
+  // Two names are carved on this island now: ELIAS in his shop, T. BRENNAN in
+  // the cave. The maker and the boy he'd save twenty years after he was gone.
+  const mark = carvedText('ELIAS', '#C8B89A', 22);
+  mark.position.set(1.0, lg(1.0, -2.85) + 0.8, -2.83); mark.scale.setScalar(0.8); g.add(mark);
+
+  // the lamp he left on — the one warm thing, still burning, nobody to turn it off
+  const lamp = new THREE.PointLight(0xFFC98A, 1.1, 11);
+  lamp.position.set(-0.3, benchTop + 1.3, -1.6); g.add(lamp);
+  const flame = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 5),
+    new THREE.MeshBasicMaterial({ color: 0xFFCE7A }));
+  flame.position.copy(lamp.position); g.add(flame);
+
   scene.add(g);
 }
 
