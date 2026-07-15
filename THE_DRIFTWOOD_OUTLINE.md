@@ -172,12 +172,40 @@ registry (20 games + 31 milestones) for the directive dropdown; the dyad link.
 `assigned → opened → completed → together? → who arrived first → time-to-session`.
 **Therapist's eyes only. Never scored, never shown, never red.**
 
-### P1 · PLACES — the address book
-**Build the waterfall + the cave.** Then name ~10 places into
-`src/data/driftwoodCity.ts` (existing single source of truth → board·app·VR never
-drift): Waterfall · Cave · Camp · Forge · Ridge · Cove · Tide Line · **Totem** ·
-**Workshop** · Lantern Dock. **Every milestone gets an address.** *(Story circles
-already anchor milestones in 3D — extending a working mechanic.)*
+### P1 · PLACES — the address book ✅ DONE (`17f6a40`, `3189b6e`)
+**The waterfall, the cave, the workshop and the totem are built and looked at.**
+Every claim below was verified in a browser, because the first attempt shipped
+visibly broken while every gate reported zero errors.
+
+**The terrain, measured:** `islandHeight()` is smooth everywhere. The "rocky
+spine" is a **ramp** — 19.3→25.9 between z=-8 and z=-35 at x=-52, ~30% grade,
+cross-slope the same. **There is no cliff on this island and we cannot carve
+one** — the terrain law is shared with the VR island and the board, and Build
+Mode's voxels key to a deterministic grid over it. *Move the ground and every
+fort a family ever raised floats or buries.* So the rock brings its own drop, the
+plunge pool has a rock rim, the basin drains by steepest descent (follow the
+stream up and you find the falls without a map), and the cave has **no floor** —
+the player's y is always `groundY`, so the island's own ground is the floor.
+
+**Every milestone gets an address — DONE, but not where this plan said.**
+
+> ⚠️ **This plan was wrong about `driftwoodCity.ts`.** It is NOT the island's
+> source of truth — it is the **city's**. `island3d/index.html` reads nothing
+> from it. The 27 city places (lighthouse, golf park, amphitheater, summit) and
+> the island's 8 landmarks are **different worlds with no shared ground.**
+
+Addresses now live in `milestoneCraft.ts` → `MILESTONE_PLACE`, mirrored into
+island3d and **asserted by `qa:island-mirror`**. Eight milestones name their own
+place; the story put them there first. The other 23 still meander — *a world
+where everything is a landmark has none.*
+
+**The drift is real and already happened:** VR and island3d share almost no
+landmarks (VR has no Waterfall, no Workshop, no Lookout, no Wreck Beach). Nothing
+noticed for weeks because nothing asserted it. The new gate is the cheap half of
+"one source of truth": we can't stop the hand-copy, but a copy checked every run
+can't lie for long.
+
+**→ OPEN FOR LANCE: is Driftwood City ON the island?** See THE OPEN DECISIONS.
 
 ### P2 · THE INVITE — "meet me at the waterfall"
 **The text message is the product surface.** place + challenge + rough time → a
@@ -211,6 +239,30 @@ Bauer's dock, the 1954 Halcyon, cold-open plates. 2D + 3D + tool interiors.
   wins.**
 - **No shame mechanics. No scorekeeping between partners.** Ever.
 - `npm run qa:all` (tsc · crisis · crawl · gathering) green at every waypoint.
+
+---
+
+---
+
+# THE OPEN DECISIONS (Lance's, not mine)
+
+### 1 · IS DRIFTWOOD CITY ON THE ISLAND? *(new — found 2026-07-14)*
+There are **two Driftwood worlds** and they do not know about each other:
+
+| | places | who renders it |
+|---|---|---|
+| **The island** | 8 landmarks — Wreck Beach, Camp, Forge, Lookout, Quiet Cove, Our Rock, + the 3 new | `island3d` (the phone world), where the 31 milestones, the Gathering, Build Mode and **Lance's waterfall scene** live |
+| **Driftwood City** | 27 places, 7 regions — Lighthouse, Mirror Lake, Echo Canyon, the Summit, Golf Park, Amphitheater, Market Square… | `DriftwoodCity.tsx`, `mr/city.html`, and VR as **a ring around the island** |
+
+**The phone-first island — the one that matters for "meet me at the waterfall" —
+has no city at all. The city has no waterfall.** The origin says the robots built
+a driftwood city, so both can be true, but nothing connects them today.
+
+This shapes P3 (does a milestone ever happen at Mirror Lake?) and P6 (does the
+Higgsfield run need city plates?). **It's a world decision, not a code one.**
+
+### 2 · The ElevenLabs tier — the gate on the Jumble's ten voices *(Lance's action)*
+### 3 · Companion side of the dyad (§0.4 — needs his word): `world: 'shore'`, `partnerOf`, the Driftwood tool registry
 
 ---
 
