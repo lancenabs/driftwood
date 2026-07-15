@@ -441,16 +441,58 @@ function loadGLB(url) {
 }
 
 function nameTag(text, color = '#0E7C7C') {
-  const c = document.createElement('canvas'); c.width = 256; c.height = 64;
-  const x = c.getContext('2d');
+  const c = document.createElement('canvas');
+  const FONT = '800 26px -apple-system, sans-serif';
+  let x = c.getContext('2d');
+  // Measure, then size the canvas to the text. This used to be a fixed 256px
+  // canvas with text.slice(0, 12), which silently cut five of the eight place
+  // names on the island mid-word — the Waterfall read "The Water". A place
+  // whose sign you can't read isn't an address, and "meet me at the waterfall"
+  // is the whole app.
+  x.font = FONT;
+  c.width = Math.max(128, Math.ceil(x.measureText(text).width) + 44);
+  c.height = 64;
+  x = c.getContext('2d');           // resizing a canvas resets its context
+  x.font = FONT;
   x.fillStyle = 'rgba(255,255,255,0.92)'; x.beginPath();
-  x.roundRect(38, 8, 180, 44, 22); x.fill();
-  x.font = '800 26px -apple-system, sans-serif'; x.fillStyle = color; x.textAlign = 'center';
-  x.fillText(text.slice(0, 12), 128, 39);
+  x.roundRect(4, 8, c.width - 8, 44, 22); x.fill();
+  x.fillStyle = color; x.textAlign = 'center';
+  x.fillText(text, c.width / 2, 39);
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
-  s.scale.set(1.3, 0.32, 1);
+  s.scale.set((c.width / 64) * 0.32, 0.32, 1);   // 256px → 1.28, the old size
   s.position.y = 2.6;
   return s;
+}
+
+// Carved, not signed. No pill, no truncation — for the two lines in this app
+// that carry the story and must not arrive as a white plastic label: the name a
+// nine-year-old scratched on a cave wall in 1954, and the words the boy cut an
+// inch deep over his own door.
+function carvedText(text, color = '#C8B89A', px = 30) {
+  const c = document.createElement('canvas');
+  const FONT = `700 ${px}px ui-monospace, Menlo, monospace`;
+  let x = c.getContext('2d');
+  x.font = FONT;
+  c.width = Math.ceil(x.measureText(text).width) + 24;
+  c.height = Math.round(px * 2);
+  x = c.getContext('2d');
+  x.font = FONT; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillStyle = 'rgba(0,0,0,0.55)';                       // the cut
+  x.fillText(text, c.width / 2 + 1.5, c.height / 2 + 1.5);
+  x.fillStyle = color;                                    // the lip the chisel leaves
+  x.fillText(text, c.width / 2, c.height / 2);
+  // A plane, NOT a sprite. A carving does not turn to face you — it is cut into
+  // the surface and stays there. Billboarding it also swings half the text
+  // behind the wall it's carved on ("...LS WILL ANSWER"). Basic, not Lambert:
+  // the cave is dark and a lit material renders the words black.
+  const h = 0.4;
+  const m = new THREE.Mesh(
+    new THREE.PlaneGeometry((c.width / c.height) * h, h),
+    new THREE.MeshBasicMaterial({
+      map: new THREE.CanvasTexture(c), transparent: true,
+      side: THREE.DoubleSide, depthWrite: false,
+    }));
+  return m;
 }
 
 // Build a rig: a group holding the loaded GLB (scaled + grounded), its mixer,
@@ -997,6 +1039,7 @@ addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 const AERIAL = location.hash === '#aerial';
 const CAM_D = AERIAL ? 52 : 9.0;
 let camYaw = 0, camPitch = AERIAL ? 1.08 : 0.34, dragging = false, px = 0, py = 0;
+let FREE_CAM = null;   // QA only — see _islandDebug.freeCam()
 renderer.domElement.addEventListener('pointerdown', e => { dragging = true; px = e.clientX; py = e.clientY; });
 addEventListener('pointerup', () => dragging = false);
 addEventListener('pointermove', e => {
@@ -1089,29 +1132,401 @@ rosterReady.then(() => {
 // our rock, and we can do the breathing exercise together"). Real places with
 // real names, always rendered; the rally system below makes them meeting
 // points across devices. ─────────────────────────────────────────────────────
+// The island's address book. "Meet me at the waterfall" only works if a place
+// has a name both phones know — the Rally below turns a name into a beacon.
+//
+// The Lookout, the Forge and the Wreck Beach were here before the origin was
+// written, and turned out to BE the origin's geography: the post a robot wore
+// smooth over twenty-four years of watching an empty sea; the Collier's forge
+// country on the spine; the sand fourteen people woke on in 1954.
+//
+// Added 2026-07-14 — the places the story needs and the island lacked:
+//   waterfall · the S4 climax (the cave behind it) and the place Lance named
+//              first, without thinking, when he described what this app is for
+//   totem     · the reward. Every milestone a family finishes together carves
+//              a name. It never resets. The origin's last image.
+//   workshop  · the boy's shed. THE TOOLS WILL ANSWER, cut an inch deep.
 const LANDMARKS = [
   { id: 'our_rock',    name: 'Our Rock',        emoji: '🪨', x: 78,  z: -62 },
   { id: 'quiet_cove',  name: 'The Quiet Cove',  emoji: '🌊', x: -80, z: -20 },
   { id: 'lookout',     name: 'The Lookout',     emoji: '🔭', x: 30,  z: -85 },
   { id: 'wreck_beach', name: 'The Wreck Beach', emoji: '⛵', x: -6,  z: 96 },
   { id: 'forge',       name: 'The Forge',       emoji: '⚒️', x: -34, z: -44 },
+  // the landmark sits at the POOL, not the cliff — it's where you stand when
+  // you say "meet me at the waterfall", and where a beacon has to land
+  { id: 'waterfall',   name: 'The Waterfall',   emoji: '💧', x: -52, z: -18 },
+  { id: 'totem',       name: 'The Totem',       emoji: '🪵', x: 6,   z: 86 },
+  { id: 'workshop',    name: 'The Workshop',    emoji: '🔧', x: -20, z: -64 },
 ];
+// Places that build their own body below get no marker stone — a cairn in
+// front of a waterfall would just be litter.
+const BUILT_LANDMARKS = new Set(['waterfall', 'totem', 'workshop']);
 for (const lm of LANDMARKS) {
   const ly = groundY(lm.x, lm.z);
   const g = new THREE.Group();
-  const rock = new THREE.Mesh(
-    new THREE.DodecahedronGeometry(lm.id === 'our_rock' ? 1.5 : 0.7),
-    mat(lm.id === 'our_rock' ? 0x8D9AA5 : 0xA9B4BC)
-  );
-  rock.position.y = lm.id === 'our_rock' ? 0.9 : 0.4;
-  rock.rotation.set(0.3, lm.x, 0.2);
-  g.add(rock);
+  if (!BUILT_LANDMARKS.has(lm.id)) {
+    const rock = new THREE.Mesh(
+      new THREE.DodecahedronGeometry(lm.id === 'our_rock' ? 1.5 : 0.7),
+      mat(lm.id === 'our_rock' ? 0x8D9AA5 : 0xA9B4BC)
+    );
+    rock.position.y = lm.id === 'our_rock' ? 0.9 : 0.4;
+    rock.rotation.set(0.3, lm.x, 0.2);
+    g.add(rock);
+  }
   const lmTag = nameTag(`${lm.emoji} ${lm.name}`, '#475569');
-  lmTag.position.y = 2.2;
+  lmTag.position.y = lm.id === 'waterfall' ? 9.5 : lm.id === 'totem' ? 5.4 : 2.2;
   g.add(lmTag);
   g.position.set(lm.x, ly, lm.z);
   scene.add(g);
   lm.pos = new THREE.Vector3(lm.x, ly, lm.z);
+}
+
+// ── THE WATERFALL, AND THE CAVE BEHIND IT ───────────────────────────────────
+// The S4 climax lives here: the youngest goes missing in the storm, the family
+// search ends at this cave, and inside is the child — asleep, warm, safe —
+// with Barnacle pressed against them (built by a boy who wanted one friend who
+// could not be given back) and the Collier tending a fire, because he is the
+// only one of them who can be awake at night. And scratched on the wall by a
+// nine-year-old in 1954: T. BRENNAN. Barnacle just did it again, seventy-two
+// years later, for a child whose great-grandparents weren't born. Nobody told
+// him to. He never stopped.
+//
+// It is also the address in Lance's own sentence — "let's meet at the waterfall
+// and finish challenge 10" — so it has to be a place you can stand in.
+//
+// THE TERRAIN PROBLEM, measured (do not re-derive this the hard way):
+// islandHeight() is smooth everywhere. The "rocky spine" is a RAMP — at x=-52
+// it climbs 19.3→25.9 between z=-8 and z=-35, about a 30% grade, and the
+// cross-slope matches. There is no cliff anywhere on this island, and we cannot
+// carve one: the terrain law is shared with the VR island and the board, and
+// Build Mode's voxels key to a deterministic grid over it. Move the ground and
+// every fort a family ever raised floats or buries.
+//
+// So the rock brings its own drop. Two consequences, both learned by looking:
+//   · A flat pool disc CANNOT sit on a ramp — an 8m pool spans 2.5m of fall and
+//     renders as a floating crescent. A plunge pool needs a rim. The rim is
+//     built from rocks seated on real ground, each sized to reach the water.
+//   · Every y here is computed against groundY AT THAT POINT, never against the
+//     group's single base. That was the original bug.
+const fallsAnim = [];
+{
+  const lm = LANDMARKS.find(l => l.id === 'waterfall');
+  const base = groundY(lm.x, lm.z);
+  const g = new THREE.Group();
+  g.position.set(lm.x, base, lm.z);
+  // local ground, relative to the group's origin — the only honest way to seat
+  // anything on a hill that is never level
+  const lg = (dx, dz) => groundY(lm.x + dx, lm.z + dz) - base;
+
+  // The pool's surface. It sits ABOVE the landmark's ground on purpose: across
+  // an 8m basin this ramp drops ~3m, so any waterline low enough to look right
+  // downhill is buried in dirt uphill. A real plunge pool solves this with a
+  // rock basin, so this one does too — the rim below holds the head, and you
+  // wade in from the low side. Raising this without resizing the rim floats it.
+  const WATER_Y = 1.3;
+  const TOP     = 8.9;     // the lip
+  const FACE_Z  = -4.0;    // where the water falls
+
+  // ── the rock. Two pillars and a lintel, so the gap between them is the cave
+  // mouth and the water falls across it. Sunk 3.5 below the pool so no corner
+  // can lift off the ramp.
+  const rock = mat(0x77848D);
+  for (const dx of [-3.2, 3.2]) {
+    const pillar = new THREE.Mesh(new THREE.BoxGeometry(2.6, 13, 3.2), rock);
+    pillar.position.set(dx, 2.9, -5.6);
+    g.add(pillar);
+  }
+  const lintel = new THREE.Mesh(new THREE.BoxGeometry(9, 4.6, 3.2), rock);
+  lintel.position.set(0, 7.0, -5.6);   // spans y 4.7 → 9.3; the mouth is under it
+  g.add(lintel);
+
+  // faceted crown + shoulders, in the island's own low-poly language, so the
+  // outcrop breaks its silhouette instead of reading as a concrete bunker
+  const crown = [
+    [-4.6, 8.2, -5.2, 2.1], [4.6, 8.4, -5.4, 2.3], [0, 9.4, -6.4, 1.9],
+    [-2.6, 9.1, -4.9, 1.5], [2.8, 9.0, -5.1, 1.6],
+    [-5.6, 4.0, -3.4, 2.6], [5.6, 4.4, -3.6, 2.8],
+    [-6.4, 1.4, -1.0, 2.2], [6.4, 1.8, -1.2, 2.4],
+  ];
+  for (const [dx, dy, dz, s] of crown) {
+    const r = new THREE.Mesh(new THREE.DodecahedronGeometry(s), rock);
+    r.position.set(dx, dy, dz);
+    r.rotation.set(dx * 0.4, dz * 0.7, dy * 0.3);
+    g.add(r);
+  }
+
+  // ── the falling water. Lance's real turquoise, scrolling. Two sheets so it
+  // reads as volume from the front AND from inside the cave looking out.
+  //
+  // Two things here look like style and are load-bearing:
+  //  · tile() and NOT texWater.clone(). A clone taken at module-eval copies a
+  //    texture whose image hasn't downloaded yet; the image later bumps the
+  //    ORIGINAL's version, never the clone's, so the clone uploads empty and the
+  //    falls render pure black. The pool works only because it uses texWater
+  //    directly. This cost an afternoon — don't "simplify" it back to a clone.
+  //  · MeshBasicMaterial and NOT Lambert. The sun sits at (30, 50, -20) — it
+  //    lights the BACK of this cliff. A +z-facing Lambert plane gets no
+  //    directional light at all and reads as a black slab. Falling water is
+  //    bright anyway; unlit is both correct and the only thing that works here.
+  const fallMat = new THREE.MeshBasicMaterial({
+    map: tile('/island3d/tex/water.jpg', 1),
+    transparent: true, opacity: 0.78, side: THREE.DoubleSide,
+  });
+  fallMat.map.repeat.set(1, 3);
+  const FALL_H = TOP - WATER_Y;
+  for (const dz of [0, -0.45]) {
+    const sheet = new THREE.Mesh(new THREE.PlaneGeometry(4.6, FALL_H), fallMat);
+    sheet.position.set(0, WATER_Y + FALL_H / 2, FACE_Z + dz);
+    g.add(sheet);
+  }
+  // both sheets share fallMat — push it ONCE or the scroll runs twice a frame
+  fallsAnim.push({ material: fallMat });
+
+  // ── the pool, and the rim that makes it possible on a hillside.
+  const pool = new THREE.Mesh(new THREE.CircleGeometry(3.8, 22), new THREE.MeshLambertMaterial({
+    map: texWater, transparent: true, opacity: 0.82,
+  }));
+  pool.rotation.x = -Math.PI / 2;
+  pool.position.set(0, WATER_Y, -1.2);   // under the fall, so the water lands IN it
+  g.add(pool);
+
+  // the rim: rocks around the downhill arc, each seated on the ground it
+  // actually stands on and stretched to just clear the waterline. The ramp is
+  // why this loop exists — a fixed ring would float on one side and bury on the
+  // other. Note the scale.y: size the rock by RADIUS to reach the ground and it
+  // bulges in plan too, and the pool turns into a stone fountain. Keep it
+  // slender in plan and stretch it vertically instead.
+  // OUT is the steepest way down from the pool, measured off the real terrain.
+  // The rim opens there — that's the outlet, and it is also (not by accident)
+  // the way a player walks up. A closed rim on a hillside is a wall of rock:
+  // from 14m downhill at eye height you see a sliver of water and no pool.
+  const OUT = (() => {
+    const e = 1.5, x = lm.x, z = lm.z;
+    const gx = (groundY(x + e, z) - groundY(x - e, z)) / (2 * e);
+    const gz = (groundY(x, z + e) - groundY(x, z - e)) / (2 * e);
+    const m = Math.hypot(gx, gz) || 1;
+    return [-gx / m, -gz / m];
+  })();
+  for (let i = 0; i < 22; i++) {
+    const a = (i / 22) * Math.PI * 2;
+    const wob = 0.82 + ((i * 37) % 11) / 24;                 // deterministic jitter
+    const rad = 4.25 + ((i * 53) % 7) / 12;
+    const dx = Math.sin(a) * rad, dz = -1.2 + Math.cos(a) * rad;
+    if (dz < -4.2) continue;                                  // that arc is the rock face
+    if (Math.sin(a) * OUT[0] + Math.cos(a) * OUT[1] > 0.72) continue;   // the outlet
+    const top = WATER_Y + 0.35 + ((i * 29) % 5) / 12;         // a ragged waterline
+    const bottom = lg(dx, dz) - 0.6;                          // bite into the real ground
+    const r = 0.95 * wob;
+    const stone = new THREE.Mesh(new THREE.DodecahedronGeometry(r), mat(0x8D9AA5));
+    stone.position.set(dx, (top + bottom) / 2, dz);
+    stone.scale.y = Math.max(1, (top - bottom) / (2 * r));
+    stone.rotation.set(a * 0.4, a * 2.3, a * 0.2);
+    g.add(stone);
+  }
+
+  // ── THE STREAM. A basin on a 30% ramp with no outlet is a bathtub on a roof.
+  // The water leaves by the gap in the rim and finds its own way down by
+  // steepest descent — no authored path, so it runs where water would run and
+  // it can never disagree with the terrain.
+  //
+  // It also does the app a quiet favour: follow the water uphill and you find
+  // the falls. No map, no marker, no line of dialogue. Built in WORLD space —
+  // it leaves the waterfall's group behind almost immediately.
+  {
+    const STEP = 1.4;
+    const pts = [];
+    // start at the rim's lip, measured from the POOL's centre, not the landmark
+    let sx = lm.x + OUT[0] * 3.6, sz = (lm.z - 1.2) + OUT[1] * 3.6, run = 0;
+    const POOL_TOP = base + WATER_Y;
+    for (let i = 0; i < 80; i++) {
+      const e = 1.5;
+      const gx = (groundY(sx + e, sz) - groundY(sx - e, sz)) / (2 * e);
+      const gz = (groundY(sx, sz + e) - groundY(sx, sz - e)) / (2 * e);
+      const m = Math.hypot(gx, gz);
+      if (m < 0.03) break;                                  // flat — it has arrived
+      // the spillway: the first few metres pour out of the basin at 1.2/m until
+      // they meet the hill, then the stream simply lies on the ground
+      pts.push([sx, Math.max(groundY(sx, sz) + 0.1, POOL_TOP - run * 2.0), sz]);
+      if (groundY(sx, sz) <= SEA_Y + 0.4) break;            // it reached the sea
+      sx -= (gx / m) * STEP; sz -= (gz / m) * STEP; run += STEP;
+    }
+    if (pts.length > 2) {
+      const pos = [], uv = [], idx = [];
+      for (let i = 0; i < pts.length; i++) {
+        const [x, y, z] = pts[i];
+        const [nx, , nz] = pts[Math.min(i + 1, pts.length - 1)];
+        const [bx, , bz] = pts[Math.max(i - 1, 0)];
+        let tx = nx - bx, tz = nz - bz;
+        const tl = Math.hypot(tx, tz) || 1; tx /= tl; tz /= tl;
+        // narrow at the lip — a 2.7m ribbon starting 2m above the hillside is a
+        // floating slab, not a spout. It widens once it's on the ground.
+        const w = Math.min(1.25, 0.4 + i * 0.14);
+        const ox = -tz * w, oz = tx * w;
+        // each bank rides its own ground — the cross-slope is 31% too
+        pos.push(x + ox, Math.max(y, groundY(x + ox, z + oz) + 0.1), z + oz,
+                 x - ox, Math.max(y, groundY(x - ox, z - oz) + 0.1), z - oz);
+        uv.push(0, i * 0.5, 1, i * 0.5);
+      }
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a0 = i * 2, b0 = a0 + 1, a1 = a0 + 2, b1 = a0 + 3;
+        idx.push(a0, b0, a1, b0, b1, a1);
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+      geo.setIndex(idx);
+      geo.computeVertexNormals();
+      const streamMat = new THREE.MeshBasicMaterial({
+        map: tile('/island3d/tex/water.jpg', 1),
+        transparent: true, opacity: 0.72, side: THREE.DoubleSide,
+      });
+      streamMat.map.repeat.set(1, 1);
+      scene.add(new THREE.Mesh(geo, streamMat));
+      fallsAnim.push({ material: streamMat });
+    }
+  }
+
+  // mist where it lands
+  for (let i = 0; i < 8; i++) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.6 + Math.random() * 0.6, 6, 5),
+      new THREE.MeshLambertMaterial({ color: 0xE8F4F6, transparent: true, opacity: 0.2 }));
+    m.position.set((Math.random() - 0.5) * 4.5, WATER_Y + 0.3 + Math.random() * 1.6, -3.4 + Math.random() * 2.8);
+    g.add(m);
+  }
+
+  // ── THE CAVE. The mouth is the gap under the lintel, behind the water.
+  //
+  // IT HAS NO FLOOR, on purpose. The player's y is always groundY(x, z) — they
+  // walk on the island and can stand on nothing else. A built floor above the
+  // terrain puts the stone over their head; below it, the hill erupts through
+  // it (the ground climbs to +4.2 local across this footprint). So the island's
+  // own ground IS the floor, and the cave is a shell standing on it.
+  //
+  // The dark mat is not decoration either: this world has no shadow maps (it
+  // must hold 60fps on a phone at the end of a workday), so an interior that
+  // isn't painted dark is lit exactly like the hillside outside it. A cave has
+  // to be painted, not lit.
+  const dark = mat(0x2A2622), floorMat = mat(0x3A3128);
+  {
+    const fg = new THREE.PlaneGeometry(4.2, 8, 6, 12);
+    fg.rotateX(-Math.PI / 2);
+    const pa = fg.attributes.position;
+    for (let i = 0; i < pa.count; i++) pa.setY(i, lg(pa.getX(i), pa.getZ(i) - 7.7) + 0.05);
+    fg.computeVertexNormals();
+    const floor = new THREE.Mesh(fg, mat(0x2E2620));
+    floor.position.set(0, 0, -7.7);
+    g.add(floor);
+  }
+  const caveBack = new THREE.Mesh(new THREE.BoxGeometry(4.2, 7, 0.5), dark);
+  caveBack.position.set(0, 3.4, -11.7);
+  g.add(caveBack);
+  // the ceiling rides the floor. A flat one can't work: the ground climbs 1.4m
+  // over the cave's depth, so a flat ceiling is either headroom at the mouth and
+  // 1.3m at the back, or it hangs below the lintel and the mouth shuts.
+  {
+    const cg = new THREE.PlaneGeometry(4.2, 8, 6, 12);
+    cg.rotateX(Math.PI / 2);                       // face down
+    const pa = cg.attributes.position;
+    for (let i = 0; i < pa.count; i++) pa.setY(i, lg(pa.getX(i), pa.getZ(i) - 7.7) + 2.9);
+    cg.computeVertexNormals();
+    const top = new THREE.Mesh(cg, dark);
+    top.position.set(0, 0, -7.7);
+    g.add(top);
+  }
+  // INSIDE the pillars' inner faces (x = ±1.9), or the sunlit rock shows through
+  // and the cave has pale grey walls
+  for (const sx of [-1.85, 1.85]) {
+    const w = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 8), floorMat);
+    w.position.set(sx, 3.4, -7.7);
+    g.add(w);
+  }
+
+  // the Collier's fire — the one light on this island that is awake at night.
+  // Seated on the real ground, like everything else here.
+  const fire = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.5, 7),
+    new THREE.MeshBasicMaterial({ color: 0xFFA94D }));
+  fire.position.set(0, lg(0, -8.8) + 0.8, -8.8);
+  g.add(fire);
+  const fireLight = new THREE.PointLight(0xFFB05C, 1.2, 13);
+  fireLight.position.set(0, lg(0, -8.8) + 1.6, -8.8);
+  g.add(fireLight);
+  fallsAnim.push({ isFire: true, fire, fireLight });
+
+  // T. BRENNAN — scratched on the back wall by a nine-year-old in 1954, at the
+  // height a nine-year-old reaches. The reveal is a name on a wall. Nobody says
+  // a word about it.
+  const scratch = carvedText('T. BRENNAN · 1954', '#C8B89A', 26);
+  scratch.position.set(0, lg(0, -11.45) + 1.35, -11.4);
+  g.add(scratch);
+
+  scene.add(g);
+}
+// ── THE TOTEM ───────────────────────────────────────────────────────────────
+// The reward, and the origin's last image. Every milestone a family finishes
+// TOGETHER carves a name into it. It never resets and it never shrinks — a
+// slip cannot un-cross the wake, in wood. Reads the real milestone log, so
+// what's carved is what they actually did.
+{
+  const lm = LANDMARKS.find(l => l.id === 'totem');
+  const base = groundY(lm.x, lm.z);
+  const g = new THREE.Group();
+  g.position.set(lm.x, base, lm.z);
+
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.62, 4.6, 9), mat(0x8B6B47));
+  post.position.y = 2.3;
+  g.add(post);
+
+  // one carved band per milestone the family closed together
+  let closed = 0;
+  try { closed = (JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || '[]') || []).length; }
+  catch { closed = 0; }
+  for (let i = 0; i < Math.min(closed, 12); i++) {
+    const band = new THREE.Mesh(new THREE.TorusGeometry(0.56, 0.09, 6, 14), mat(0xC8A96E));
+    band.rotation.x = Math.PI / 2;
+    band.position.y = 0.7 + i * 0.32;
+    g.add(band);
+  }
+  const cap = new THREE.Mesh(new THREE.ConeGeometry(0.8, 0.9, 9), mat(0x6E5236));
+  cap.position.y = 5.0;
+  g.add(cap);
+  scene.add(g);
+}
+
+// ── THE WORKSHOP ────────────────────────────────────────────────────────────
+// The boy's shed, up in the forge country. The cot, the bench, the crate
+// stencilled GULLHAVEN, the notebooks going back to 1930 — and over the door,
+// cut an inch deep, the sentence Malakor found here and spent the rest of his
+// life saying as if it were his own.
+//
+// A player who has finished L.A.N.C.E. walks in and understands what he did,
+// and nobody says a word.
+{
+  const lm = LANDMARKS.find(l => l.id === 'workshop');
+  const base = groundY(lm.x, lm.z);
+  const g = new THREE.Group();
+  g.position.set(lm.x, base, lm.z);
+  g.rotation.y = 0.5;
+
+  // sunk 0.3 into the ramp so no corner floats — the ground here is never level
+  const walls = new THREE.Mesh(new THREE.BoxGeometry(5, 3, 4.2), mat(0x7A5C3E));
+  walls.position.y = 1.2;
+  g.add(walls);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(4.1, 1.6, 4), mat(0x5C4530));
+  roof.position.y = 3.5; roof.rotation.y = Math.PI / 4;
+  g.add(roof);
+  // the doorway, dark, always open — he never had a lock
+  const door = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.2, 0.2), mat(0x241A12));
+  door.position.set(0, 0.8, 2.15);
+  g.add(door);
+  // the carving over the door, cut an inch deep
+  const carving = carvedText('THE TOOLS WILL ANSWER', '#E8D9B5', 24);
+  carving.position.set(0, 2.35, 2.12);
+  g.add(carving);
+  // the lamp he left on
+  const lamp = new THREE.PointLight(0xFFC98A, 0.9, 10);
+  lamp.position.set(0, 2, 1);
+  g.add(lamp);
+  scene.add(g);
 }
 
 // THE RALLY — one family member calls a place; every gathered device raises
@@ -1197,6 +1612,42 @@ window._islandDebug = {
   // the family members this device currently sees, and their chosen looks
   others: () => { const out = []; for (const [actor, o] of others) out.push({ actor, kind: o.kind, tint: o.tint }); return out; },
   me: () => ({ kind: myKind, tint: myTint }),
+  // ── the visual gate ──────────────────────────────────────────────────────
+  // The waterfall once shipped visibly broken — floating slabs, a pool hanging
+  // in the air — while every gate reported zero errors, because nothing here
+  // could aim a camera at a place and take its picture. A world you can only
+  // assert about is a world you cannot see.
+  look(yaw = 0, pitch = 0.34) { camYaw = yaw; camPitch = pitch; },
+  groundY: (x, z) => groundY(x, z),
+  // take the camera off the player entirely and put it where you like. The
+  // chase cam can't photograph a hillside from the air — pass null to give it
+  // back. QA only; nothing in the game ever calls this.
+  freeCam(pos, target) { FREE_CAM = pos ? { pos, target: target || [0, 0, 0] } : null; },
+  // what is actually standing at (x, z)? For when a screenshot shows something
+  // you did not put there.
+  whatsAt(x, z, r = 6) {
+    const out = [];
+    scene.traverse(o => {
+      if (!o.isMesh && !o.isSprite) return;
+      const w = o.getWorldPosition(new THREE.Vector3());
+      const d = Math.hypot(w.x - x, w.z - z);
+      if (d > r) return;
+      out.push({ type: o.type, geo: o.geometry?.type,
+        color: o.material?.color ? '#' + o.material.color.getHexString() : null,
+        at: [+w.x.toFixed(1), +w.y.toFixed(1), +w.z.toFixed(1)], d: +d.toFixed(1) });
+    });
+    return out.sort((a, b) => a.d - b.d);
+  },
+  // stand off a landmark and face it, the way a player walks up to it.
+  // camYaw 0 puts the camera behind you looking down -z, so approach from +z.
+  visit(id, from = 16) {
+    const l = LANDMARKS.find(v => v.id === id);
+    if (!l) return null;
+    const z = l.z + from;
+    player.position.set(l.x, groundY(l.x, z), z);
+    camYaw = 0; camPitch = 0.3;
+    return { id, standing: [l.x, z], ground: +groundY(l.x, z).toFixed(2), place: [l.x, l.z] };
+  },
 };
 
 // proximity watch — 4Hz is plenty at walking speed
@@ -1506,13 +1957,33 @@ renderer.setAnimationLoop(() => {
     }
   }
 
-  // third-person camera: behind + above, orbit by drag
-  const cx = player.position.x + Math.sin(camYaw) * CAM_D * Math.cos(camPitch);
-  const cz = player.position.z + Math.cos(camYaw) * CAM_D * Math.cos(camPitch);
-  // ride the hills with the player (never sink the camera into a slope)
-  const cy = Math.max(player.position.y + 2.4 + Math.sin(camPitch) * CAM_D, groundY(cx, cz) + 1.2);
-  camera.position.lerp(new THREE.Vector3(cx, cy, cz), Math.min(1, dt * 7));
-  camera.lookAt(player.position.x, player.position.y + 1.2, player.position.z);
+  // the waterfall falls, and the Collier's fire breathes. He runs on flame —
+  // he is the only one of them who can be awake after dark, which is why he
+  // sat with the boy every night for six years, and why there is a fire in
+  // that cave when a lost child needs one.
+  for (const f of fallsAnim) {
+    if (f.isFire) {
+      const b = 1.3 + Math.sin(t * 5.5) * 0.18 + Math.sin(t * 11.3) * 0.09;
+      f.fireLight.intensity = b;
+      f.fire.scale.y = 0.9 + (b - 1.3) * 0.5;
+    } else if (f.material?.map) {
+      f.material.map.offset.y = (f.material.map.offset.y - dt * 1.6) % 1;
+    }
+  }
+
+  if (FREE_CAM) {
+    // QA has taken the camera off the player to photograph a place
+    camera.position.set(...FREE_CAM.pos);
+    camera.lookAt(...FREE_CAM.target);
+  } else {
+    // third-person camera: behind + above, orbit by drag
+    const cx = player.position.x + Math.sin(camYaw) * CAM_D * Math.cos(camPitch);
+    const cz = player.position.z + Math.cos(camYaw) * CAM_D * Math.cos(camPitch);
+    // ride the hills with the player (never sink the camera into a slope)
+    const cy = Math.max(player.position.y + 2.4 + Math.sin(camPitch) * CAM_D, groundY(cx, cz) + 1.2);
+    camera.position.lerp(new THREE.Vector3(cx, cy, cz), Math.min(1, dt * 7));
+    camera.lookAt(player.position.x, player.position.y + 1.2, player.position.z);
+  }
 
   renderer.render(scene, camera);
 });
