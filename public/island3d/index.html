@@ -1461,6 +1461,220 @@ const fallsAnim = [];
 
   scene.add(g);
 }
+// ── DRIFTWOOD CITY ──────────────────────────────────────────────────────────
+//
+// Chapter 18, "The City Stands Up":
+//
+//   "They found it on the second day, going inland for water: a city. Empty.
+//    Perfect. Wooden. The waterwheel turning. The clocks running. Streets, and
+//    benches, and a park, and HUNDREDS OF LAMPS THAT HAD NEVER BEEN LIT."
+//   "Kathleen Brennan said, 'There's people here,' and cried with relief, and
+//    there were no people there."
+//
+// Nine robots. Ninety-seven tools. Decades, and nobody coming. They built an
+// instrument for every gift the boy gave them and never had one guest.
+//
+// So the city is HERE FROM DAY ONE and it is DARK. You walk its streets while it
+// isn't yours. Chapter 19: "The Jumble watched you argue on the beach. We don't
+// help storms." Every milestone the family truly closes brings one place up. At
+// 31 — The Naming of the Boat — the whole thing comes on.
+//
+// THE PLACES ARE NOT TERRAIN. Mount Driftwood is not a mountain: it's the
+// robots' timber climb. Echo Canyon is not a canyon: it's a narrow street between
+// tall walls, built that way because Echo-2 needed somewhere to work. Mirror Lake
+// is not a lake: it's a wooden reservoir, mirror-still BECAUSE it's engineered.
+// Every "natural" feature of this city is a machine for a feeling. That is why it
+// is wooden, and why it hums with running water.
+//
+// Coordinates come from /city/driftwood-city.json, generated from
+// src/data/driftwoodCity.ts — the ONE geography. The board and VR read the same
+// numbers. Before this each world placed the city itself and they had already
+// drifted to sharing almost nothing. qa:island-mirror asserts it now.
+const CITY_ANIM = [];
+const CITY_LIT = [];   // { lightsAt, lamp, glow } — raised by the milestone log
+const M_TIMBER = mat(0x8B6B47), M_PLANK = mat(0xA9835B), M_DARK = mat(0x5C4530);
+
+function closedCount() {
+  try {
+    const s = JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || 'null');
+    return Array.isArray(s?.closed) ? s.closed.length : Array.isArray(s) ? s.length : 0;
+  } catch { return 0; }
+}
+
+// the glow a lamp throws — one shared radial texture, made once
+const HALO_TEX = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const x = c.getContext('2d');
+  const gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(255,232,180,1)');
+  gr.addColorStop(0.35, 'rgba(255,190,110,0.5)');
+  gr.addColorStop(1, 'rgba(255,170,90,0)');
+  x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+})();
+
+// A lamp on a post. Unlit until the family earns it — this is the whole reward.
+//
+// The glow is a SPRITE, not a PointLight. Twenty-seven PointLights compile into
+// the shader of every lit material in the world, and this app has to hold 60fps
+// on a phone at the end of somebody's workday. A halo costs one additive quad,
+// reads warmer than a light, and never touches the shader. The Heart's ember is
+// the only real light the city gets — which is also the Collier's law: exactly
+// one thing here is awake at night.
+function cityLamp(g, x, y, z, lightsAt) {
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 2.9, 6), M_DARK);
+  post.position.set(x, y + 1.45, z);
+  g.add(post);
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.46, 0.42),
+    new THREE.MeshBasicMaterial({ color: 0x2E2822 }));   // dark glass. Never lit.
+  head.position.set(x, y + 3.05, z);
+  g.add(head);
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: HALO_TEX, transparent: true, opacity: 0, depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  }));
+  halo.scale.setScalar(3.4);
+  halo.position.set(x, y + 3.05, z);
+  g.add(halo);
+  CITY_LIT.push({ lightsAt, head, halo });
+  return head;
+}
+
+fetch('/city/driftwood-city.json').then(r => r.json()).then(city => {
+  const byRegion = {};
+  for (const p of city.places) (byRegion[p.region] ||= []).push(p);
+  const region = Object.fromEntries(city.regions.map(r => [r.id, r]));
+
+  for (const p of city.places) {
+    const y = groundY(p.x, p.z);
+    const g = new THREE.Group();
+    g.position.set(p.x, y, p.z);
+    g.rotation.y = (p.x * 0.7 + p.z * 0.3) % Math.PI;   // stable, never random
+
+    // the body — a wooden building, sized by what it's for. Sunk 0.3 into the
+    // ground: nothing on this island stands on level earth.
+    const w = 3.4 + (Math.abs(p.x * 7 + p.z * 13) % 11) / 6;
+    const h = 2.6 + (Math.abs(p.x * 3 + p.z * 5) % 9) / 4;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, w * 0.85), M_TIMBER);
+    body.position.y = h / 2 - 0.65;
+    g.add(body);
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(w * 0.82, 1.5, 4), M_DARK);
+    roof.position.y = h + 0.1; roof.rotation.y = Math.PI / 4;
+    g.add(roof);
+    // a dark doorway — every one of them stands open. They never had a lock
+    // either, and they never had a visitor.
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.7, 0.15), mat(0x241A12));
+    door.position.set(0, 0.2, w * 0.43);
+    g.add(door);
+
+    // the sign, and the lamp that has never been lit
+    const sign = nameTag(`${p.glyph} ${p.name}`, region[p.region]?.color || '#475569');
+    sign.position.y = h + 1.55;
+    g.add(sign);
+    cityLamp(g, w * 0.62, 0, w * 0.5, p.lightsAt);
+
+    scene.add(g);
+  }
+
+  // THE HEART — the city's centre, where the flume arrives and the wheels turn.
+  // "The whole thing humming very faintly with running water, like a held note."
+  {
+    const hx = -8, hz = 18, hy = groundY(hx, hz);
+    const g = new THREE.Group();
+    g.position.set(hx, hy, hz);
+    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.8, 1.2, 10), M_PLANK);
+    plinth.position.y = 0.2; g.add(plinth);
+    // stacked driftwood, the way a totem is stacked
+    for (let i = 0; i < 5; i++) {
+      const s = 2.4 - i * 0.36;
+      const b = new THREE.Mesh(new THREE.BoxGeometry(s, 0.8, s), i % 2 ? M_TIMBER : M_PLANK);
+      b.position.y = 1.2 + i * 0.82;
+      b.rotation.y = i * 0.5;
+      g.add(b);
+    }
+    // the ember. It breathes, and it is the ONE light the robots kept burning —
+    // the Collier's law: something has to be awake at night.
+    const ember = new THREE.Mesh(new THREE.SphereGeometry(0.62, 9, 7),
+      new THREE.MeshBasicMaterial({ color: 0xFF9A3C }));
+    ember.position.y = 5.6; g.add(ember);
+    const emberLight = new THREE.PointLight(0xFFA94D, 1.4, 26);
+    emberLight.position.y = 5.6; g.add(emberLight);
+    CITY_ANIM.push({ t: 'ember', ember, emberLight });
+
+    // four wheels in the moat, turning on the water the flume brings
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2 + 0.79;
+      const wheel = new THREE.Group();
+      wheel.add(new THREE.Mesh(new THREE.TorusGeometry(1.1, 0.09, 5, 12), M_TIMBER));
+      for (let k = 0; k < 8; k++) {
+        const ka = (k / 8) * Math.PI * 2;
+        const pad = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.26, 0.1), M_PLANK);
+        pad.position.set(Math.cos(ka) * 1.1, Math.sin(ka) * 1.1, 0);
+        pad.rotation.z = ka;
+        wheel.add(pad);
+      }
+      wheel.position.set(Math.sin(a) * 4.4, 1.2, Math.cos(a) * 4.4);
+      wheel.rotation.y = a;
+      g.add(wheel);
+      CITY_ANIM.push({ t: 'wheel', wheel });
+    }
+    const tag = carvedText('THE HEART OF DRIFTWOOD', '#E8D9B5', 22);
+    tag.position.set(0, 5.0, 3.9);
+    g.add(tag);
+    scene.add(g);
+  }
+
+  // THE FLUME — the aqueduct. The city stands on the only flat ground here and
+  // the falls are 40m away uphill, so the robots CARRIED THE WATER TO IT. Nine
+  // robots, 97 tools, decades and nobody coming: of course they built one. It is
+  // also the island's spine of meaning — Skip's secret at milestone 4 is the
+  // source of everything the family is later given. Follow it either way and you
+  // find the other half of the story.
+  {
+    const wf = LANDMARKS.find(l => l.id === 'waterfall');
+    const A = [wf.x + 2, wf.z + 2], B = [-8, 18];          // the falls → the Heart
+    const N = 22;
+    const g = new THREE.Group();
+    for (let i = 0; i < N; i++) {
+      const t0 = i / N, t1 = (i + 1) / N;
+      const p0 = [A[0] + (B[0] - A[0]) * t0, A[1] + (B[1] - A[1]) * t0];
+      const p1 = [A[0] + (B[0] - A[0]) * t1, A[1] + (B[1] - A[1]) * t1];
+      // the channel falls gently and steadily from the pool to the Heart — that
+      // is what an aqueduct IS: it refuses the ground's opinion
+      const y0 = groundY(wf.x, wf.z) + 2.2 - t0 * 7.0;
+      const mid = [(p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2];
+      const len = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) + 0.2;
+      const trough = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.34, len), M_PLANK);
+      trough.position.set(mid[0], y0, mid[1]);
+      trough.rotation.y = Math.atan2(p1[0] - p0[0], p1[1] - p0[1]);
+      g.add(trough);
+      // trestles down to the real ground, every other bay
+      if (i % 2 === 0) {
+        const gy = groundY(mid[0], mid[1]);
+        const drop = Math.max(0.4, y0 - gy);
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.16, drop, 0.16), M_DARK);
+        leg.position.set(mid[0], y0 - drop / 2, mid[1]);
+        g.add(leg);
+      }
+    }
+    g.position.y = 0;
+    scene.add(g);
+  }
+
+  raiseCityLights();
+}).catch(() => { /* honest degradation: no city rather than a fake one */ });
+
+// The reward. Dark until earned; at 31 the whole thing comes on.
+function raiseCityLights() {
+  const n = closedCount();
+  for (const L of CITY_LIT) {
+    const lit = n >= L.lightsAt || n >= 31;   // 31 lights everything still dark
+    L.head.material.color.setHex(lit ? 0xFFEAC2 : 0x2E2822);
+    L.halo.material.opacity = lit ? 0.95 : 0;
+  }
+}
+window.addEventListener('storage', raiseCityLights);
+
 // ── THE TOTEM ───────────────────────────────────────────────────────────────
 // The reward, and the origin's last image. Every milestone a family finishes
 // TOGETHER carves a name into it. It never resets and it never shrinks — a
@@ -1630,6 +1844,16 @@ window._islandDebug = {
   // chase cam can't photograph a hillside from the air — pass null to give it
   // back. QA only; nothing in the game ever calls this.
   freeCam(pos, target) { FREE_CAM = pos ? { pos, target: target || [0, 0, 0] } : null; },
+  // close N milestones and raise the city's lamps — the reward, provable.
+  // (raiseCityLights is module-scope; window.raiseCityLights is undefined, and
+  // `window.raiseCityLights?.()` silently does nothing. That cost a false pass.)
+  closeMilestones(n) {
+    const ids = Array.from({ length: n }, (_, i) => 'ms_test_' + i);
+    localStorage.setItem('driftwood_milestone_log_v1', JSON.stringify({ closed: ids, investigating: null }));
+    raiseCityLights();
+    return { closed: n, lit: CITY_LIT.filter(L => L.halo.material.opacity > 0).length, of: CITY_LIT.length };
+  },
+  cityLights: () => ({ lit: CITY_LIT.filter(L => L.halo.material.opacity > 0).length, of: CITY_LIT.length }),
   // what is actually standing at (x, z)? For when a screenshot shows something
   // you did not put there.
   whatsAt(x, z, r = 6) {
@@ -1990,6 +2214,17 @@ renderer.setAnimationLoop(() => {
   // he is the only one of them who can be awake after dark, which is why he
   // sat with the boy every night for six years, and why there is a fire in
   // that cave when a lost child needs one.
+  // the city breathes: the Heart's ember, and the wheels the flume turns
+  for (const c of CITY_ANIM) {
+    if (c.t === 'ember') {
+      const b = 1.25 + Math.sin(t * 1.5) * 0.35;
+      c.emberLight.intensity = b;
+      c.ember.scale.setScalar(0.94 + (b - 1.25) * 0.14);
+    } else if (c.t === 'wheel') {
+      c.wheel.rotation.x += dt * 0.7;
+    }
+  }
+
   for (const f of fallsAnim) {
     if (f.isFire) {
       const b = 1.3 + Math.sin(t * 5.5) * 0.18 + Math.sin(t * 11.3) * 0.09;

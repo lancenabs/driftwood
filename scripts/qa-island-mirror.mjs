@@ -88,5 +88,62 @@ ok('all five seasons are anchored', tsC.length === 5, `canon has ${tsC.length}`)
 ok('the island stands them in the same places', tsC.join(' | ') === jsC.join(' | '),
   tsC.join(' | ') === jsC.join(' | ') ? '' : `canon=[${tsC}] island=[${jsC}]`);
 
+// ── D · DRIFTWOOD CITY — one island, one geography ──────────────────────────
+//
+// Lance's call 2026-07-14: the city is ON the walkable island and the 31 light
+// it. Before that every surface placed the city itself — island3d didn't render
+// it at all, VR strung it in a ring, the board laid it flat — and they had
+// drifted to sharing almost nothing. The coords in driftwoodCity.ts are now the
+// ONE geography; the generated JSON is how the standalone worlds read them.
+console.log('\nD · Driftwood City — one island, one geography');
+const cityTs = fs.readFileSync('src/data/driftwoodCity.ts', 'utf8');
+const cityJson = JSON.parse(fs.readFileSync('public/city/driftwood-city.json', 'utf8'));
+
+ok('every place has an address in the source of truth',
+  (cityTs.match(/ x: -?\d+, z: -?\d+,/g) ?? []).length === 27,
+  `${(cityTs.match(/ x: -?\d+, z: -?\d+,/g) ?? []).length}/27`);
+ok('the generated JSON carries them',
+  cityJson.places.every(p => typeof p.x === 'number' && typeof p.z === 'number'));
+ok('the JSON is not stale (27 places)', cityJson.places.length === 27, `${cityJson.places.length}`);
+ok('island3d reads the generated city', /fetch\('\/city\/driftwood-city\.json'\)/.test(html));
+
+const lits = cityJson.places.map(p => p.lightsAt);
+ok('every place is keyed to the milestone that lights it',
+  lits.every(n => Number.isInteger(n) && n >= 1 && n <= 31));
+ok('nothing lights before milestone 4 (First Fire is the turn)',
+  Math.min(...lits) >= 4, `min=${Math.min(...lits)}`);
+ok('the last thing to light is lantern-park at 31 — the payoff',
+  cityJson.places.find(p => p.id === 'lantern-park')?.lightsAt === 31);
+ok('no two places light at the same milestone', new Set(lits).size === lits.length);
+ok('the city is DARK until earned (ch 18: lamps that had never been lit)',
+  /opacity: 0,[\s\S]{0,90}AdditiveBlending/.test(html));
+ok('milestone 31 lights everything still dark', /n >= L\.lightsAt \|\| n >= 31/.test(html));
+ok('the lamps are halos, not 27 PointLights (this must run on a phone)',
+  !/const glow = new THREE\.PointLight\(0xFFC98A/.test(html));
+
+// every place must stand on real, walkable ground — islandHeight transcribed
+const cityH = (x, z) => {
+  const ss = (v, a, b) => { if (v <= a) return 0; if (v >= b) return 1; v = (v - a) / (b - a); return v * v * (3 - 2 * v); };
+  const noise = (a, c) => Math.sin(a * 0.055) * Math.cos(c * 0.047) + Math.sin(a * 0.021 + c * 0.033) * 1.6;
+  const r = Math.hypot(x, z); if (r > 136) return -6;
+  let h = -5 + (1 - ss(r, 98, 130)) * 5.9;
+  const shore = 1 - ss(r, 55, 102);
+  h += shore * (7 + noise(x, z) * 2.4);
+  h += Math.exp(-Math.pow((x + 40) / 55, 2)) * Math.exp(-Math.pow((z + 55) / 70, 2)) * 26 * shore;
+  return h;
+};
+const cityGrade = (x, z) => { const e = 1.5;
+  return Math.hypot((cityH(x + e, z) - cityH(x - e, z)) / (2 * e), (cityH(x, z + e) - cityH(x, z - e)) / (2 * e)); };
+const drowned = cityJson.places.filter(p => cityH(p.x, p.z) < 2);
+const steep = cityJson.places.filter(p => cityGrade(p.x, p.z) > 0.17);
+ok('no place is in the sea', drowned.length === 0, drowned.map(p => p.id).join(', '));
+ok('no place is on unbuildable ground (>17% grade)', steep.length === 0,
+  steep.map(p => `${p.id} ${(cityGrade(p.x, p.z) * 100).toFixed(0)}%`).join(', '));
+const STORY = [['wreck_beach', -6, 96], ['forge', -34, -44], ['waterfall', -52, -18],
+  ['totem', 6, 86], ['workshop', -20, -64], ['camp', 0, 92], ['lookout', 30, -85]];
+const onTop = cityJson.places.flatMap(p => STORY
+  .filter(([n, x, z]) => Math.hypot(p.x - x, p.z - z) < 12).map(([n]) => `${p.id}->${n}`));
+ok('the city does not stand on a story landmark', onTop.length === 0, onTop.join(', '));
+
 console.log(`\n${failures === 0 ? '✅ THE MIRROR HOLDS' : `❌ ${failures} FAILURE(S)`} — the island says what the canon says.\n`);
 process.exit(failures === 0 ? 0 : 1);
