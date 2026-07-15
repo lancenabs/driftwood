@@ -244,23 +244,86 @@ Bauer's dock, the 1954 Halcyon, cold-open plates. 2D + 3D + tool interiors.
 
 ---
 
+# P7 · ONE ISLAND — THE CITY IS THE REWARD
+### *Lance's decision, 2026-07-14. Binding. This is now the biggest thing left.*
+
+**It is not an invention. It is chapter 18, and the app never built it.**
+
+> *"They found it on the second day, going inland for water: a city. Empty.
+> Perfect. Wooden. The waterwheel turning. The clocks running. Streets, and
+> benches, and a park, and **hundreds of lamps that had never been lit.**"*
+>
+> *"Kathleen Brennan said, 'There's people here,' and cried with relief, and
+> there were no people there."*
+
+**Nine robots. Decades. A city built for guests who never came.** The 27 places
+are the boy's 97 tools made architectural — an instrument for every gift, and
+nobody to use one on.
+
+### THE ARC (all of it already written)
+- **Day two** — they find it. *Not at milestone 31.* You walk its streets in S1.
+- **It refuses them.** Ch 19: *"The Jumble watched you argue on the beach. We
+  don't help storms."* The city is **dark**. You can see it and it isn't yours.
+- **The 31 light it.** Every milestone closed brings a place up.
+- **Milestone 31: the whole city comes on.** Hundreds of lamps, finally lit,
+  because one family proved they weren't a storm.
+
+**`lantern-park` is already in `driftwoodCity.ts`** — *"light one lantern for
+something you hope for."* The robots built a park of lamps and never lit one.
+**That is the reward Lance's bar demands** (*"if there's no reward — 'I'm feeling
+better, this is working for me' — then we have not done our job"*), and it costs
+a boolean per place.
+
+### THE GEOGRAPHY IS DICTATED BY CANON — don't invent it
+*(measured 2026-07-14, not guessed — see the numbers below)*
+
+- *"going inland for water"* → they find it walking **north from the wreck
+  beach** `(-6, 96)`, on the way to the waterfall (milestone 4).
+- *"down from the ridge"* → the spine is northwest. The robots come off it.
+- *"the clocks running"* → seventy years of maintenance. It is not a ruin.
+
+**THE MEASUREMENTS THAT DECIDE THE LAYOUT:**
+
+| fact | number |
+|---|---|
+| The stream (steepest descent from the pool) | `(-52.8, -15.7)` → sea at `(-100, 21)`, **67m, running southwest** |
+| The island's centre | `(-30, 20)` … `(-10, 30)` — h ≈ **14–15**, grade **1–8%** |
+| Everywhere else | 26–31% ramp |
+
+**The centre is the only flat ground on this island, and the stream doesn't go
+there.** So the city can't sit on the natural water.
+
+**→ THE AQUEDUCT.** Canon: *"The waterwheel turning… the whole thing humming very
+faintly with running water, like a held note."* A city humming with water that
+has no river means **the robots carried the water to it** — a wooden flume from
+the falls to the plain, feeding wheels and channels down every street.
+
+**That is the most in-character thing in this entire world.** Nine robots. Ninety-
+seven tools. Decades, and nobody coming. Of course they built an aqueduct. And it
+gives the island its spine of meaning: *the waterfall feeds the city* — Skip's
+secret at milestone 4 is the source of everything the family will later be given.
+
+Follow the flume in either direction and you find the other half of the story.
+
+### THE BUILD (order matters)
+1. **One source of truth first.** `island3d` must read the generated
+   `public/city/driftwood-city.json` (`scripts/build-city-json.mjs` already
+   exists and VR already reads it — the island just never plugged in). Extend
+   `qa:island-mirror` to assert every city place resolves.
+2. **The terrain cannot help you.** No canyon, no lake, no mountain — it's a 30%
+   dome. **Build every one as rock**, the waterfall pattern: geography brought by
+   the structure, every y against `groundY` at its own point. Mirror Lake is a
+   rimmed basin. Echo Canyon is two walls. The Summit is built on the spine.
+3. **Districts on the stream**, walking outward from the falls.
+4. **The dark/lit state per place**, keyed to the milestone log. Dark by default.
+5. **VR + board read the same coordinates** — kill the drift at the root.
+6. **Higgsfield doubles**: 27 places, dark and lit.
+
+---
+
 # THE OPEN DECISIONS (Lance's, not mine)
 
-### 1 · IS DRIFTWOOD CITY ON THE ISLAND? *(new — found 2026-07-14)*
-There are **two Driftwood worlds** and they do not know about each other:
-
-| | places | who renders it |
-|---|---|---|
-| **The island** | 8 landmarks — Wreck Beach, Camp, Forge, Lookout, Quiet Cove, Our Rock, + the 3 new | `island3d` (the phone world), where the 31 milestones, the Gathering, Build Mode and **Lance's waterfall scene** live |
-| **Driftwood City** | 27 places, 7 regions — Lighthouse, Mirror Lake, Echo Canyon, the Summit, Golf Park, Amphitheater, Market Square… | `DriftwoodCity.tsx`, `mr/city.html`, and VR as **a ring around the island** |
-
-**The phone-first island — the one that matters for "meet me at the waterfall" —
-has no city at all. The city has no waterfall.** The origin says the robots built
-a driftwood city, so both can be true, but nothing connects them today.
-
-This shapes P3 (does a milestone ever happen at Mirror Lake?) and P6 (does the
-Higgsfield run need city plates?). **It's a world decision, not a code one.**
-
+### 1 · ~~Is Driftwood City on the island?~~ **DECIDED 2026-07-14 → ONE ISLAND.** See P7.
 ### 2 · The ElevenLabs tier — the gate on the Jumble's ten voices *(Lance's action)*
 ### 3 · Companion side of the dyad (§0.4 — needs his word): `world: 'shore'`, `partnerOf`, the Driftwood tool registry
 
