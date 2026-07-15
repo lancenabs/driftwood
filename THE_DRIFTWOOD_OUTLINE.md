@@ -207,20 +207,30 @@ can't lie for long.
 
 **→ OPEN FOR LANCE: is Driftwood City ON the island?** See THE OPEN DECISIONS.
 
-### P2 · THE INVITE — "meet me at the waterfall"
-**The text message is the product surface.** place + challenge + rough time → a
-link. He taps it in Messages, lands on the island, beacon on the waterfall.
-**Late-tolerant**: whoever arrives first can skip stones — *the Skipping is
-already one of the boy's 97 tools; put it where the waiting happens.*
+### P2 · THE INVITE — "meet me at the waterfall" ✅ DONE (`0ab702e`)
+Built the whole chain and drove it in a real browser (both sides). The wife taps
+"call the family here" at a place → the island builds `<origin>/?meet=<code>&at=<place>`
+and hands it to `navigator.share`/the clipboard: her Messages thread. The husband
+taps it → `App.tsx` joins her camp, routes to the island, the beacon rises at the
+waterfall from the URL. He walks over from the camp. `src/lib/invite.ts` +
+`qa:invite` (24 assertions) + `scripts/shot-invite.mjs` (the live two-device
+proof). Late-tolerant by design; the place rides in the link so the beacon never
+races the relay.
 
-### P3 · THE DIALOGUE — all 31, the Jumble's arc
-Deepen `milestoneCraft.ts` per PART 1. Ensemble law: every robot speaks in every
-milestone. **Every line written to be spoken** (voice slots wired, auto-light).
+### P3 · THE DIALOGUE — all 31 ✅ COMPLETE (+ canon reconciled `0f4cf19`)
+All 31 milestones have openings (milestones.ts) + steps + closings (milestoneCraft.ts),
+10 bound to real games. The arc reads: safety → structure → joy → repair → letting
+go. **The climax was reconciled to the blessed origin (2026-07-14):** milestone 25
+said "Bauer built us"; now Elias is the maker and Bauer is the '54 child the cave
+saved. See [[the-wayward-boy-origin-canon]]. *If a future line says Bauer MADE
+them, that's the old canon leaking — the maker is always Elias.*
 
-### P4 · THE REWARD — accumulation
-The totem. Every milestone finished together carves a name. **Never resets, never
-shrinks.** They met at the waterfall Thursday → the waterfall is theirs → a
-lantern, two names, a date. *A slip cannot un-cross the wake, in wood.*
+### P4 · THE REWARD — accumulation ✅ DONE (`4dfd5de`)
+The totem carves one band per milestone (all 31, not capped at 12) and the city
+lights one place per milestone — **both live, on the same storage signal**, so
+they agree the instant a milestone closes. Verified across the iframe boundary:
+0→31 bands, 0→27 lamps. *A slip cannot un-cross the wake, in wood — and now you
+can watch the wood grow.*
 
 ### P5 · THE VOICES
 The Jumble ×10, on Lance's upgraded tier. **Skip's line last.**
