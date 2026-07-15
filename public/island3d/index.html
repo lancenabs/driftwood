@@ -1689,27 +1689,35 @@ window.addEventListener('storage', raiseCityLights);
   const post = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.62, 4.6, 9), mat(0x8B6B47));
   post.position.y = 2.3;
   g.add(post);
-
-  // one carved band per milestone the family closed together
-  // The log is an OBJECT — { closed: string[], investigating } — not an array.
-  // Reading it as an array gives undefined, the band loop never runs, and the
-  // totem stays bare forever while looking exactly like a totem that is simply
-  // waiting for the family to do something. Line 1839 and VR always had this
-  // right; this didn't. Verified against MilestoneLog.tsx, which writes it.
-  let closed = 0;
-  try {
-    const s = JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || 'null');
-    closed = Array.isArray(s?.closed) ? s.closed.length : Array.isArray(s) ? s.length : 0;
-  } catch { closed = 0; }
-  for (let i = 0; i < Math.min(closed, 12); i++) {
-    const band = new THREE.Mesh(new THREE.TorusGeometry(0.56, 0.09, 6, 14), mat(0xC8A96E));
-    band.rotation.x = Math.PI / 2;
-    band.position.y = 0.7 + i * 0.32;
-    g.add(band);
-  }
   const cap = new THREE.Mesh(new THREE.ConeGeometry(0.8, 0.9, 9), mat(0x6E5236));
   cap.position.y = 5.0;
   g.add(cap);
+
+  // One carved band per milestone the family closed together — all 31, spaced to
+  // fit the post so the full crossing is one monument (not capped at 12, which
+  // hid two thirds of a finished journey). Rebuilds LIVE on the storage event,
+  // the same signal that lights the city, so the totem and the city agree the
+  // instant a milestone closes instead of the totem lagging until reload.
+  //
+  // closedCount() reads the OBJECT shape { closed: [...] }. Reading it as an
+  // array gives undefined and the loop never runs — the totem stays bare while
+  // looking exactly like one that is simply waiting. That was the bug.
+  const bands = [];
+  function recarveTotem() {
+    for (const b of bands) g.remove(b);
+    bands.length = 0;
+    const closed = Math.min(closedCount(), 31);
+    const gap = 3.4 / 31;                       // the whole crossing fits the post
+    for (let i = 0; i < closed; i++) {
+      const band = new THREE.Mesh(new THREE.TorusGeometry(0.56, 0.075, 6, 14), mat(0xC8A96E));
+      band.rotation.x = Math.PI / 2;
+      band.position.y = 0.7 + i * gap;
+      g.add(band);
+      bands.push(band);
+    }
+  }
+  recarveTotem();
+  window.addEventListener('storage', e => { if (!e.key || e.key === 'driftwood_milestone_log_v1') recarveTotem(); });
   scene.add(g);
 }
 
