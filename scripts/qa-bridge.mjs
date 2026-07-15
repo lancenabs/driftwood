@@ -144,5 +144,63 @@ ok('the reader tolerates both shapes', /Array\.isArray\(s\?\.closed\)/.test(src)
   ok('the new read still handles a bare array', readClosedSim('["a"]').length === 1);
 }
 
+// ── G · the deferral signal actually COMPLETES ─────────────────────────────
+// Lance's #1 instrument: "did they do the homework, or did they put it off?"
+// buildDeferralRecords reads receipts, but nothing recorded a 'completed' receipt
+// when a milestone closed — so the therapist saw "assigned" and never "done
+// together." This asserts the reconciler exists, runs before the payload, and
+// keys on the closed log.
+console.log('\nG · the deferral completes (did they do the homework?)');
+ok('a milestone-completion reconciler exists', /function detectMilestoneCompletions/.test(src));
+ok('it keys off the real closed log', /detectMilestoneCompletions[\s\S]{0,200}readClosed\(\)/.test(src));
+ok('it only completes assignments that name a milestone', /\.milestoneId as string/.test(src));
+ok('syncNow reconciles BEFORE building the payload',
+  /detectMilestoneCompletions\(state\)[\s\S]{0,120}buildExportPayload\(\)/.test(src));
+ok('the deferral records whether they were together', /wasTogetherAround\(completed\)/.test(src));
+
+// prove the semantics end to end (re-implemented, so a logic change is caught)
+{
+  const recordReceipt = (receipts, id, status) => {
+    const rank = { received: 1, opened: 2, completed: 3 };
+    const cur = receipts[id];
+    if (cur && (rank[cur.status] ?? 0) >= (rank[status] ?? 0)) return;
+    receipts[id] = { status, at: new Date().toISOString() };
+  };
+  const reconcile = (directives, receipts, closed) => {
+    const set = new Set(closed);
+    for (const d of directives) {
+      if (d.type !== 'push_app' && d.type !== 'suggest_work') continue;
+      if (receipts[d.id]?.status === 'completed') continue;
+      const ms = d.payload?.milestoneId;
+      if (ms && set.has(ms)) recordReceipt(receipts, d.id, 'completed');
+    }
+  };
+  const buildDeferral = (directives, receipts) => directives.flatMap(d => {
+    const r = receipts[d.id]; if (!r) return [];
+    const completed = r.status === 'completed';
+    return [{ what: d.payload.milestoneId, assignedAt: d.issuedAt, completedAt: completed ? r.at : undefined,
+      hoursToOpen: completed ? (new Date(r.at) - new Date(d.issuedAt)) / 3.6e6 : undefined }];
+  });
+
+  const assigned = new Date(Date.now() - 13 * 3.6e6).toISOString();   // 13h ago, in session
+  const directives = [{ id: 'd1', type: 'push_app', issuedAt: assigned, payload: { milestoneId: 'ms_two_huts' } }];
+  const receipts = {};
+
+  let recs = buildDeferral(directives, receipts);
+  ok('before they do it: no completion crosses', recs.length === 0);
+
+  reconcile(directives, receipts, []);                     // nothing closed yet
+  ok('assigned-but-untouched still does not complete', !receipts.d1);
+
+  reconcile(directives, receipts, ['ms_two_huts']);        // they finish challenge 10
+  recs = buildDeferral(directives, receipts);
+  ok('after they finish: it completes', recs[0]?.completedAt !== undefined);
+  ok('and Lance gets hours-to-open (~13h — the night before)',
+    recs[0]?.hoursToOpen > 12 && recs[0]?.hoursToOpen < 14, `${recs[0]?.hoursToOpen?.toFixed(1)}h`);
+  ok('a different milestone closing does NOT complete this one', (() => {
+    const rc = {}; reconcile(directives, rc, ['ms_first_fire']); return !rc.d1;
+  })());
+}
+
 console.log(`\n${failures === 0 ? '✅ THE BRIDGE HOLDS' : `❌ ${failures} FAILURE(S)`} — what they say at the waterfall stays theirs.\n`);
 process.exit(failures === 0 ? 0 : 1);

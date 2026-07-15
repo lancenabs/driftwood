@@ -263,6 +263,39 @@ function wasTogetherAround(at: string, windowMin = 20): { together: boolean; fir
   } catch { return { together: false }; }
 }
 
+/**
+ * THE MISSING HALF OF THE DEFERRAL SIGNAL.
+ *
+ * buildDeferralRecords reads receipts, but nothing here ever recorded a
+ * 'completed' receipt when a milestone closed — the vendored LANCE library has
+ * detectCompletions(); Driftwood's bridge never got it. So the therapist saw
+ * "assigned" and, if wired, "opened," but never "completed together" — which is
+ * the entire tell Lance's scene turns on: *did they do the homework, or did they
+ * put it off, and did they do it as a couple?*
+ *
+ * An assigned milestone is DONE the instant it's in driftwood_milestone_log_v1's
+ * closed list. That's the honest completion signal (the milestone log only grows
+ * when a real instrument's store grew — boxes are never self-checked). Stamped at
+ * reconcile time, which syncNow runs right after a close, so wasTogetherAround's
+ * ±20-min window still sees both castaways who just finished together.
+ *
+ * `payload.milestoneId` is the same field buildDeferralRecords already keys on —
+ * no new contract with the Companion, just the completion it was always missing.
+ * (Tool assignments complete through the app's own tool_work events; this closes
+ * the milestone half, which is what "challenge 10" actually is.)
+ */
+function detectMilestoneCompletions(s: DirectiveState): boolean {
+  const closed = new Set(readClosed());
+  let changed = false;
+  for (const d of s.directives) {
+    if (d.type !== 'push_app' && d.type !== 'suggest_work') continue;
+    if (s.receipts[d.id]?.status === 'completed') continue;
+    const ms = (d.payload as any)?.milestoneId as string | undefined;
+    if (ms && closed.has(ms)) { recordReceipt(s, d.id, 'completed', `${ms} closed`); changed = true; }
+  }
+  return changed;
+}
+
 export function buildDeferralRecords(): DeferralRecord[] {
   const s = getDirectiveState();
   const out: DeferralRecord[] = [];
@@ -405,6 +438,9 @@ export async function syncNow(): Promise<boolean> {
   try {
     await pullDirectives(link);
     const state = getDirectiveState();
+    // reconcile milestone assignments against the closed log BEFORE the payload
+    // is built, so a milestone finished since the last sync crosses as completed
+    if (detectMilestoneCompletions(state)) saveDirectiveState(state);
     const payload = await buildExportPayload();
     const res = await fetch(`${link.endpoint}/api/companion-sync/${link.clientId}`, {
       method: 'POST',
