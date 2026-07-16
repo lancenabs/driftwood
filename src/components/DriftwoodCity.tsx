@@ -256,6 +256,14 @@ function CityHero() {
         className="story-kenburns h-full w-full object-cover"
         onError={() => setOk(false)}
       />
+      {lit && (
+        // the night the city came on, kept breathing — the lit hero's motion
+        // twin plays when it exists; the still is its poster (2026-07-16)
+        <video src="/city/_city-lit.mp4" autoPlay muted loop playsInline aria-hidden
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ opacity: 0.999 }}
+          onError={e => { (e.target as HTMLVideoElement).style.display = 'none'; }} />
+      )}
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-4 pb-2.5 pt-8">
         <p className="text-[11px] font-black uppercase tracking-[0.18em] text-white/90">
           {lit

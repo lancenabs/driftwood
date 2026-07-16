@@ -23,13 +23,13 @@ import { THE_SEVEN, claimSlot, setActiveCastaway, readCrew, writeRelationship } 
 // into one look. The file lives in assets/retired/; the commissioned stills
 // carry the boarding with the Ken Burns hold. If on-canon clips are ever
 // generated (silhouettes + wooden robots only), point these slots at them.
-// All three slots are empty on purpose: no clip on disk passes the laws today,
-// and an empty slot renders zero <video> (no 404 on every boarding). When
-// on-canon clips land (silhouettes + wooden robots only), put paths back.
+// The 1954 clips (2026-07-16): image-to-video from the period stills, so the
+// motion IS the painting moving. An unloadable clip degrades to the still's
+// Ken Burns — never black, never a 404 spiral (SceneBackdrop guards it).
 const VIDEO = {
-  ship: '',
-  storm: '',
-  shore: '',
+  ship: '/shore/onboard_ship.mp4',
+  storm: '/shore/onboard_storm.mp4',
+  shore: '/shore/onboard_shore.mp4',
 };
 const FALLBACK_ART = '/shore/boarding_hero.jpg';
 

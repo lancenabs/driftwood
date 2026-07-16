@@ -72,14 +72,29 @@ type Phase = 'log' | 'scene' | 'conch' | 'working' | 'closing' | 'closed';
 
 // A story still that slow-zooms over its beat (the Ken Burns law). Missing
 // art renders nothing at all — the text carries the scene alone, honestly.
+// 2026-07-16: beats whose art has a motion twin (same path, .mp4 under
+// /story/video/) play it over the still; the still stays as the poster.
+const STORY_VIDEO: Record<string, string> = {
+  '/story/act4/27_glow_behind_falls.jpg': '/story/video/27_glow_behind_falls.mp4',
+  '/story/act5/32_fire_lit.jpg': '/story/video/32_fire_lit.mp4',
+};
 function StoryArt({ src }: { src: string }) {
   const [ok, setOk] = React.useState(true);
+  const [videoLive, setVideoLive] = React.useState(false);
+  const video = STORY_VIDEO[src];
   if (!ok) return null;
   return (
-    <div className="rounded-2xl overflow-hidden border-2 border-outline-variant mb-1" style={{ aspectRatio: '16/9' }}>
+    <div className="relative rounded-2xl overflow-hidden border-2 border-outline-variant mb-1" style={{ aspectRatio: '16/9' }}>
       <img src={src} alt="" aria-hidden loading="lazy"
         className="w-full h-full object-cover story-kenburns"
         onError={() => setOk(false)} />
+      {video && (
+        <video src={video} autoPlay muted loop playsInline aria-hidden
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ opacity: videoLive ? 1 : 0, transition: 'opacity 0.8s ease' }}
+          onPlaying={() => setVideoLive(true)}
+          onError={e => { (e.target as HTMLVideoElement).style.display = 'none'; }} />
+      )}
     </div>
   );
 }
