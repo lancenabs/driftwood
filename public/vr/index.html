@@ -184,21 +184,38 @@ instancedScatter(new THREE.CylinderGeometry(0.16, 0.34, 7, 6), barkMat, palmSpot
   d.rotation.set(0, rand() * Math.PI * 2, (rand() - 0.5) * 0.3);
   d.scale.setScalar(0.8 + rand() * 0.5);
 });
+// PHOTOREAL FRONDS + FOLIAGE (2026-07-16) — same treatment as island3d, so
+// the flat island and the headset island are the same island.
 const frondSpots = [];
 for (const s of palmSpots) for (let i = 0; i < 6; i++) frondSpots.push({ ...s, fi: i });
-instancedScatter(new THREE.ConeGeometry(0.55, 3.6, 4), mat(0x3B8456), frondSpots, (d, s) => {
-  d.position.set(s.x + Math.cos((s.fi / 6) * Math.PI * 2) * 0.9, s.h + 6.9, s.z + Math.sin((s.fi / 6) * Math.PI * 2) * 0.9);
-  d.rotation.set(Math.PI / 2.5 * Math.sin((s.fi / 6) * Math.PI * 2), 0, Math.PI / 2.5 * Math.cos((s.fi / 6) * Math.PI * 2));
+const frondGeo = (() => {
+  const g = new THREE.PlaneGeometry(4.2, 4.2);
+  g.rotateX(-Math.PI / 2);
+  g.translate(1.8, 0, 0);
+  return g;
+})();
+const frondMat = new THREE.MeshLambertMaterial({
+  map: texLoader.load('/island3d/tex/frond.png'),
+  alphaTest: 0.4, side: THREE.DoubleSide,
 });
+instancedScatter(frondGeo, frondMat, frondSpots, (d, s) => {
+  d.position.set(s.x, s.h + 6.9, s.z);
+  d.rotation.order = 'YZX';
+  d.rotation.set(0, (s.fi / 6) * Math.PI * 2 + rand() * 0.5, -(0.35 + rand() * 0.3));
+  d.scale.setScalar(0.85 + rand() * 0.4);
+});
+const texFoliage = tile('/island3d/tex/foliage.jpg', 2);
+const foliageMat = new THREE.MeshLambertMaterial({ map: texFoliage });
 const treeSpots = scatterOn(90, h => h > 3.5 && h < 13);
 instancedScatter(new THREE.CylinderGeometry(0.3, 0.5, 5, 6), barkMat, treeSpots, (d, s) => {
   d.position.set(s.x, s.h + 2.2, s.z); d.scale.setScalar(0.8 + rand() * 0.8);
 });
-instancedScatter(new THREE.SphereGeometry(2.6, 7, 5), mat(0x2F6B43), treeSpots, (d, s, i) => {
+instancedScatter(new THREE.SphereGeometry(2.6, 8, 6), foliageMat, treeSpots, (d, s, i) => {
   d.position.set(s.x, s.h + 6 + (i % 3) * 0.5, s.z);
+  d.rotation.y = rand() * Math.PI * 2;
   d.scale.set(1 + rand() * 0.7, 0.75 + rand() * 0.4, 1 + rand() * 0.7);
 });
-instancedScatter(new THREE.ConeGeometry(0.5, 1.1, 5), mat(0x4E9B63), scatterOn(120, h => h > 3 && h < 11), (d, s) => {
+instancedScatter(new THREE.ConeGeometry(0.5, 1.1, 6), foliageMat, scatterOn(120, h => h > 3 && h < 11), (d, s) => {
   d.position.set(s.x, s.h + 0.4, s.z); d.rotation.y = rand() * Math.PI; d.scale.setScalar(0.7 + rand());
 });
 instancedScatter(new THREE.DodecahedronGeometry(1.3, 0), new THREE.MeshLambertMaterial({ map: texRock }), scatterOn(40, h => h > 8), (d, s) => {

@@ -18,8 +18,13 @@ import { THE_SEVEN, claimSlot, setActiveCastaway, readCrew, writeRelationship } 
 //    /shore/onboard_shore.mp4   — waking on the tide line
 // ═════════════════════════════════════════════════════════════════════════════
 
+// RETIRED 2026-07-16 (Lance's call): onboard_ship.mp4 showed fixed, readable
+// faces — the silhouette law says shared story art never locks the family
+// into one look. The file lives in assets/retired/; the commissioned stills
+// carry the boarding with the Ken Burns hold. If on-canon clips are ever
+// generated (silhouettes + wooden robots only), point these slots at them.
 const VIDEO = {
-  ship: '/shore/onboard_ship.mp4',
+  ship: '/shore/onboard_ship_retired.mp4',
   storm: '/shore/onboard_storm.mp4',
   shore: '/shore/onboard_shore.mp4',
 };
