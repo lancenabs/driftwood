@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { CITY_REGIONS } from '../data/driftwoodCity';
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -55,6 +55,11 @@ export default function CityScene({
   const W = 320, H = 180;
   const reg = CITY_REGIONS.find(r => r.id === region) ?? CITY_REGIONS[0];
   const color = reg.color;
+
+  // The commissioned still (2026-07-16 art run) is preferred; the generative
+  // SVG below stays as the honest fallback if the file is missing. The still
+  // rides the Ken Burns law — a slow zoom toward the scene's heart.
+  const [artOk, setArtOk] = useState(true);
 
   const scene = useMemo(() => {
     const rand = rng(hash(placeId));
@@ -149,6 +154,20 @@ export default function CityScene({
 
     return { skyTop, skyMid, sun, baseGround, back, mid, ground, motes, uid };
   }, [placeId, region, color]);
+
+  if (artOk) {
+    return (
+      <div className={className} style={{ height, overflow: 'hidden', display: 'block', position: 'relative' }}>
+        <img
+          src={`/city/${placeId}.jpg`} alt=""
+          className="story-kenburns"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          onError={() => setArtOk(false)}
+          loading="lazy"
+        />
+      </div>
+    );
+  }
 
   return (
     <svg

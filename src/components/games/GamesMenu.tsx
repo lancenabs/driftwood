@@ -20,6 +20,7 @@ import LetterInTheBottle from './LetterInTheBottle';
 import ApologyForge from './ApologyForge';
 import LoadTest from './LoadTest';
 import GenogramHunt from './GenogramHunt';
+import SceneCard from '../SceneCard';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  CAMPFIRE GAMES — the home for the reconnection mini-games (the 30-40, growing).
@@ -32,6 +33,35 @@ import GenogramHunt from './GenogramHunt';
 type GameDef = {
   id: string; name: string; emoji: string; tier: string; blurb: string;
   render: (onClose: () => void) => React.ReactNode;
+  /** Commissioned still that plays as a 1.5–2s SceneCard cut on entry
+   *  (Lance's 2026-07-16 commission). focus = where the zoom travels. */
+  art?: string; focus?: string;
+};
+
+// Every game borrows the story still it grew out of — the same image the
+// family met at that milestone, so entering the tool feels like walking back
+// into the scene. No new art needed: the crossing already painted these.
+const GAME_ART: Record<string, { art: string; focus?: string }> = {
+  fire_quiz:           { art: '/story/act1/08_burned_hand.jpg', focus: '42% 58%' },
+  two_truths:          { art: '/story/act3/19_game_night.jpg' },
+  appreciation_volley: { art: '/story/act3/18_volley.jpg', focus: '50% 34%' },
+  love_language_sort:  { art: '/story/act2/15_five_oils.jpg' },
+  bid_and_turn:        { art: '/story/act1/10_night_watch.jpg' },
+  weather_report:      { art: '/story/act1/03_storm_wall.jpg', focus: '55% 30%' },
+  repair_rope:         { art: '/story/act4/25_repair_rope.jpg', focus: '50% 55%' },
+  story_circle:        { art: '/story/act3/22_feast.jpg' },
+  chore_swap:          { art: '/story/act2/13_rules_post.jpg' },
+  memory_match:        { art: '/story/act1/07_skip.jpg', focus: '50% 48%' },
+  ridgepole_vote:      { art: '/story/act2/11_village.jpg' },
+  sand_drawings:       { art: '/story/act1/05_tide_line.jpg' },
+  two_huts:            { art: '/story/act2/14_sleeping_spiral.jpg' },
+  ritual_designer:     { art: '/story/act3/21_signal_unlit.jpg', focus: '50% 30%' },
+  naming_the_undertow: { art: '/story/act4/24_naming_undertow.jpg', focus: '50% 62%' },
+  perspective_swap:    { art: '/story/act1/04_hold_the_line.jpg', focus: '50% 55%' },
+  letter_in_the_bottle:{ art: '/story/act3/20_bottle_ashore.jpg', focus: '45% 55%' },
+  apology_forge:       { art: '/story/act2/12_collier.jpg', focus: '48% 45%' },
+  load_test:           { art: '/story/act4/23_second_storm.jpg' },
+  genogram_hunt:       { art: '/story/act2/17_remembering_house.jpg' },
 };
 
 const GAMES: GameDef[] = [
@@ -108,6 +138,13 @@ const GAMES: GameDef[] = [
 
 export default function GamesMenu({ onClose, embedded = false }: { onClose: () => void; embedded?: boolean }) {
   const [active, setActive] = useState<GameDef | null>(null);
+  // the entry cut: the game's story still, once, on the way in
+  const [card, setCard] = useState<{ art: string; focus?: string; name: string } | null>(null);
+  const open = (g: GameDef) => {
+    const a = GAME_ART[g.id];
+    if (a) setCard({ ...a, name: g.name });
+    setActive(g);
+  };
   // the milestone log queues a specific game (the instrument) before routing
   // the crew to the fire — honor it once, then clear the slip
   useEffect(() => {
@@ -116,11 +153,17 @@ export default function GamesMenu({ onClose, embedded = false }: { onClose: () =
       if (pending) {
         sessionStorage.removeItem('driftwood_pending_game');
         const g = GAMES.find(x => x.id === pending);
-        if (g) setActive(g);
+        if (g) open(g);
       }
     } catch { /* the menu itself is the fallback */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  if (active) return <>{active.render(() => setActive(null))}</>;
+  if (active) return (
+    <>
+      {active.render(() => setActive(null))}
+      {card && <SceneCard src={card.art} focus={card.focus} caption={card.name} onDone={() => setCard(null)} />}
+    </>
+  );
 
   return (
     <div className={embedded ? 'h-full flex flex-col rounded-t-2xl overflow-hidden' : 'fixed inset-0 z-[65] flex flex-col'} style={{ background: 'linear-gradient(#1E2A44, #33415E)' }}>
@@ -134,7 +177,7 @@ export default function GamesMenu({ onClose, embedded = false }: { onClose: () =
       </div>
       <div className="flex-1 overflow-y-auto p-4 grid grid-cols-1 lg:grid-cols-2 gap-3 content-start w-full">
         {GAMES.map(g => (
-          <button key={g.id} data-testid={`game-${g.id}`} onClick={() => setActive(g)}
+          <button key={g.id} data-testid={`game-${g.id}`} onClick={() => open(g)}
             className="text-left bg-white/95 rounded-2xl p-4 shadow-lg hover:brightness-105 active:scale-[0.99] transition-all flex items-center gap-3">
             <span className="text-3xl shrink-0">{g.emoji}</span>
             <span className="flex-1 min-w-0">

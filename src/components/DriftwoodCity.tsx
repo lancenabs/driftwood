@@ -57,6 +57,11 @@ export default function DriftwoodCity({
       />
 
       <div className="relative mx-auto w-full max-w-5xl px-4 pb-16 pt-4">
+        {/* ── The hero plate: the city DARK until the 31 light it (chapter 18 →
+            milestone 31). The same storage signal the lamps use — no new law,
+            just the reward made visible at the door. ── */}
+        <CityHero />
+
         {/* ── The city sign ── */}
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -225,6 +230,37 @@ export default function DriftwoodCity({
 
         <p className="mt-10 text-center text-[11px] italic" style={{ color: '#a98d63' }}>
           Built plank by plank by the Driftwood robots · more places keep going up
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// The door plate. Dark city until all 31 milestones close, then the night the
+// whole thing comes on. Reads the same milestone log the lamps key to; if the
+// commissioned plates are missing it renders nothing — the page stands alone.
+function CityHero() {
+  const [ok, setOk] = useState(true);
+  const closed = (() => {
+    try {
+      const s = JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || 'null');
+      return Array.isArray(s?.closed) ? s.closed.length : Array.isArray(s) ? s.length : 0;
+    } catch { return 0; }
+  })();
+  const lit = closed >= 31;
+  if (!ok) return null;
+  return (
+    <div className="relative mb-4 overflow-hidden rounded-2xl shadow-lg" style={{ height: 180 }}>
+      <img
+        src={lit ? '/city/_city-lit.jpg' : '/city/_city-dark.jpg'} alt=""
+        className="story-kenburns h-full w-full object-cover"
+        onError={() => setOk(false)}
+      />
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-4 pb-2.5 pt-8">
+        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-white/90">
+          {lit
+            ? 'Every lamp is burning — this family was never a storm'
+            : `Hundreds of lamps that have never been lit · ${closed} of 31 places glowing`}
         </p>
       </div>
     </div>

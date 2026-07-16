@@ -172,5 +172,29 @@
 }
 .story-kenburns {
   animation: story-kenburns 9s ease-in-out both;
+  transform-origin: var(--kb-origin, 50% 42%);
   will-change: transform;
+}
+
+/* The second mode (Lance, 2026-07-16): the 1.5–2s TRANSITION CARD. A still
+   fills the screen and zooms slowly toward the scene's focus — set per image
+   with --kb-origin — then the surface underneath takes over. Between scenes,
+   on tool entry, at the ending. The long 9s hold above stays for boarding and
+   milestone openings; this one is the cut. */
+@keyframes story-kenburns-card {
+  from { transform: scale(1.0); }
+  to   { transform: scale(1.16); }
+}
+.story-kenburns-card {
+  animation: story-kenburns-card 2.1s cubic-bezier(0.22, 0.6, 0.36, 1) both;
+  transform-origin: var(--kb-origin, 50% 42%);
+  will-change: transform;
+}
+@keyframes scene-card-fade {
+  0% { opacity: 0; } 12% { opacity: 1; } 82% { opacity: 1; } 100% { opacity: 0; }
+}
+.scene-card-fade { animation: scene-card-fade 2.1s ease-in-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .story-kenburns, .story-kenburns-card { animation: none; }
+  .scene-card-fade { animation-duration: 0.8s; }
 }
