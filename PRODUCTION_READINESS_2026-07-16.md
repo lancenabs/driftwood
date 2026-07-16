@@ -39,41 +39,39 @@ evaluation passes (gates + real-browser drives of every surface). Items marked
    real keyed frond planes + photographed foliage tile, island3d AND VR.
 8. ✅ FIXED **VR city ignored the canonical geography** (decorative ring) —
    now stands at driftwood-city.json x/z, same ground as app + board.
-9. **VR island lacks the landmarks** — no Waterfall, Totem, Workshop, Wreck
-   Beach in the headset. "Meet me at the waterfall" has no address in VR.
-   Fix plan: port the three BUILT_LANDMARKS groups from island3d (they're
-   self-contained THREE.Group builds against groundY) + the LANDMARKS ring;
-   extend qa:island-mirror to assert VR contains every landmark id.
-10. **The castaway avatar is a suited figure with a diving-helmet head**
-    (vendored LANCE mesh). A family-therapy island deserves the family meshes
-    that already exist (`island3d/family-*.glb` — wired for the invite flow
-    but the default solo avatar is still the suit).
+9. ✅ FIXED **VR island lacks the landmarks** — the seven named places now
+   stand in the headset at canonical coordinates: waterfall (rock + falling
+   water + rimmed pool), totem (carved bands from the real log), workshop
+   (THE TOOLS WILL ANSWER), cairns for the rest. VR Heart moved to island3d's
+   coords. Remaining: extend qa:island-mirror to assert the VR list too.
+10. ✅ FIXED **The castaway avatar defaulted to the suited LANCE figure** —
+    unchosen players now wash ashore as an age-matched family castaway once
+    the family meshes load; the body-neutral picker still rules.
 11. **mr/city.html is still signposts-on-discs** — superseded by the unified
     wayward-robots board in lance-app, but it's still linked from Driftwood's
     MR door. Either point Driftwood's MR at the unified board or rebuild the
     disc board with the real structures.
-12. **The island3d spawn camera looks at the ground.** First impression of the
-    flagship surface is sand + a cobble slab. Aim the intro camera at the
-    totem/camp with a slow settle.
-13. **20 game/tool interior plates missing** — game ENTRY is covered (each
-    reuses its story still via SceneCard) but interiors are chrome-only.
-    Foundry can batch these now that Gemini is topped up (~20 images, free).
+12. ✅ FIXED **The island3d spawn camera looked at the ground** — THE ARRIVAL:
+    a four-second ease-out sweep down over the water onto the camp; any input
+    cuts straight to gameplay.
+13. ✅ FIXED (differently) **Game interiors were chrome-only** — every
+    GameShell now hangs its own story still, dimmed with a slow zoom, behind
+    the play surface. No generation spend needed.
 
 ## P2 · POLISH THAT EARNS ITS KEEP
 
-14. **Grass tile reads neon at distance** (island3d + VR midband). Tone the
-    terrain grass color multiply (~0xDDE8D0) or regenerate a duller tile.
-15. **Fire is a flat orange cone** on both islands. Two crossed alpha-flame
-    planes + the existing point light would sell it.
+14. ✅ FIXED **Grass tile read neon at distance** — toned in the terrain
+    shader on both islands (cGrass *= vec3(0.80, 0.84, 0.74)).
+15. ✅ FIXED **Fire was a flat orange cone** — crossed additive teardrop
+    planes with live flicker, island3d and VR.
 16. **The 23 unaddressed milestones meander** (MILESTONE_PLACE names 8).
     The story put 8 places first; consider giving the rest addresses in the
     city (places already exist; it's a data edit in milestoneCraft.ts).
-17. **Boot 404s**: VIDEO.storm/.shore never existed; the code degrades
-    gracefully but the network tab shows three failed requests on every
-    boarding. Cheap to silence (skip <video> when src is known-absent).
-18. **`undefined/` directory in repo root** (created by a path bug long ago)
-    and `THE_WAYWARD_BOY copy.txt` duplicate — repo hygiene before open house.
-19. **server.log is committed and growing** — .gitignore it.
+17. ✅ FIXED **Boot 404s** — empty video slots render no <video>; slots are
+    documented for when on-canon clips land.
+18. ✅ FIXED **Repo hygiene** — `undefined/` PNGs moved to assets/reference/,
+    the story-file duplicate removed.
+19. ✅ (was already fine) **server.log** — covered by `*.log` in .gitignore.
 
 ## ENH · VISUAL ENHANCEMENTS WORTH DOING
 
@@ -83,13 +81,13 @@ evaluation passes (gates + real-browser drives of every surface). Items marked
     even just scrolling the water tile two directions at different speeds.
 22. **Weather beats**: milestone 20/25 could dim the sky + rain particles on
     the island for the storm season — the island telling the story.
-23. **City dark→lit transition moment**: when the 31st closes, a 4-second
-    camera sweep as the lamps come up (the payoff deserves a camera).
+23. ✅ BUILT **City dark→lit transition moment** — closing the 31st earns a
+    six-second camera arc over the lit streets; a tap ends it early.
 24. **Higgsfield videos for the five hero cold-opens** (waterfall, city
     dark→lit, flume, cave glow) when credits allow (~10 credits remain).
-25. **The Heart's hum**: a soft looping held-note audio near the Heart
-    (Foundry music door can generate it; shoreSounds.ts already has the
-    ambient audio pattern).
+25. ✅ BUILT **The Heart's hum** — a generated 30s held-note drone
+    (`public/ambient/heart-hum.mp3`), volume by distance to the Heart,
+    starts on the first gesture, fails silent if the file is gone.
 
 ---
 
