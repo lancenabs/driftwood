@@ -384,7 +384,7 @@ export default function CheckInTab({ onOpenTool }: Props) {
                       <motion.span animate={{ opacity: [0.3,1,0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}>●</motion.span>
                     </span>
                   : internResponse
-                    ?? `${userName ? `${userName}, ` : ''}I'm here whenever you need support!`
+                    ?? `${userName ? `${userName}, ` : ''}the bench is open — bring what needs mending.`
                 }
               </div>
             </div>
