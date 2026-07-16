@@ -152,6 +152,7 @@ terrainMat.onBeforeCompile = (shader) => {
       // two-scale sampling (second sample ROTATED 90°) kills tile periodicity
       vec4 cSand  = mix(texture2D(map, vUv),           texture2D(map, vUv.yx * 0.23 + 0.37),  0.5);
       vec4 cGrass = mix(texture2D(tGrass, vUv * 0.9),  texture2D(tGrass, vUv.yx * 0.21 + 0.53), 0.5);
+      cGrass.rgb *= vec3(0.80, 0.84, 0.74);   // 2026-07-16: pull the neon out of the midband
       vec4 cRock  = mix(texture2D(tRock, vUv * 0.66),  texture2D(tRock, vUv.yx * 0.15 + 0.11), 0.5);
       // organic band edges: world-noise wobbles the height thresholds
       float wob = sin(vWPos.x * 0.19) * sin(vWPos.z * 0.17) * 1.4
@@ -356,10 +357,40 @@ for (let i = 0; i < logCount; i++) {
   fire.add(stick);
 }
 const flameScale = 1 + warmth * 0.055;                 // the week grows the flame
-const flame = new THREE.Mesh(new THREE.ConeGeometry(0.34, 1.1, 7), new THREE.MeshBasicMaterial({ color: 0xFFA64D }));
-flame.position.y = 0.9;
+// THE FLAME (2026-07-16): two crossed additive planes wearing a painted
+// teardrop gradient, flickering in the loop — the orange cone is retired.
+const FLAME_TEX = (() => {
+  const c = document.createElement('canvas'); c.width = 64; c.height = 128;
+  const x = c.getContext('2d');
+  const gr = x.createRadialGradient(32, 96, 4, 32, 78, 78);
+  gr.addColorStop(0, 'rgba(255,246,200,1)');
+  gr.addColorStop(0.25, 'rgba(255,196,90,0.95)');
+  gr.addColorStop(0.55, 'rgba(255,124,40,0.55)');
+  gr.addColorStop(1, 'rgba(120,30,0,0)');
+  x.fillStyle = gr;
+  x.beginPath();
+  x.moveTo(32, 4); x.quadraticCurveTo(58, 70, 44, 108); x.quadraticCurveTo(32, 124, 20, 108);
+  x.quadraticCurveTo(6, 70, 32, 4); x.fill();
+  return new THREE.CanvasTexture(c);
+})();
+const flameMat = new THREE.MeshBasicMaterial({
+  map: FLAME_TEX, transparent: true, depthWrite: false,
+  blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+});
+const FIRE_FLAMES = [];
+const flame = new THREE.Group();
+for (let i = 0; i < 2; i++) {
+  const p = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.7), flameMat);
+  p.rotation.y = i * Math.PI / 2;
+  flame.add(p);
+}
+flame.position.y = 1.15;
+FIRE_FLAMES.push(flame);
 fire.add(flame);
 let fireBoost = 0; // night raises the hearth (set by the sky loader)
+let introT = 0; const INTRO_LEN = 4.0;   // the arrival sweep, cut by any input
+addEventListener('pointerdown', () => { introT = INTRO_LEN; }, { once: true });
+addEventListener('keydown', () => { introT = INTRO_LEN; }, { once: true });
 const fireLight = new THREE.PointLight(0xFFA64D, 1.1 + warmth * 0.05, 12 + warmth * 0.8);
 fireLight.position.y = 1.4;
 fire.add(fireLight);
@@ -632,8 +663,26 @@ function animateWalk(rig, speed, dt, t) {
 // my chosen avatar (persisted) — default the human Castaway. Skin tone
 // (myTint) is pre-seeded from the boarding swatch on the claimed castaway,
 // then overridable here on the island (2026-07-12 inclusivity law).
-let myKind = 'human', myTint = null;
-try { const f = JSON.parse(localStorage.getItem(FIT_KEY) || 'null'); if (f?.kind && AVATARS[f.kind]) myKind = f.kind; if (f?.tint) myTint = f.tint; } catch {}
+let myKind = 'human', myTint = null, kindChosen = false;
+try { const f = JSON.parse(localStorage.getItem(FIT_KEY) || 'null'); if (f?.kind && AVATARS[f.kind]) { myKind = f.kind; kindChosen = true; } if (f?.tint) myTint = f.tint; } catch {}
+// FIRST-IMPRESSION FIX (2026-07-16): nobody who hasn't chosen should wash
+// ashore as the suited LANCE figure — when the family meshes land, an
+// unchosen player becomes a castaway body (age-matched from their claimed
+// castaway; body-neutral labels still rule the picker).
+rosterReady.then(() => {
+  if (kindChosen) return;
+  let age = 'adult';
+  try {
+    const crew = JSON.parse(localStorage.getItem('driftwood_castaways_v1') || '[]');
+    const mine = crew.find(c => c.kind !== 'ai');
+    if (mine?.age) age = mine.age;
+  } catch {}
+  const pick = age === 'young'
+    ? ['family-boy-middle', 'family-boy-oldest', 'family-robot']
+    : ['family-mom', 'family-dad', 'family-robot'];
+  const found = pick.find(k => AVATARS[k]);
+  if (found) swapPlayer(found);
+});
 // pre-seed the tone the family picked at boarding (only if none chosen yet here)
 if (!myTint) { try {
   const crew = JSON.parse(localStorage.getItem('driftwood_castaways_v1') || '[]');
@@ -1719,6 +1768,7 @@ fetch('/city/driftwood-city.json').then(r => r.json()).then(city => {
 }).catch(() => { /* honest degradation: no city rather than a fake one */ });
 
 // The reward. Dark until earned; at 31 the whole thing comes on.
+let lastClosedN = null;
 function raiseCityLights() {
   const n = closedCount();
   for (const L of CITY_LIT) {
@@ -1726,8 +1776,28 @@ function raiseCityLights() {
     L.head.material.color.setHex(lit ? 0xFFEAC2 : 0x2E2822);
     L.halo.material.opacity = lit ? 0.95 : 0;
   }
+  // THE NIGHT THE CITY COMES ON (2026-07-16): the 31st closing earns a
+  // 6-second sweep over the lit streets — hundreds of lamps, finally, because
+  // one family proved they weren't a storm. Once per crossing, then back to
+  // the player. Any tap ends it early.
+  if (lastClosedN !== null && lastClosedN < 31 && n >= 31) startCitySweep();
+  lastClosedN = n;
 }
 window.addEventListener('storage', raiseCityLights);
+
+let citySweepT = -1;   // ≥0 while sweeping (drives the camera in the loop)
+function startCitySweep() { citySweepT = 0; }
+addEventListener('pointerdown', () => { if (citySweepT >= 0) citySweepT = -1; });
+
+// THE HEART'S HUM — "humming very faintly with running water, like a held
+// note." A generated 30s drone loop, volume by distance to the Heart. Starts
+// on the first gesture (autoplay law); a missing file fails silent.
+const heartHum = new Audio('/ambient/heart-hum.mp3');
+heartHum.loop = true; heartHum.volume = 0;
+addEventListener('pointerdown', function startHum() {
+  heartHum.play().catch(() => { /* the island is quiet, honestly */ });
+  removeEventListener('pointerdown', startHum);
+});
 
 // ── THE TOTEM ───────────────────────────────────────────────────────────────
 // The reward, and the origin's last image. Every milestone a family finishes
@@ -2384,6 +2454,19 @@ renderer.setAnimationLoop(() => {
   // he is the only one of them who can be awake after dark, which is why he
   // sat with the boy every night for six years, and why there is a fire in
   // that cave when a lost child needs one.
+  // the Heart hums louder the closer you stand (silent past 34m)
+  {
+    const d = Math.hypot(player.position.x + 8, player.position.z - 18);
+    heartHum.volume = Math.max(0, Math.min(0.45, (1 - d / 34) * 0.45));
+  }
+
+  // the family's fire flickers — scale + sway on the crossed planes
+  for (const fl of FIRE_FLAMES) {
+    fl.scale.y = flameScale * (0.92 + Math.sin(t * 9.7) * 0.1 + Math.sin(t * 23.3) * 0.05);
+    fl.scale.x = fl.scale.z = flameScale * (0.95 + Math.sin(t * 13.1) * 0.07);
+    fl.rotation.y += dt * 0.6;
+  }
+
   // the city breathes: the Heart's ember, and the wheels the flume turns
   for (const c of CITY_ANIM) {
     if (c.t === 'ember') {
@@ -2405,7 +2488,19 @@ renderer.setAnimationLoop(() => {
     }
   }
 
-  if (FREE_CAM) {
+  if (citySweepT >= 0) {
+    // the night the city comes on: a slow arc over the lit streets. The
+    // Heart sits at (-8, 18); the arc rides high enough to clear the spine.
+    citySweepT += dt;
+    if (citySweepT > 6) { citySweepT = -1; }
+    else {
+      const k = citySweepT / 6;
+      const a = -0.6 + k * 1.7;
+      const sx = -8 + Math.sin(a) * 34, sz = 18 + Math.cos(a) * 34;
+      camera.position.set(sx, Math.max(24 - k * 6, groundY(sx, sz) + 3), sz);
+      camera.lookAt(-8, groundY(-8, 18) + 4, 18);
+    }
+  } else if (FREE_CAM) {
     // QA has taken the camera off the player to photograph a place
     camera.position.set(...FREE_CAM.pos);
     camera.lookAt(...FREE_CAM.target);
@@ -2415,8 +2510,25 @@ renderer.setAnimationLoop(() => {
     const cz = player.position.z + Math.cos(camYaw) * CAM_D * Math.cos(camPitch);
     // ride the hills with the player (never sink the camera into a slope)
     const cy = Math.max(player.position.y + 2.4 + Math.sin(camPitch) * CAM_D, groundY(cx, cz) + 1.2);
-    camera.position.lerp(new THREE.Vector3(cx, cy, cz), Math.min(1, dt * 7));
-    camera.lookAt(player.position.x, player.position.y + 1.2, player.position.z);
+    // THE ARRIVAL (2026-07-16): the first four seconds sweep down from over
+    // the water onto the camp — the island introduces itself instead of
+    // opening on sand. Any input (drag/walk) cuts straight to gameplay.
+    if (introT < INTRO_LEN) {
+      introT += dt;
+      const k = Math.min(1, introT / INTRO_LEN);
+      const e = 1 - Math.pow(1 - k, 3);              // ease-out cubic
+      const ix = (CAMP.x + 26) + (cx - (CAMP.x + 26)) * e;
+      const iy = 22 + (cy - 22) * e;
+      const iz = (CAMP.z + 34) + (cz - (CAMP.z + 34)) * e;
+      camera.position.set(ix, Math.max(iy, groundY(ix, iz) + 1.5), iz);
+      const ly = (1 - e) * (fire.position.y + 2.5) + e * (player.position.y + 1.2);
+      camera.lookAt(
+        (1 - e) * fire.position.x + e * player.position.x, ly,
+        (1 - e) * fire.position.z + e * player.position.z);
+    } else {
+      camera.position.lerp(new THREE.Vector3(cx, cy, cz), Math.min(1, dt * 7));
+      camera.lookAt(player.position.x, player.position.y + 1.2, player.position.z);
+    }
   }
 
   renderer.render(scene, camera);

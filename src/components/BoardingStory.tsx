@@ -23,10 +23,13 @@ import { THE_SEVEN, claimSlot, setActiveCastaway, readCrew, writeRelationship } 
 // into one look. The file lives in assets/retired/; the commissioned stills
 // carry the boarding with the Ken Burns hold. If on-canon clips are ever
 // generated (silhouettes + wooden robots only), point these slots at them.
+// All three slots are empty on purpose: no clip on disk passes the laws today,
+// and an empty slot renders zero <video> (no 404 on every boarding). When
+// on-canon clips land (silhouettes + wooden robots only), put paths back.
 const VIDEO = {
-  ship: '/shore/onboard_ship_retired.mp4',
-  storm: '/shore/onboard_storm.mp4',
-  shore: '/shore/onboard_shore.mp4',
+  ship: '',
+  storm: '',
+  shore: '',
 };
 const FALLBACK_ART = '/shore/boarding_hero.jpg';
 
@@ -165,7 +168,7 @@ function SceneBackdrop({ video, art }: { video: string; art?: string }) {
           style={{ opacity: 0.92 }}
           onError={() => setArtOk(false)} />
       )}
-      {videoOk && (
+      {videoOk && !!video && (
         <video key={video} src={video} autoPlay muted loop playsInline
           className="absolute inset-0 w-full h-full object-cover"
           style={{ opacity: videoLive ? 0.85 : 0, transition: 'opacity 1.4s ease' }}

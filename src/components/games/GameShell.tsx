@@ -35,9 +35,20 @@ export default function GameShell({ emoji, title, subtitle, onClose, bg, childre
   emoji: string; title: string; subtitle: string; onClose: () => void;
   bg?: string; children: React.ReactNode;
 }) {
+  // The scene the game grew out of, dimmed behind the play surface — set by
+  // GamesMenu when a game opens. Missing file/key degrades to the gradient.
+  let sceneArt = '';
+  try { sceneArt = sessionStorage.getItem('driftwood_current_game_art') || ''; } catch { /* gradient carries it */ }
   return (
     <div className="fixed inset-0 z-[70] flex flex-col" style={{ background: bg ?? 'linear-gradient(#1E2A44, #33415E)' }}>
-      <div className="flex items-center gap-2 px-3 py-2.5 bg-black/25 shrink-0">
+      {sceneArt && (
+        <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
+          <img src={sceneArt} alt="" className="w-full h-full object-cover story-kenburns"
+            style={{ opacity: 0.22 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(20,30,52,0.55), rgba(20,30,52,0.8))' }} />
+        </div>
+      )}
+      <div className="relative flex items-center gap-2 px-3 py-2.5 bg-black/25 shrink-0">
         <span className="text-lg">{emoji}</span>
         <div className="flex-1 min-w-0">
           <p className="text-[12px] font-black text-white truncate">{title}</p>
@@ -45,7 +56,7 @@ export default function GameShell({ emoji, title, subtitle, onClose, bg, childre
         </div>
         <button onClick={onClose} className="text-[10px] font-black uppercase rounded-full px-3 py-1.5 bg-white/85 text-slate-700 shrink-0">leave</button>
       </div>
-      <div className="flex-1 overflow-y-auto">{children}</div>
+      <div className="relative flex-1 overflow-y-auto">{children}</div>
     </div>
   );
 }

@@ -143,6 +143,9 @@ export default function GamesMenu({ onClose, embedded = false }: { onClose: () =
   const open = (g: GameDef) => {
     const a = GAME_ART[g.id];
     if (a) setCard({ ...a, name: g.name });
+    // GameShell reads this to hang the same still, dimmed, behind the game —
+    // the scene the tool grew out of stays in the room (2026-07-16).
+    try { sessionStorage.setItem('driftwood_current_game_art', a?.art ?? ''); } catch {}
     setActive(g);
   };
   // the milestone log queues a specific game (the instrument) before routing
