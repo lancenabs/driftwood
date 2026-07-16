@@ -33,25 +33,40 @@ const VIDEO = {
 };
 const FALLBACK_ART = '/shore/boarding_hero.jpg';
 
-// THE COLD OPEN — THE_TIDE_LINE.md canon, playable
-// `art`: the commissioned Ken Burns still (ASSET_PROMPTS_V3) — slow-zooms
-// over the beat when the file exists; the video/painting carry it otherwise.
+// THE COLD OPEN — THE_WAYWARD_BOY.md canon (rewritten 2026-07-16; the old
+// beats were generation-2 script from THE_TIDE_LINE — see
+// THE_STORY_FIT_PLAN_2026-07-16.md). Two prologue beats carry Book One; the
+// arrival is Bauer's private crossing — no tour company, no ticket window.
+// `art`: the commissioned Ken Burns still — slow-zooms over the beat when the
+// file exists; the video/painting carry it otherwise.
 const CINEMATIC: { speaker: string; color: string; location: string; text: string; video: keyof typeof VIDEO; art?: string }[] = [
   {
-    speaker: 'THE DOCK', color: '#9CC3D5', location: 'PIER 4 · MORNING · THE FAMILY TOUR',
-    text: 'The brochure said ISLAND ADVENTURE — A DAY TO RECONNECT. The family arrives the way they arrive everywhere lately: together, and in separate rooms. Two phones out. One argument already half-finished from the car, warming up for its hundredth performance.',
+    speaker: 'BEFORE', color: '#B8A382', location: 'GULLHAVEN, MAINE · 1929',
+    text: 'A home for foundlings on a gray hook of the coast, and a boy it kept the way a pocket keeps a stone. Twice a family chose him. Twice they brought him back. The other boys had a name for him after that — DRIFTWOOD — because he washed up from nowhere, because the sea throws it away. He had one thing. He had hands.',
+    video: 'ship',
+    art: '/story/act0/p1_gullhaven.jpg',
+  },
+  {
+    speaker: 'BEFORE', color: '#B8A382', location: 'AN ISLAND ON NO CHART · YEARS LATER',
+    text: 'He built a boat out of the material they used to insult him — fourteen boards, copper nails taken two at a time — and sailed for an island with nothing on it, because nothing can\'t give you back. What he built there, alone, out of storm-wood and bottle-glass and need, is ahead of this story. It is still there. All of it. This is the part nobody tells: the island you are about to visit is somebody\'s whole heart, still running.',
+    video: 'ship',
+    art: '/story/act0/p2_lamplight.jpg',
+  },
+  {
+    speaker: 'THE DOCK', color: '#9CC3D5', location: 'A WORKING PIER · THIS MORNING',
+    text: 'No sign. No ticket window. One old wooden boat, kept the way a promise is kept, and a family arriving the way they arrive everywhere lately: together, and in separate rooms. One argument already half-finished from the car, warming up for its hundredth performance.',
     video: 'ship',
     art: '/story/act1/01_the_dock.jpg',
   },
   {
-    speaker: 'THE ARGUMENT', color: '#D14545', location: 'PIER 4 · THE SAME FIGHT',
+    speaker: 'THE ARGUMENT', color: '#D14545', location: 'THE PIER · THE SAME FIGHT',
     text: '"You PROMISED you\'d leave work at home—" "Somebody has to PAY for—" "Can we not. CAN WE NOT." "Nobody even asked what I wanted to do today." Four voices, one knot. The youngest counts seagulls and pretends not to hear, which is a skill nobody should have to be good at.',
     video: 'ship',
     art: '/story/act1/01_the_dock.jpg',
   },
   {
     speaker: 'MR. BAUER', color: '#E7C892', location: 'THE GANGWAY · THE GUIDE',
-    text: 'The guide is waiting at the boat like he\'s been waiting longer than a morning. Weathered hands. Eyes that do a headcount of the family and land somewhere deeper than a headcount. "Mr. Bauer," he says. "I take families to the island. Just families. It only works on families." Odd thing to say. He says it like a man who has seen this exact argument board this exact boat before.',
+    text: 'The guide is waiting at the boat like he\'s been waiting longer than a morning. Weathered hands. Eighty-some years, most of them at sea, and eyes that do a headcount of the family and land somewhere deeper than a headcount. "Mr. Bauer," he says. "I take families to the island. Just families. It only works on families." Odd thing to say. Then he opens a small canvas ledger, soft with salt and older than anyone\'s parents, and writes one line before he takes a single bag.',
     video: 'ship',
     art: '/story/act1/02_bauer_wheel.jpg',
   },
