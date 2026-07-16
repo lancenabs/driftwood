@@ -40,8 +40,14 @@ const boarding = read('src/components/BoardingStory.tsx');
 const island3d = read('public/island3d/index.html');
 const vr = read('public/vr/index.html');
 ok('the maker is named: Elias speaks from the cave', /Elias/.test(milestones));
-ok('the reveal frame: the twelfth family', /twelfth/.test(milestones));
-ok("Bauer's ledger exists in the reveal", /ledger/.test(milestones));
+// THE 1954 FRAME (Lance, 2026-07-16, restoring his Jul-14 dictation): the
+// player family IS a Halcyon family. No guide, no present day, anywhere.
+ok('the crossing is the Halcyon (boarding)', /Halcyon/.test(boarding));
+ok('the wreck year is 1954 (boarding)', /1954/.test(boarding));
+ok('the cave remembers the Brennan boy (milestones)', /Brennan/.test(milestones));
+ok("Elias's notebooks close the reveal (why we practice)", /why we practice/.test(milestones));
+ok('the ending is Malakor\'s arrival — the invasion', /Malakor/.test(milestones));
+ok('the boat can be named DRIFTWOOD (the word said with love)', /THE DRIFTWOOD/.test(milestones));
 ok('the prologue carries Gullhaven (Book One opens the app)', /Gullhaven/i.test(boarding));
 ok('the prologue carries the name given in love and insult', /DRIFTWOOD/.test(boarding));
 ok('the boarding header cites the blessed canon, not the seed',
@@ -62,7 +68,10 @@ const PLAYER_SOURCES = {
 const FORBIDDEN = [
   ['the brochure-tour frame', /brochure|ISLAND ADVENTURE/i],
   ['the old robot origin (lost in shipping)', /lost in shipping|shelved at almost|cousins of the Wayward Crew/i],
-  ['Bauer as the maker', /Bauer built (us|them|the robots)|his name was Bauer\. He built/i],
+  // The guide character was cut entire (Lance, 2026-07-16): the player family
+  // IS the 1954 family, so no Bauer may reach a player anywhere, ever.
+  ['the cut guide character (any Bauer)', /Bauer/i],
+  ['the present-day tour frame', /twelfth family|tour boat|island tours/i],
 ];
 for (const [label, re] of FORBIDDEN) {
   const hits = Object.entries(PLAYER_SOURCES)

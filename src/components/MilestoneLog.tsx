@@ -451,7 +451,7 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
                 {readCrew().map(c => c.name.toUpperCase()).join(' · ')}
               </p>
               <p className="text-[9px] font-black uppercase tracking-[0.2em] mt-1" style={{ color: '#B45309' }}>
-                MR. BAUER'S FAMILY — ALL OF US
+                ELIAS'S PEOPLE — ALL OF US
               </p>
             </div>
           )}

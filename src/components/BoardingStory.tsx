@@ -33,10 +33,10 @@ const VIDEO = {
 };
 const FALLBACK_ART = '/shore/boarding_hero.jpg';
 
-// THE COLD OPEN — THE_WAYWARD_BOY.md canon (rewritten 2026-07-16; the old
-// beats were generation-2 script from THE_TIDE_LINE — see
-// THE_STORY_FIT_PLAN_2026-07-16.md). Two prologue beats carry Book One; the
-// arrival is Bauer's private crossing — no tour company, no ticket window.
+// THE COLD OPEN — THE_WAYWARD_BOY.md canon, PURE 1954 FRAME (Lance's call,
+// 2026-07-16, restoring his Jul-14 dictation: "the whole story starts
+// 1950s"). Two prologue beats carry Book One; then the player family IS a
+// Halcyon family — Book Two, played. No guide, no present day anywhere.
 // `art`: the commissioned Ken Burns still — slow-zooms over the beat when the
 // file exists; the video/painting carry it otherwise.
 const CINEMATIC: { speaker: string; color: string; location: string; text: string; video: keyof typeof VIDEO; art?: string }[] = [
@@ -53,32 +53,26 @@ const CINEMATIC: { speaker: string; color: string; location: string; text: strin
     art: '/story/act0/p2_lamplight.jpg',
   },
   {
-    speaker: 'THE DOCK', color: '#9CC3D5', location: 'A WORKING PIER · THIS MORNING',
-    text: 'No sign. No ticket window. One old wooden boat, kept the way a promise is kept, and a family arriving the way they arrive everywhere lately: together, and in separate rooms. One argument already half-finished from the car, warming up for its hundredth performance.',
+    speaker: 'THE HALCYON', color: '#9CC3D5', location: 'NEW YORK HARBOR · AUTUMN 1954',
+    text: 'Halcyon: a bird out of an old story that could calm the sea by sitting on it. She sails out of New York in the autumn of 1954 with four hundred and eleven people, a dance band, and a swimming pool — into the best few years anybody can remember. The war is over. There is money, and nylon, and a feeling. And the people aboard have everything and are, most of them, quietly not all right — and have no language for it whatsoever, because in 1954 there isn\'t one.',
     video: 'ship',
-    art: '/story/act1/01_the_dock.jpg',
+    art: '/story/act1/01_the_halcyon.jpg',
   },
   {
-    speaker: 'THE ARGUMENT', color: '#D14545', location: 'THE PIER · THE SAME FIGHT',
-    text: '"You PROMISED you\'d leave work at home—" "Somebody has to PAY for—" "Can we not. CAN WE NOT." "Nobody even asked what I wanted to do today." Four voices, one knot. The youngest counts seagulls and pretends not to hear, which is a skill nobody should have to be good at.',
+    speaker: 'THE SEPARATE ROOMS', color: '#D14545', location: 'ABOARD · YOUR FAMILY',
+    text: 'Your family is aboard. And on the ship, they do exactly what they do at home: they come apart, politely. One at the rail. One at cards. One trailing the dance band. One counting portholes and pretending not to hear the argument warming up for its hundredth performance — the same one as always, in nicer clothes. Same vessel. Separate rooms.',
     video: 'ship',
-    art: '/story/act1/01_the_dock.jpg',
+    art: '/story/act1/01b_separate_rooms.jpg',
   },
   {
-    speaker: 'MR. BAUER', color: '#E7C892', location: 'THE GANGWAY · THE GUIDE',
-    text: 'The guide is waiting at the boat like he\'s been waiting longer than a morning. Weathered hands. Eighty-some years, most of them at sea, and eyes that do a headcount of the family and land somewhere deeper than a headcount. "Mr. Bauer," he says. "I take families to the island. Just families. It only works on families." Odd thing to say. Then he opens a small canvas ledger, soft with salt and older than anyone\'s parents, and writes one line before he takes a single bag.',
-    video: 'ship',
-    art: '/story/act1/02_bauer_wheel.jpg',
-  },
-  {
-    speaker: 'THE STORM', color: '#7A8FB5', location: 'OPEN WATER · NO WARNING',
-    text: 'It comes over the horizon like a decision. The sky goes green-black. Bauer\'s voice changes registers — the tour-guide is gone; something older takes the wheel. "LIFE JACKETS. NOW. All of you — to the mast line."',
+    speaker: 'THE REEF', color: '#7A8FB5', location: 'OPEN WATER · THE FIFTH OF NOVEMBER',
+    text: 'It comes over the horizon like a decision. The sky goes green-black — and the sea opens on a reef that is on no chart. No chart, because the only man who ever found the island it guards had nobody to tell.',
     video: 'storm',
     art: '/story/act1/03_storm_wall.jpg',
   },
   {
-    speaker: 'MR. BAUER', color: '#E7C892', location: 'THE MAST LINE · HIS LAST ORDER',
-    text: 'He lashes the family\'s hands to one rope, hand over hand over hand, and puts both of his over all of theirs. "HOLD THE LINE. Not the rail — EACH OTHER. Whatever the sea takes, it does not get to take the LINE—" Lightning. The wheel spinning. His silhouette going back for it.',
+    speaker: 'THE LINE', color: '#E7C892', location: 'THE BOAT DECK · HOLD',
+    text: 'LIFE JACKETS. NOW. In the crush of the boat deck, weathered hands — a steward\'s, a stranger\'s, a father\'s, nobody ever agrees whose — lash your family\'s hands to one rope, hand over hand over hand. "HOLD THE LINE. Not the rail — EACH OTHER. Whatever the sea takes, it does not get to take the LINE—" Lightning. The funnel groaning. The water coming up to meet you.',
     video: 'storm',
     art: '/story/act1/04_hold_the_line.jpg',
   },
@@ -88,14 +82,14 @@ const CINEMATIC: { speaker: string; color: string; location: string; text: strin
     video: 'storm',
   },
   {
-    speaker: 'THE TIDE LINE', color: '#F2A65A', location: 'THE ISLAND · THE GREY BEFORE DAWN',
-    text: 'Sand. Rain-light. The sound of a sea pretending nothing happened. The family wakes scattered down one shoreline — soaked, bruised, alive, still holding one rope with no boat on the end of it. They count heads the way you count when you cannot breathe until the number is right. The number is right. All of them. Except—',
+    speaker: 'THE TIDE LINE', color: '#F2A65A', location: 'THE ISLAND · DAWN · NOVEMBER 5, 1954',
+    text: 'Sand. Rain-light. The sound of a sea pretending nothing happened. The family wakes scattered down one shoreline — soaked, bruised, alive, still holding one rope with no ship on the end of it. They count heads the way you count when you cannot breathe until the number is right. The number is right. All of them. And down the beach, other shapes stirring — a handful of the saved, waking on the same sand.',
     video: 'shore',
     art: '/story/act1/05_tide_line.jpg',
   },
   {
     speaker: 'THE COMPASS', color: '#E7C892', location: 'THE WRECK LINE · WHAT WASHED UP',
-    text: 'Mr. Bauer is not on the beach. Not in the shallows. Not anywhere a voice can reach. What washes up instead, glinting in the tide junk, is his brass compass — heavy, old, engraved with letters gone soft: TO M.B. — COME HOME. The needle does not point north. It points INLAND, toward the jungle, steady as a held breath. And from the treeline — small, wooden, gone the second anyone looks — something watches the family count heads.',
+    text: 'The Halcyon is gone. What washes up in the tide junk, glinting, is a brass compass — heavy, old, its casing worked by hand, by somebody who loved it. The needle does not point north. It points INLAND, toward the jungle, steady as a held breath. And from the treeline — small, wooden, gone the second anyone looks — something watches the family count heads.',
     video: 'shore',
     art: '/story/act1/06_compass_ashore.jpg',
   },

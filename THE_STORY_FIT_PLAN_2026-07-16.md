@@ -42,11 +42,16 @@ versions." He was right. Here is the full account, then the fit plan.*
   through, and the answer to "verify there is a script": there wasn't one.
   Now there is: **`THE_DRIFTWOOD_SCRIPT.md`** + a `qa:script` gate.
 
-### Why the timeline reads "early 1900s"
-Book One is 1929–1951; Book Two is 1954–55. The player family arrives in the
-PRESENT (Lance's binding Jul-14 decision: Bauer is 81 now) — walking into a
-story that happened before they were born. The island is period; the frame is
-today. The opening's job is to carry that weight from the first line.
+### Why the timeline reads "early 1900s" — CORRECTED SAME DAY
+Book One is 1929–1951; Book Two is 1954–55. The first version of this plan
+said the player family arrives in the present ("Bauer, 81 now") — but the
+transcript research proved that frame was a bundled recommendation, not
+Lance's dictation, which always said **"the whole story starts 1950s."**
+Lance confirmed 2026-07-16: **the player family IS a 1954 Halcyon family;
+there is no guide character; milestone 31 ends with Malakor's arrival (the
+invasion).** The app was rewritten accordingly the same day — the crossing is
+the Halcyon's, the relics are Elias's, T. BRENNAN is the fellow-castaway
+child, and qa:script now bans "Bauer" from every player-facing source.
 
 ---
 
