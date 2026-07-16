@@ -1,3 +1,10 @@
+> ## ⚠️ PARTIALLY SUPERSEDED (2026-07-16)
+> Items **17 (Remembering House)** and **28 (Bauer's Workshop)** carry OLD
+> canon (Bauer as the maker) — both images were regenerated to THE_WAYWARD_BOY
+> canon on 2026-07-16 (the walls carve the BOY; the cave reads T. BRENNAN 1954).
+> For any regeneration use **`THE_HIGGSFIELD_SHOTLIST.md`** +
+> **`THE_DRIFTWOOD_SCRIPT.md`**. The silhouette law section below still governs.
+
 # ASSET PROMPTS v3 — THE 30 PICTURES THAT SLOW AND ZOOM
 ### Driftwood · the heartfelt transitions (Lance's 2026-07-12 commission: "at least 30 pictures that slow and zoom, for heart felt transitions throughout")
 

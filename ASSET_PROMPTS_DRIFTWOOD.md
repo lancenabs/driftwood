@@ -1,3 +1,9 @@
+> ## ⚠️ SUPERSEDED FOR STORY ART (2026-07-16)
+> Written in the generation-2 era (pre-THE_WAYWARD_BOY). The delivered assets
+> (robots, beaches, icons) are canon-neutral and stand; but do NOT generate
+> new story art from this file — use **`THE_HIGGSFIELD_SHOTLIST.md`** (canon-
+> corrected) and **`THE_DRIFTWOOD_SCRIPT.md`** as the source of prompts.
+
 # ASSET PROMPTS — Driftwood's generation batch (Lance's FREE tier, web app)
 *Paste-ready. Files drop into `public/` at the exact paths; every slot
 auto-lights (missing art degrades honestly — nothing breaks while you generate).*

@@ -1,3 +1,10 @@
+> ## ⚠️ SUPERSEDED — HISTORY ONLY (2026-07-16)
+> This is the **generation-2 story seed** (Jul 11). The blessed canon is
+> **`THE_WAYWARD_BOY.md`** (Jul 14) and the canonical beat map is
+> **`THE_DRIFTWOOD_SCRIPT.md`**. Do not write dialogue, prompts, or art from
+> this file — `qa:script` bans its phrases from every player-facing source.
+> Kept for the record of how the world was found.
+
 # 🌊 THE TIDE LINE — Driftwood's story seed
 *Canon set by Lance, 2026-07-11 night ("make DRIFTWOOD our next hit"). Companion to
 `~/lance-command-center/docs/DRIFTWOOD_BIBLE.md` (v3, the constitution — this file is
