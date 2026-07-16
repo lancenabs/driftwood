@@ -145,5 +145,17 @@ const onTop = cityJson.places.flatMap(p => STORY
   .filter(([n, x, z]) => Math.hypot(p.x - x, p.z - z) < 12).map(([n]) => `${p.id}->${n}`));
 ok('the city does not stand on a story landmark', onTop.length === 0, onTop.join(', '));
 
+// THE HEADSET IS THE SAME ISLAND (2026-07-16): VR must carry every landmark
+// island3d names, at the same coordinates, and must place the city from the
+// canonical JSON x/z — the decorative-ring drift can never come back quietly.
+{
+  const vr = fs.readFileSync(new URL('../public/vr/index.html', import.meta.url), 'utf8');
+  const lmIds = [...html.matchAll(/\{ id: '([a-z_]+)',\s+name: '[^']+',\s+emoji: '[^']+', x: /g)].map(m => m[1]);
+  const missing = lmIds.filter(id => !new RegExp(`id: '${id}'`).test(vr));
+  ok('VR carries every island3d landmark', lmIds.length > 0 && missing.length === 0, missing.join(', '));
+  ok('VR places the city at canonical coordinates (no ring)',
+    /const px = p\.x, pz = p\.z;/.test(vr) && !/const RING = /.test(vr));
+}
+
 console.log(`\n${failures === 0 ? '✅ THE MIRROR HOLDS' : `❌ ${failures} FAILURE(S)`} — the island says what the canon says.\n`);
 process.exit(failures === 0 ? 0 : 1);
