@@ -350,12 +350,14 @@ for (const r of JUMBLE) {
 // island's core. The definition of driftwood: crude and rough, made beautiful.
 const CITY_ANIM = [];  // {fn(t,dt)} — waterwheels turning, the Heart breathing
 
-// The driftwood palette — rough timber, bleached plank, mossy thatch, wet stone.
-const M_TIMBER = new THREE.MeshLambertMaterial({ color: 0x6b4a2b });
-const M_PLANK  = new THREE.MeshLambertMaterial({ color: 0xa9895f });
-const M_PLANK2 = new THREE.MeshLambertMaterial({ color: 0x8a6a48 });
-const M_THATCH = new THREE.MeshLambertMaterial({ color: 0x5f7a3a });
-const M_STONE  = new THREE.MeshLambertMaterial({ color: 0x8b8577 });
+// The driftwood palette — real plank grain now (2026-07-16), one tile tinted
+// per role, same treatment as island3d's city so the two match.
+const texCityPlank = tile('/island3d/tex/planks.jpg', 2);
+const M_TIMBER = new THREE.MeshLambertMaterial({ map: texCityPlank, color: 0x9a7048 });
+const M_PLANK  = new THREE.MeshLambertMaterial({ map: texCityPlank, color: 0xd8b585 });
+const M_PLANK2 = new THREE.MeshLambertMaterial({ map: texCityPlank, color: 0xb08a5f });
+const M_THATCH = new THREE.MeshLambertMaterial({ map: tile('/island3d/tex/moss.jpg', 2), color: 0x9fb56a });
+const M_STONE  = new THREE.MeshLambertMaterial({ map: tile('/island3d/tex/rock.jpg', 2), color: 0xb0aa9c });
 
 // seeded rng so every build is unique but stable
 function hstr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
@@ -421,17 +423,15 @@ function namePlaque(name, hex){ const c=document.createElement('canvas'); c.widt
 
 fetch('/city/driftwood-city.json').then(r => r.json()).then(data => {
   const regions = data.regions;
-  const RING = 72;
-  regions.forEach((region, ri) => {
-    const th = (ri / regions.length) * Math.PI * 2;
-    const cx = Math.cos(th) * RING, cz = Math.sin(th) * RING;
+  // ONE GEOGRAPHY (2026-07-16): the headset stands each place at its CANONICAL
+  // x/z from driftwood-city.json — the same numbers island3d and the board
+  // read. The old decorative ring was the exact drift the mirror gate exists
+  // to kill: three worlds, three cities. Now "meet me at Mirror Lake" is the
+  // same walk in the app and in the headset.
+  regions.forEach((region) => {
     const places = data.places.filter(p => p.region === region.id);
-    places.forEach((p, pi) => {
-      // a tight village per region, two rows deep, so it reads as a settlement
-      const off = (pi - (places.length - 1) / 2) * 6.2;
-      const depth = (pi % 2 ? 6 : -4);
-      const px = cx + Math.cos(th + Math.PI / 2) * off + Math.cos(th) * depth;
-      const pz = cz + Math.sin(th + Math.PI / 2) * off + Math.sin(th) * depth;
+    places.forEach((p) => {
+      const px = p.x, pz = p.z;
       const gy = groundY(px, pz);
       const s = buildFor(p, region.id);
       s.scale.setScalar(1.7);                        // grand — stands above the treeline
