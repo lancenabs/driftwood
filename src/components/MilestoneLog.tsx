@@ -78,7 +78,15 @@ type Phase = 'log' | 'scene' | 'conch' | 'working' | 'closing' | 'closed';
 // 2026-07-16: beats whose art has a motion twin (same path, .mp4 under
 // /story/video/) play it over the still; the still stays as the poster.
 const STORY_VIDEO: Record<string, string> = {
+  '/story/act1/07_skip.jpg': '/story/video/07_skip.mp4',
+  '/story/act2/11_village.jpg': '/story/video/11_village.mp4',
+  '/story/act3/20_bottle_ashore.jpg': '/story/video/20_bottle_ashore.mp4',
+  '/story/act3/22_feast.jpg': '/story/video/22_feast.mp4',
+  '/story/act4/24_naming_undertow.jpg': '/story/video/24_naming_undertow.mp4',
+  '/story/act4/26_search_line.jpg': '/story/video/26_search_line.mp4',
   '/story/act4/27_glow_behind_falls.jpg': '/story/video/27_glow_behind_falls.mp4',
+  '/story/act5/30_totem.jpg': '/story/video/30_totem.mp4',
+  '/story/act5/31_compass_hands.jpg': '/story/video/31_compass_hands.mp4',
   '/story/act5/32_fire_lit.jpg': '/story/video/32_fire_lit.mp4',
 };
 function StoryArt({ src }: { src: string }) {
