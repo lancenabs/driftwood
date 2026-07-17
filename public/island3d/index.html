@@ -204,11 +204,20 @@ texLoader.load(SKY_TEX[skyPhase], t => {
     scene.background = new THREE.Color(0xF2DFC9);
     sun.color.set(0xFFD9A0);
   } else if (skyPhase === 'night') {
-    // Lance's stars over a moonlit island: the fire becomes the hearth light
-    scene.fog.color.set(0x1A2430);
-    scene.background = new THREE.Color(0x141C28);
-    sun.color.set(0x9FB6D8); sun.intensity = 0.35;
+    // Lance's stars over a moonlit island: the fire becomes the hearth light.
+    // PHONE FIX (2026-07-17, "when I spawned I was in a dark place"): night
+    // stays night, but never unreadable — a stronger moon, warmer ambient,
+    // and a lantern at the spawn so the first thing a family sees is home.
+    scene.fog.color.set(0x22303F);
+    scene.background = new THREE.Color(0x1B2635);
+    sun.color.set(0xB9CBE8); sun.intensity = 0.62;
+    const moonFill = new THREE.AmbientLight(0x8FA6C8, 0.5);
+    scene.add(moonFill);
     fireBoost = 0.8; fireLight.distance += 6;
+    // the spawn lantern — a warm pool of light where the family wakes
+    const spawnLamp = new THREE.PointLight(0xFFC98A, 1.6, 22);
+    spawnLamp.position.set(2, groundY(2, 86) + 3, 86);
+    scene.add(spawnLamp);
   }
 });
 
@@ -1789,6 +1798,39 @@ let citySweepT = -1;   // ≥0 while sweeping (drives the camera in the loop)
 function startCitySweep() { citySweepT = 0; }
 addEventListener('pointerdown', () => { if (citySweepT >= 0) citySweepT = -1; });
 
+// THE WAYFINDER (2026-07-17, Lance on the phone: "it can be very difficult
+// to find challenges"): a screen-edge arrow that always points toward the
+// next story circle when it's off-screen, with the distance in steps. Tap it
+// and the camera yaw swings to face the circle. Hidden once you're close.
+const wayEl = document.createElement('button');
+wayEl.style.cssText = 'position:fixed;z-index:46;display:none;background:rgba(14,124,124,0.92);color:#fff;border:none;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,0.35);cursor:pointer;font-family:inherit;white-space:nowrap';
+document.body.appendChild(wayEl);
+wayEl.addEventListener('click', () => {
+  if (!storyCircle) return;
+  camYaw = Math.atan2(storyCircle.position.x - player.position.x, storyCircle.position.z - player.position.z) + Math.PI;
+});
+function updateWayfinder() {
+  if (!storyCircle || citySweepT >= 0 || introT < INTRO_LEN) { wayEl.style.display = 'none'; return; }
+  const dx = storyCircle.position.x - player.position.x;
+  const dz = storyCircle.position.z - player.position.z;
+  const dist = Math.hypot(dx, dz);
+  if (dist < 14) { wayEl.style.display = 'none'; return; }   // it's on screen and near — the ring carries it
+  const p = storyCircle.position.clone(); p.y += 2;
+  const ndc = p.project(camera);
+  const onScreen = ndc.z < 1 && Math.abs(ndc.x) < 0.9 && Math.abs(ndc.y) < 0.85;
+  if (onScreen) { wayEl.style.display = 'none'; return; }
+  // park the pill on the screen edge in the circle's direction
+  const ang = Math.atan2(ndc.y, ndc.x);
+  const rx = Math.cos(ang), ry = Math.sin(ang);
+  const px = (0.5 + rx * 0.42) * innerWidth;
+  const py = (0.5 - ry * 0.38) * innerHeight;
+  const arrow = ry > 0.5 ? '↑' : ry < -0.5 ? '↓' : rx > 0 ? '→' : '←';
+  wayEl.textContent = `${arrow} next challenge · ${Math.round(dist)}m`;
+  wayEl.style.left = `${Math.max(8, Math.min(innerWidth - 150, px - 60))}px`;
+  wayEl.style.top = `${Math.max(70, Math.min(innerHeight - 120, py))}px`;
+  wayEl.style.display = 'block';
+}
+
 // THE HEART'S HUM — "humming very faintly with running water, like a held
 // note." A generated 30s drone loop, volume by distance to the Heart. Starts
 // on the first gesture (autoplay law); a missing file fails silent.
@@ -2472,6 +2514,8 @@ renderer.setAnimationLoop(() => {
   // he is the only one of them who can be awake after dark, which is why he
   // sat with the boy every night for six years, and why there is a fire in
   // that cave when a lost child needs one.
+  updateWayfinder();
+
   // the Heart hums louder the closer you stand (silent past 34m)
   {
     const d = Math.hypot(player.position.x + 8, player.position.z - 18);
