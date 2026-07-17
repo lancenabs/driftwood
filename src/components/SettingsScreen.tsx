@@ -383,6 +383,9 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
                 </div>
               )}
 
+              <div className="text-center text-[10px] text-slate-500 pt-4 pb-2">
+                Driftwood · a <span className="font-bold">Wayward Robots</span> world
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>
