@@ -39,18 +39,36 @@ const FALLBACK_ART = '/shore/boarding_hero.jpg';
 // Halcyon family — Book Two, played. No guide, no present day anywhere.
 // `art`: the commissioned Ken Burns still — slow-zooms over the beat when the
 // file exists; the video/painting carry it otherwise.
-const CINEMATIC: { speaker: string; color: string; location: string; text: string; video: keyof typeof VIDEO; art?: string }[] = [
+// `clip`: the beat's own motion painting (2026-07-16, Lance: "images like
+// video — a painting moving"). Plays over the still; the still is the poster.
+const CINEMATIC: { speaker: string; color: string; location: string; text: string; video: keyof typeof VIDEO; art?: string; clip?: string }[] = [
   {
     speaker: 'BEFORE', color: '#B8A382', location: 'GULLHAVEN, MAINE · 1929',
     text: 'A home for foundlings on a gray hook of the coast, and a boy it kept the way a pocket keeps a stone. Twice a family chose him. Twice they brought him back. The other boys had a name for him after that — DRIFTWOOD — because he washed up from nowhere, because the sea throws it away. He had one thing. He had hands.',
     video: 'ship',
     art: '/story/act0/p1_gullhaven.jpg',
+    clip: '/story/video/p1_gullhaven.mp4',
+  },
+  {
+    speaker: 'BEFORE', color: '#B8A382', location: 'THE CRAWL SPACE · SPRING 1930',
+    text: 'The third family looked at all the boys and their eyes went over him the way your eyes go over a chair. That night he went down under the house and started the boat. Fourteen boards. Tar off the roof. Copper nails taken two at a time over four months so nobody would notice. A sail cut from a flour sack, the mill\'s name still faint on it. He built himself a way out of the material they used to throw him away.',
+    video: 'ship',
+    art: '/story/act0/p2b_the_boat.jpg',
+    clip: '/story/video/p2b_the_boat.mp4',
+  },
+  {
+    speaker: 'BEFORE', color: '#B8A382', location: 'OPEN WATER · THE CROSSING OUT',
+    text: 'He sailed for an island with nothing on it, because nothing can\'t give you back. The storm found him the first night, and the flour-sack sail held, because he had sewn it the way he did everything — like his life depended on the seams. It did. It would again.',
+    video: 'ship',
+    art: '/story/act0/p3_the_sail.jpg',
+    clip: '/story/video/p3_the_sail.mp4',
   },
   {
     speaker: 'BEFORE', color: '#B8A382', location: 'AN ISLAND ON NO CHART · YEARS LATER',
-    text: 'He built a boat out of the material they used to insult him — fourteen boards, copper nails taken two at a time — and sailed for an island with nothing on it, because nothing can\'t give you back. What he built there, alone, out of storm-wood and bottle-glass and need, is ahead of this story. It is still there. All of it. This is the part nobody tells: the island you are about to visit is somebody\'s whole heart, still running.',
+    text: 'What he built there, alone, out of storm-wood and bottle-glass and need, is ahead of this story. It is still there. All of it. This is the part nobody tells: the island you are about to visit is somebody\'s whole heart, still running.',
     video: 'ship',
     art: '/story/act0/p2_lamplight.jpg',
+    clip: '/story/video/p2_lamplight.mp4',
   },
   {
     speaker: 'THE HALCYON', color: '#9CC3D5', location: 'NEW YORK HARBOR · AUTUMN 1954',
@@ -162,7 +180,9 @@ function SpeechPanel({ speakerColor, speakerLabel, locationLine, text, onNext, n
 // (Ken Burns) → the honest painting, in that order; whatever exists carries
 // the scene, nothing fakes it. The art still doubles as the video's poster
 // so slow loads fade dramatically instead of popping. ──
-function SceneBackdrop({ video, art }: { video: string; art?: string }) {
+function SceneBackdrop({ video, art, clip }: { video: string; art?: string; clip?: string }) {
+  // a beat's own motion painting outranks the act-level ambient video
+  video = clip || video;
   const [videoOk, setVideoOk] = useState(true);
   const [videoLive, setVideoLive] = useState(false);   // first real frame drawn
   const [artOk, setArtOk] = useState(true);
@@ -224,7 +244,7 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
 
   return (
     <div className="fixed inset-0 z-[90] flex flex-col overflow-hidden">
-      <SceneBackdrop video={phase === 'cinematic' ? VIDEO[cine.video] : VIDEO.shore} art={phase === 'cinematic' ? cine.art : undefined} />
+      <SceneBackdrop video={phase === 'cinematic' ? VIDEO[cine.video] : VIDEO.shore} art={phase === 'cinematic' ? cine.art : undefined} clip={phase === 'cinematic' ? cine.clip : undefined} />
 
       {/* progress dots + honest skip (crisis strip stays above via App) */}
       <div className="relative z-10 flex items-center justify-between px-5 pt-9">

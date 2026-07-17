@@ -134,6 +134,33 @@ export default function TheShore({ onOpenTool }: { onOpenTool: (id: string) => v
           game, lives ON the island now. This is the hero action of the whole
           app, not one of a row of equals — so it reads like one. */}
       <div className="bg-white p-3 border-t-2 border-outline-variant">
+        {/* THE FIRST NUDGE (2026-07-16): until the family closes their first
+            milestone, the door wears the boy's own boat and points the way —
+            words + a bouncing arrow, gone forever after milestone one. */}
+        {(() => {
+          try {
+            const s = JSON.parse(localStorage.getItem('driftwood_milestone_log_v1') || 'null');
+            const closed = Array.isArray(s?.closed) ? s.closed.length : 0;
+            if (closed > 0) return null;
+          } catch { /* fresh shore — show the nudge */ }
+          return (
+            <button onClick={enterIsland}
+              className="w-full relative overflow-hidden rounded-[1.75rem] mb-2 text-left cursor-pointer active:scale-[0.99] transition-all"
+              style={{ height: 108 }}>
+              <img src="/story/act0/p3_the_sail.jpg" alt="" aria-hidden
+                className="absolute inset-0 w-full h-full object-cover story-kenburns"
+                onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(7,33,31,0.82), rgba(7,33,31,0.25))' }} />
+              <div className="absolute inset-0 flex items-center gap-3 px-4">
+                <span className="text-2xl animate-bounce shrink-0">👇</span>
+                <div>
+                  <p className="text-[13px] font-display font-black text-white">Your first challenge is waiting on the island</p>
+                  <p className="text-[10.5px] font-bold text-amber-200/90">walk to the glowing circle marked START HERE — the crew will meet you there</p>
+                </div>
+              </div>
+            </button>
+          );
+        })()}
         <button onClick={enterIsland} data-testid="walk-island"
           className="w-full flex items-center gap-3 p-4 rounded-[1.75rem] text-left cursor-pointer active:scale-[0.99] transition-all"
           style={{ background: 'linear-gradient(120deg,#0E7C7C,#2E96B5)', boxShadow: '0 10px 28px rgba(14,124,124,0.35)' }}>

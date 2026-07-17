@@ -60,12 +60,15 @@ function gameRounds(gameId: string): number {
   } catch { return 0; }
 }
 
-const ROBOT_NAMES: Record<string, { name: string; emoji: string }> = {
-  skip:    { name: 'Skip',        emoji: '🤖' },
-  hollow:  { name: 'Hollow',      emoji: '🐚' },
-  echo2:   { name: 'Echo-2',      emoji: '📻' },
-  bailer:  { name: 'Bailer',      emoji: '🪣' },
-  collier: { name: 'The Collier', emoji: '⚒️' },
+// Portraits over emoji (2026-07-16, THE ART RAISE): the robots ARE the art —
+// their painted faces carry every line of dialogue. Emoji is the fallback if
+// a portrait file goes missing.
+const ROBOT_NAMES: Record<string, { name: string; emoji: string; portrait?: string }> = {
+  skip:    { name: 'Skip',        emoji: '🤖', portrait: '/robots/skip.webp' },
+  hollow:  { name: 'Hollow',      emoji: '🐚', portrait: '/robots/hollow.webp' },
+  echo2:   { name: 'Echo-2',      emoji: '📻', portrait: '/robots/echo2.webp' },
+  bailer:  { name: 'Bailer',      emoji: '🪣', portrait: '/robots/bailer.webp' },
+  collier: { name: 'The Collier', emoji: '⚒️', portrait: '/robots/collier.webp' },
 };
 
 type Phase = 'log' | 'scene' | 'conch' | 'working' | 'closing' | 'closed';
@@ -297,7 +300,7 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
           <div key={i}>
             {b.art && <StoryArt src={b.art} />}
             {b.kind === 'narration' && (
-              <p className="font-serif italic text-[12px] leading-relaxed text-slate-600 px-1">{b.text}</p>
+              <p className="font-serif italic text-[13.5px] leading-relaxed text-slate-700 px-1">{b.text}</p>
             )}
             {b.kind === 'choice' && flags[b.id] && (
               <p className="text-[10.5px] text-teal-700 italic px-1 flex items-center gap-1.5">
@@ -306,11 +309,21 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
               </p>
             )}
             {b.kind === 'robot' && (
-              <div className="p-2.5 bg-surface-container-lowest border-2 border-outline-variant rounded-2xl flex items-start gap-2">
-                <span className="text-lg shrink-0">{ROBOT_NAMES[b.who].emoji}</span>
-                <div>
-                  <p className="text-[8px] font-black uppercase tracking-widest text-amber-600">{ROBOT_NAMES[b.who].name}</p>
-                  <p className="text-[11.5px] leading-relaxed text-slate-700">{b.text}</p>
+              <div className="p-3 bg-surface-container-lowest border-2 border-outline-variant rounded-2xl flex items-start gap-2.5">
+                {ROBOT_NAMES[b.who].portrait ? (
+                  <img src={ROBOT_NAMES[b.who].portrait} alt={ROBOT_NAMES[b.who].name}
+                    className="w-11 h-11 rounded-xl object-cover shrink-0 border border-amber-200/70 shadow-sm"
+                    onError={e => {
+                      const img = e.currentTarget; const em = document.createElement('span');
+                      em.textContent = ROBOT_NAMES[b.who].emoji; em.className = 'text-lg shrink-0';
+                      img.replaceWith(em);
+                    }} />
+                ) : (
+                  <span className="text-lg shrink-0">{ROBOT_NAMES[b.who].emoji}</span>
+                )}
+                <div className="min-w-0">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-amber-700">{ROBOT_NAMES[b.who].name}</p>
+                  <p className="text-[13px] leading-relaxed text-slate-800">{b.text}</p>
                 </div>
               </div>
             )}
@@ -475,7 +488,7 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
 
       {phase === 'conch' && active.instrument && (
         <div className="flex flex-col gap-2">
-          <p className="font-serif italic text-[12px] text-slate-600 px-1">
+          <p className="font-serif italic text-[13.5px] text-slate-700 px-1">
             🐚 This first is a TOGETHER first. The phone is the conch: pass it around —
             each person taps their name to say "I'm here for this one."
           </p>
@@ -559,6 +572,18 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
 
       {phase === 'closed' && (
         <div className="flex flex-col gap-2 text-center py-2">
+          {/* THE MEMORY FLASH (2026-07-16): every closed milestone earns two
+              seconds of the boy — the island remembering who taught this
+              lesson first. Rotates through the prologue paintings. */}
+          <div className="relative rounded-2xl overflow-hidden border-2 border-amber-200" style={{ aspectRatio: '21/9' }}>
+            <img
+              src={['/story/act0/p2_lamplight.jpg', '/story/act0/p2b_the_boat.jpg', '/story/act0/p3_the_sail.jpg', '/story/act0/p1_gullhaven.jpg'][active.n % 4]}
+              alt="" aria-hidden className="w-full h-full object-cover story-kenburns"
+              onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = 'none'; }} />
+            <p className="absolute bottom-1.5 inset-x-0 text-center text-[8px] font-black uppercase tracking-[0.3em] text-amber-100/90 drop-shadow">
+              the island remembers
+            </p>
+          </div>
           <span className="text-2xl">🪵</span>
           <p className="text-[13px] font-display font-black text-slate-800">{active.title} — done for real.</p>
           <p className="text-[10px] text-slate-500">
