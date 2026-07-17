@@ -13,12 +13,13 @@ after Lance approves the casting — voices are a person's face; he hears first.
 | **Kettle** | Mabel | kettle-the-warm-thing.wav | "I brought you a warm thing!" |
 | **Dr. Malakor** (journal) | Alistair | lance-app/public/lance-videos/journal_debt_voice.mp3 | the full Notebooks journal (90s) |
 
-## STILL TO CAST (credits ran out at 0.23 — top up, then run these)
-| character | suggested preset | signature line |
-|---|---|---|
-| **Barnacle** | Kevin (or any warm low male) | "I'm not going anywhere. …That's it. That's the whole speech. Somebody built me to stay, so I stay. You can cry on me. I am extremely waterproof." |
-| **The Wright** | Brooks | "Measure the wood, not the worry. The worry lies about lengths. Wood never has. Hand me the long one — no, the one your brother is sitting on." |
-| **Hoist** | Roman | "Heavy things are just light things that need two of us. I lifted the whole bow of the wreck once. Then I put it down. Knowing when to put it down is the skill." |
+| **Barnacle** | Kevin | barnacle-the-staying.wav | "I'm not going anywhere… I am extremely waterproof." |
+| **The Wright** | Brooks | wright-the-measuring.wav | "Measure the wood, not the worry." |
+| **Hoist** | Roman | hoist-the-lifting.wav | "Heavy things are just light things that need two of us." |
+| **The First Mate** (Rehabit) | Sterling | clauderecovery-app/public/voices/firstmate-reporting.wav | "Captain on deck!… I keep the maps and I shout when I see weather." |
+| **Chip** (Rehabit) | Leo — same as Skip, ON PURPOSE: Skip carries Elias; Chip carries the boy | clauderecovery-app/public/voices/chip-the-hinge.wav | "It was a hinge. It's always a hinge." |
 
-*Then: the Voyager crew ×7 (Rehabit), and re-record any voice Lance replaces
-with his ElevenLabs picks — the preset cast is a working cast, not a locked one.*
+**THE CAST IS COMPLETE (2026-07-17 pre-dawn).** Nine Jumble voices + Malakor +
+two Voyager leads. Remaining Voyager crew (Buddy, Patch, Anchor, Jester…) cast
+on demand. Re-record any voice Lance replaces with his ElevenLabs picks — the
+preset cast is a working cast, not a locked one.
