@@ -52,6 +52,14 @@ export default function IslandSeek({ onClose }: { onClose: () => void }) {
   const me = activeCastaway();
   const [, force] = useState(0);
   const [mode, setMode] = useState<'walking' | 'hiding'>('walking');
+  // first-open how-to card (2026-07-18, Lance: "a very step by step") — once
+  const [showHowTo, setShowHowTo] = useState(() => {
+    try { return !localStorage.getItem('driftwood_seek_howto_v1'); } catch { return true; }
+  });
+  const dismissHowTo = () => {
+    try { localStorage.setItem('driftwood_seek_howto_v1', '1'); } catch { /* still dismiss */ }
+    setShowHowTo(false);
+  };
   const [found, setFound] = useState<string | null>(null); // a "found you!" toast
   const [speaking, setSpeaking] = useState<{ id: string; name: string; line: string } | null>(null);
   const lastLine = useRef<Record<string, number>>({});
@@ -231,6 +239,23 @@ export default function IslandSeek({ onClose }: { onClose: () => void }) {
             {g.code
               ? `the island is yours so far — family joins from the camp bar with code ${g.code}`
               : 'a solo walk — the Jumble keeps you company. Light the fire at camp to bring the family here live.'}
+          </div>
+        )}
+
+        {/* first-open how-to — the very step by step, then never again */}
+        {showHowTo && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/35" onClick={dismissHowTo} data-testid="seek-howto">
+            <div className="bg-white rounded-3xl px-6 py-5 max-w-[300px] text-slate-700 shadow-2xl" onClick={e => e.stopPropagation()}>
+              <p className="text-sm font-black mb-2">🏝️ Island Seek — how to</p>
+              <ol className="text-[11px] font-bold space-y-1.5 leading-snug">
+                <li>1 · walk with the stick (bottom-left) or WASD</li>
+                <li>2 · visit a robot — walk close or tap to hear them</li>
+                <li>3 · tap HIDING near 🪨 🌴 🌿 to fade from seekers</li>
+                <li>4 · spot someone? tap them — “found you!”</li>
+                <li>5 · meet back at the 🔥 — nothing is scored</li>
+              </ol>
+              <button onClick={dismissHowTo} className="mt-3 w-full bg-emerald-500 text-white rounded-full py-2 text-xs font-black">got it — let’s walk</button>
+            </div>
           </div>
         )}
 

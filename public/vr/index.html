@@ -467,7 +467,7 @@ for (const lm of VR_LANDMARKS) {
   const tag = nameTag(`${lm.emoji} ${lm.name}`);
   tag.position.set(lm.x, y + (lm.id === 'waterfall' ? 9.5 : lm.id === 'totem' ? 5.6 : 2.6), lm.z);
   scene.add(tag);
-  if (!['waterfall', 'totem', 'workshop'].includes(lm.id)) {
+  if (!['waterfall', 'totem', 'workshop', 'wreck_beach'].includes(lm.id)) {
     const cairn = new THREE.Mesh(new THREE.DodecahedronGeometry(0.55, 0), M_STONE);
     cairn.position.set(lm.x, y + 0.35, lm.z);
     cairn.rotation.y = lm.x * 0.7;
@@ -534,6 +534,52 @@ for (const lm of VR_LANDMARKS) {
   door.position.set(0, 0.75, 2.15); g.add(door);
   const lintel = nameTag('THE TOOLS WILL ANSWER');
   lintel.position.set(0, 3.15, 2.3); lintel.scale.set(2.6, 0.55, 1); g.add(lintel);
+  scene.add(g);
+}
+// the cave behind the water — island3d's cave, kept simple for the headset
+// (one island, every world: the LANCE era walks this same rock as a ruinfield)
+{
+  const x = -52, z = -18, y = groundY(x, z);
+  const g = new THREE.Group(); g.position.set(x, y, z);
+  const p1 = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4.2, 1.4), M_STONE);
+  p1.position.set(-1.6, 2.1, 0.4); g.add(p1);
+  const p2 = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4.2, 1.4), M_STONE);
+  p2.position.set(1.6, 2.1, 0.4); g.add(p2);
+  const lintel = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1.3, 1.6), M_STONE);
+  lintel.position.set(0, 4.7, 0.4); g.add(lintel);
+  // the room: dark pocket behind the mouth — painted dark because caves are
+  const dark = new THREE.MeshLambertMaterial({ color: 0x14110e });
+  const back = new THREE.Mesh(new THREE.BoxGeometry(4.4, 4.6, 0.4), dark);
+  back.position.set(0, 2.2, -2.6); g.add(back);
+  const side1 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.6, 3.2), dark);
+  side1.position.set(-2.0, 2.2, -1.0); g.add(side1);
+  const side2 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 4.6, 3.2), dark);
+  side2.position.set(2.0, 2.2, -1.0); g.add(side2);
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.4, 3.2), dark);
+  roof.position.set(0, 4.3, -1.0); g.add(roof);
+  const ember = new THREE.PointLight(0xE7A15C, 0.5, 7);
+  ember.position.set(0, 1.2, -1.6); g.add(ember);
+  const tag = nameTag('🕳️ The Cave');
+  tag.position.set(0, 6.2, 1.4); g.add(tag);
+  scene.add(g);
+}
+// the wreck itself — Book Two's landing, half in the sand at Wreck Beach
+{
+  const x = -6, z = 96, y = groundY(x, z);
+  const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = 0.7;
+  const old = new THREE.MeshLambertMaterial({ map: tile('/island3d/tex/planks.jpg', 2), color: 0x8a7a64 });
+  const keel = new THREE.Mesh(new THREE.BoxGeometry(9, 1.0, 0.5), old);
+  keel.position.set(0, 0.35, 0); keel.rotation.z = 0.1; g.add(keel);
+  for (let i = 0; i < 6; i++) {                       // the ribs, open to the sky
+    const rib = new THREE.Mesh(new THREE.TorusGeometry(1.5 + (i % 3) * 0.22, 0.09, 6, 12, Math.PI), old);
+    rib.position.set(-3.2 + i * 1.3, 0.5, 0);
+    rib.rotation.set(0, Math.PI / 2, Math.PI);        // ∪ — a hull that lost its planks
+    g.add(rib);
+  }
+  const bow = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.6, 0.5), old);
+  bow.position.set(5.1, 0.9, 0); bow.rotation.z = 0.5; g.add(bow);
+  const scrap = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.12, 1.1), old);
+  scrap.position.set(-2.4, 0.06, 2.6); scrap.rotation.y = 0.9; g.add(scrap);
   scene.add(g);
 }
 
