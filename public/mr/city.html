@@ -111,24 +111,24 @@ function plaque(glyph, name, hex) {
 
 // Build one place: a wooden post + a billboarded plaque, plus a gem if it hides
 // a mystery. Returned so we can animate the mysteries' little glow.
-function makePlace(p, x, z, hex) {
+function makePlace(p, x, z, hex, cardY = 0.07) {
   const grp = new THREE.Group();
   const post = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.006, 0.008, 0.05, 8),
+    new THREE.CylinderGeometry(0.006, 0.008, cardY - 0.02, 8),
     new THREE.MeshStandardMaterial({ color: 0x7a4f22, roughness: 0.8 })
   );
-  post.position.y = 0.025; grp.add(post);
+  post.position.y = (cardY - 0.02) / 2; grp.add(post);
   const card = new THREE.Mesh(
     new THREE.PlaneGeometry(0.07, 0.035),
     new THREE.MeshBasicMaterial({ map: plaque(p.glyph, p.name, hex), transparent: true, side: THREE.DoubleSide, alphaTest: 0.05 })
   );
-  card.position.y = 0.07; grp.add(card); billboards.push(card);
+  card.position.y = cardY; grp.add(card); billboards.push(card);
   if (p.mystery) {
     const gem = new THREE.Mesh(
       new THREE.OctahedronGeometry(0.008),
       new THREE.MeshPhysicalMaterial({ color: 0xffd27a, emissive: 0x8a5a12, roughness: 0.2, clearcoat: 1 })
     );
-    gem.position.y = 0.095; grp.add(gem); grp.userData.gem = gem;
+    gem.position.y = cardY + 0.025; grp.add(gem); grp.userData.gem = gem;
   }
   grp.position.set(x, 0.054, z);
   board.add(grp); return grp;
@@ -155,13 +155,18 @@ fetch('/city/driftwood-city.json').then(r => r.json()).then(data => {
     makeRegion(region, cx, cz);
     const places = data.places.filter(p => p.region === region.id);
     places.forEach((p, pi) => {
-      // fan the places out on the plateau, facing outward
-      const spread = (places.length - 1) * 0.03;
-      const off = -spread / 2 + pi * 0.03;
-      const ax = Math.cos(th) * (off * 0) + Math.cos(th + Math.PI / 2) * off;
-      const az = Math.sin(th) * (off * 0) + Math.sin(th + Math.PI / 2) * off;
-      const rr = 0.03 + (pi % 2) * 0.028;   // two rows so plaques don't overlap
-      const g = makePlace(p, cx + ax + Math.cos(th) * rr, cz + az + Math.sin(th) * rr, region.color);
+      // fan the places out on the plateau, facing outward. The billboarded
+      // cards are 0.07 wide, so same-height neighbours need ≥0.07 between
+      // them: 0.042 lateral spacing + a three-tier height cycle keeps every
+      // plaque readable from any orbit angle (the old 0.03/two-row layout
+      // shingled them into unreadable stacks).
+      const spread = (places.length - 1) * 0.042;
+      const off = -spread / 2 + pi * 0.042;
+      const ax = Math.cos(th + Math.PI / 2) * off;
+      const az = Math.sin(th + Math.PI / 2) * off;
+      const rr = 0.03 + (pi % 2) * 0.028;   // two radial rows for depth
+      const cardY = 0.055 + (pi % 3) * 0.032; // three height tiers
+      const g = makePlace(p, cx + ax + Math.cos(th) * rr, cz + az + Math.sin(th) * rr, region.color, cardY);
       if (g.userData.gem) gems.push(g.userData.gem);
     });
   });
