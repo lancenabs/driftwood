@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, Zap, Heart, SkipForward, Plus, Check } from 'lucide-react';
 import { THE_SEVEN, claimSlot, setActiveCastaway, readCrew, writeRelationship } from '../lib/castaways';
+import DriftwoodOpening from './DriftwoodOpening';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE BOARDING — Driftwood's opening, on the L.A.N.C.E. onboarding template
@@ -285,13 +286,12 @@ export default function BoardingStory({ onStart }: { onStart: () => void }) {
             </motion.div>
           )}
 
-          {/* ── CINEMATIC — the cold open ── */}
+          {/* ── CINEMATIC — the cold open is THE FILM now (2026-07-19, the
+               masterpiece): sixteen painted beats in Skip's own voice on the
+               trailer engine. The old text-panel CINEMATIC data above stays as
+               the story's written record; the film replaces its rendering. ── */}
           {phase === 'cinematic' && (
-            <motion.div key={`cine-${beat}`} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <SpeechPanel speakerColor={cine.color} speakerLabel={cine.speaker} locationLine={cine.location} text={cine.text}
-                onNext={() => (beat < CINEMATIC.length - 1 ? setBeat(beat + 1) : setPhase('crew'))}
-                nextLabel={beat < CINEMATIC.length - 1 ? 'Continue' : 'Wade ashore'} />
-            </motion.div>
+            <DriftwoodOpening onDone={() => setPhase('crew')} />
           )}
 
           {/* ── THE CREW — the family claims their castaways ── */}
