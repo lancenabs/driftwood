@@ -155,6 +155,17 @@ ok('the city does not stand on a story landmark', onTop.length === 0, onTop.join
   ok('VR carries every island3d landmark', lmIds.length > 0 && missing.length === 0, missing.join(', '));
   ok('VR places the city at canonical coordinates (no ring)',
     /const px = p\.x, pz = p\.z;/.test(vr) && !/const RING = /.test(vr));
+
+  // THE JUMBLE IS THE SAME JUMBLE (2026-07-19): the landmark check above only
+  // matches entries with an emoji field, so the robot roster drifted around it
+  // — VR shipped with 6 of the 10 and nothing noticed. Assert every island3d
+  // JUMBLE robot exists in VR at the same coordinates.
+  const jumble = [...html.matchAll(/\{ id: '([a-z_0-9]+)', name: '[^']+', x: (-?\d+), z: (-?\d+), lines:/g)]
+    .map(m => ({ id: m[1], x: +m[2], z: +m[3] }));
+  ok('island3d JUMBLE parses (all ten)', jumble.length === 10, `found ${jumble.length}`);
+  const vrMissing = jumble.filter(r => !new RegExp(`id: '${r.id}', name: '[^']+', x: ${r.x}, z: ${r.z},`).test(vr));
+  ok('VR carries every JUMBLE robot at canonical coordinates',
+    jumble.length > 0 && vrMissing.length === 0, vrMissing.map(r => r.id).join(', '));
 }
 
 console.log(`\n${failures === 0 ? '✅ THE MIRROR HOLDS' : `❌ ${failures} FAILURE(S)`} — the island says what the canon says.\n`);
