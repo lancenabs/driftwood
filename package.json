@@ -16,7 +16,8 @@
     "qa:bridge": "node scripts/qa-bridge.mjs",
     "qa:island-mirror": "node scripts/qa-island-mirror.mjs",
     "qa:invite": "node scripts/qa-invite.mjs",
-    "qa:script": "node scripts/qa-script.mjs"
+    "qa:script": "node scripts/qa-script.mjs",
+    "deploy": "node scripts/deploy.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
