@@ -14,7 +14,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 // audio before the first tap. Skippable everywhere: nothing blocks the work.
 // ============================================================================
 
-const OPENING_V = '?v=20260719a';
+const OPENING_V = '?v=20260719b';   // b: full wides + quiet clips + the watching-from-the-trees pick
 const A = '/opening/audio';
 const V = '/opening/video';
 const S = '/opening/still';
@@ -52,7 +52,10 @@ const BEATS: Beat[] = [
     caption: 'The Collier has never told us.', fallbackMs: 41000 },
   { key: 'b11_question', voice: `${A}/skip_n11.mp3`, location: 'A TUESDAY AFTERNOON · 1951',
     caption: 'It’s still open.', fallbackMs: 28000 },
-  { key: 'b12_wreck', voice: `${A}/skip_n12.mp3`, location: 'SS HALCYON · NOVEMBER 1954',
+  // Lance's pick (2026-07-19): the robots watching from the trees plays here —
+  // it IS "we watched from the trees". The lifeboat painting (b12_wreck) stays
+  // in the repo for the story plates.
+  { key: 'b12alt_watch', voice: `${A}/skip_n12.mp3`, location: 'SS HALCYON · NOVEMBER 1954',
     caption: '“We don’t help storms.”', fallbackMs: 23000 },
   { key: 'b14_hand', voice: `${A}/skip_n13.mp3`, location: '',
     caption: 'Nobody gave me back.', fallbackMs: 43000 },

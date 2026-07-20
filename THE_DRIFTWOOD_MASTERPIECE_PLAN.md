@@ -157,7 +157,9 @@ never claims Malakor invented anything. His gait is in the cut: down, up.
 
 **Casting law for the paintings:** the true ten only (Skip · Hollow · Echo-2 ·
 Bailer · the Collier · Kettle · Barnacle · the Wright · Hoist · the Lookout) —
-driftwood bodies, GREEN bottle-glass eyes (canon; fixes the amber drift), brass
+driftwood bodies, WARM AMBER eyes (Lance's ruling 2026-07-19 on seeing the film
+paintings: amber is canon now; the old green-bottle-glass line is retired —
+update island3d/VR emissives to match in Phase 4, don't regenerate art), brass
 cap on Skip's forearm from beat 13 onward. The castaways: keep every canon name
 and beat; the fourteen are painted as the multicultural 1954 New York they
 sailed from — these frames become permanent visual canon. The boy: consistent
