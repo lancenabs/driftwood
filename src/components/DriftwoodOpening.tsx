@@ -14,7 +14,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 // audio before the first tap. Skippable everywhere: nothing blocks the work.
 // ============================================================================
 
-const OPENING_V = '?v=20260719b';   // b: full wides + quiet clips + the watching-from-the-trees pick
+const OPENING_V = '?v=20260720c';   // c: THE NARRATOR — Bill (wise, old, made for stories) records all sixteen
 const A = '/opening/audio';
 const V = '/opening/video';
 const S = '/opening/still';
