@@ -17,6 +17,7 @@ import { TOOL_COMPLETION, readSaveSignature } from './lance/components/LANCEGame
 import { appendEvent } from './lib/world';
 import { activeCastaway } from './lib/castaways';
 import { parseInvite, acceptInvite, clearInviteFromURL } from './lib/invite';
+import { syncNow as companionSyncNow } from './lib/companionLink';
 import GamesMenu from './components/games/GamesMenu';
 import DriftwoodCity from './components/DriftwoodCity';
 
@@ -66,6 +67,13 @@ function DriftwoodShell() {
     };
     window.addEventListener('driftwood:open-tool', openTool as EventListener);
     return () => window.removeEventListener('driftwood:open-tool', openTool as EventListener);
+  }, []);
+
+  // The outcome loop's heartbeat: sync-on-open. If the family is paired with a
+  // Navigator, pull directives and push receipts once per launch — the same
+  // law as the island and the voyage. Fail-silent; the shore never blocks.
+  React.useEffect(() => {
+    void companionSyncNow();
   }, []);
 
   // THE INVITE lands here: "meet me at the waterfall" was a texted link, and the

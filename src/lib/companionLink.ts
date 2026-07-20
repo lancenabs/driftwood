@@ -441,11 +441,21 @@ export async function syncNow(): Promise<boolean> {
     // reconcile milestone assignments against the closed log BEFORE the payload
     // is built, so a milestone finished since the last sync crosses as completed
     if (detectMilestoneCompletions(state)) saveDirectiveState(state);
-    const payload = await buildExportPayload();
+    // THE TREATY SHAPE (found broken 2026-07-19, the outcome-loop prover):
+    // the export goes FLAT at the top level with receipts as a
+    // directiveReceipts[] array — exactly as the island and voyage send it.
+    // The nested { payload, receipts } shape was silently 400ing on every
+    // sync, so driftwood pulled directives but never once reported home.
+    const payload = {
+      ...(await buildExportPayload()),
+      directiveReceipts: Object.entries(state.receipts).map(([directiveId, r]) => ({
+        directiveId, status: r.status, at: r.at, detail: r.detail,
+      })),
+    };
     const res = await fetch(`${link.endpoint}/api/companion-sync/${link.clientId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${link.token}` },
-      body: JSON.stringify({ payload, receipts: state.receipts }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) return false;
     localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());

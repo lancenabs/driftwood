@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X, ChevronRight, Users, Zap, Heart, Shield, Sliders, Volume2, VolumeX,
-  RotateCcw, Trash2, BookOpen, Check,
+  RotateCcw, Trash2, BookOpen, Check, Anchor,
 } from 'lucide-react';
 import { THE_SEVEN, readCrew, claimSlot, setActiveCastaway, activeCastaway } from '../lib/castaways';
 import { loadCartridge } from '../lib/cartridge';
 import SafetyCrisisSettings from './SafetyCrisisSettings';
+import HarbormasterCard from './HarbormasterCard';
+import { getLink as getTherapistLink } from '../lib/companionLink';
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE SHIP'S FITTINGS — rebuilt on the L.A.N.C.E. settings template (Lance's
@@ -56,7 +58,7 @@ function SectionHeader({ title }: { title: string }) {
 
 const card: React.CSSProperties = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' };
 
-type Screen = 'main' | 'crew' | 'mode' | 'sound' | 'safety' | 'cartridge' | 'data';
+type Screen = 'main' | 'crew' | 'mode' | 'sound' | 'safety' | 'cartridge' | 'data' | 'harbormaster';
 
 export default function SettingsScreen({ onBack }: { onBack: () => void }) {
   const [screen, setScreen] = useState<Screen>('main');
@@ -80,6 +82,7 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
   const screenTitle: Record<Screen, string> = {
     main: 'Settings', crew: 'The Crew', mode: 'How You Begin', sound: 'Sounds',
     safety: 'Safety & Crisis', cartridge: 'Practice Cartridge', data: 'Privacy & Data',
+    harbormaster: 'The Harbormaster',
   };
 
   return (
@@ -174,6 +177,7 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
                   <SectionRow icon={quiet ? VolumeX : Volume2} label="Sounds" sub={quiet ? 'The quiet shore — sounds off' : 'Shore sounds on'} onPress={() => setScreen('sound')} color="#A78BFA" />
 
                   <SectionHeader title="System" />
+                  <SectionRow icon={Anchor}   label="The Harbormaster"   sub={getTherapistLink() ? `${getTherapistLink()?.practiceName || 'Your therapist'} · connected` : 'Connect your therapist’s Navigator'} onPress={() => setScreen('harbormaster')} color="#2E96B5" />
                   <SectionRow icon={Shield}   label="Safety & Crisis"    sub="Set up with your therapist" onPress={() => setScreen('safety')} color="#F87171" />
                   <SectionRow icon={BookOpen} label="Practice Cartridge" sub={cart.practiceName}          onPress={() => setScreen('cartridge')} color="#7FD98C" />
 
@@ -310,6 +314,9 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
                   </div>
                 </div>
               )}
+
+              {/* ══ THE HARBORMASTER — the Navigator bridge (client #3) ═══════ */}
+              {screen === 'harbormaster' && <HarbormasterCard />}
 
               {/* ══ SAFETY & CRISIS — therapist-configured, settings-only ═════ */}
               {screen === 'safety' && (
