@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Activity, 
-  Sparkles, 
+import { aiHeaders } from '../lib/aiKey';
+import {
+  Activity,
+  Sparkles,
   Volume2, 
   VolumeX, 
   HelpCircle, 
@@ -313,7 +314,7 @@ export default function RelationalResonanceOrb({ onClose }: { onClose?: () => vo
     try {
       const response = await fetch('/api/co-regulate-blueprint', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: aiHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           partnerAState: { heartRate: partnerA.heartRate, tension: partnerA.tension },
           partnerBState: { heartRate: partnerB.heartRate, tension: partnerB.tension },

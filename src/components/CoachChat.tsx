@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import LiquidOrb from './LiquidOrb';
+import { aiHeaders } from '../lib/aiKey';
 import { 
   MessageSquare, 
   Send, 
@@ -185,9 +186,9 @@ While offline, I cannot connect to the clinical cloud to generate custom respons
       // Call our secure server endpoint
       const response = await fetch('/api/coach-chat', {
         method: 'POST',
-        headers: {
+        headers: aiHeaders({
           'Content-Type': 'application/json'
-        },
+        }),
         body: JSON.stringify({
           message: textToSend,
           history: messages.slice(-10) // Send last 10 messages for conversational context

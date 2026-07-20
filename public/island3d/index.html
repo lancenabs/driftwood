@@ -1627,9 +1627,9 @@ const fallsAnim = [];
     body.position.y = 0.5; bg.add(body);
     const head = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.5, 0.5), mat(0x7A5E3C));
     head.position.y = 1.12; bg.add(head);
-    for (const ex of [-0.13, 0.13]) {            // green bottle-glass knot-eyes
+    for (const ex of [-0.13, 0.13]) {            // warm amber knot-eyes (canon, Lance's 2026-07-19 ruling)
       const eye = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 6),
-        new THREE.MeshBasicMaterial({ color: 0x6FBF73 }));
+        new THREE.MeshBasicMaterial({ color: 0xFFB347 }));
       eye.position.set(ex, 1.16, 0.26); bg.add(eye);
     }
     for (const ax of [-0.45, 0.45]) {            // stubby arms, one reaching to the warmth

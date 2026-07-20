@@ -9,6 +9,42 @@ import { loadCartridge } from '../lib/cartridge';
 import SafetyCrisisSettings from './SafetyCrisisSettings';
 import HarbormasterCard from './HarbormasterCard';
 import { getLink as getTherapistLink } from '../lib/companionLink';
+import { loadAiKey, saveAiKey } from '../lib/aiKey';
+
+// ══ AI BRAIN & KEY — the practice's own Gemini key, localStorage-only ════════
+function AiKeyScreen() {
+  const [key, setKey] = useState(loadAiKey());
+  const [savedFlash, setSavedFlash] = useState(false);
+  const card: React.CSSProperties = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' };
+  return (
+    <div className="space-y-3">
+      <div className="p-4 rounded-2xl space-y-2" style={card}>
+        <p className="text-sm font-bold text-white">Run this shore on your practice’s key</p>
+        <p className="text-[12px] text-slate-400 leading-relaxed">
+          Paste a Google Gemini API key and every AI feature here — the relationship guide, the
+          co-regulation blueprints — rides your account from this device. The key lives only in this
+          browser’s storage and travels per-request; our server never stores it. Clear the field to
+          go back to the house configuration.
+        </p>
+        <input
+          value={key}
+          onChange={e => setKey(e.target.value)}
+          placeholder="AIza…"
+          type="password"
+          autoComplete="off"
+          className="w-full p-3 rounded-xl text-xs font-mono focus:outline-none"
+          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#fff' }}
+        />
+        <button
+          onClick={() => { saveAiKey(key); setSavedFlash(true); setTimeout(() => setSavedFlash(false), 2000); }}
+          className="w-full py-3 rounded-2xl font-black text-sm cursor-pointer transition-all active:scale-[0.98]"
+          style={{ background: '#0E7C7C', color: '#fff' }}>
+          {savedFlash ? 'Saved ✓' : key.trim() ? 'Save key' : 'Clear key'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  THE SHIP'S FITTINGS — rebuilt on the L.A.N.C.E. settings template (Lance's
@@ -58,7 +94,7 @@ function SectionHeader({ title }: { title: string }) {
 
 const card: React.CSSProperties = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' };
 
-type Screen = 'main' | 'crew' | 'mode' | 'sound' | 'safety' | 'cartridge' | 'data' | 'harbormaster';
+type Screen = 'main' | 'crew' | 'mode' | 'sound' | 'safety' | 'cartridge' | 'data' | 'harbormaster' | 'aikey';
 
 export default function SettingsScreen({ onBack }: { onBack: () => void }) {
   const [screen, setScreen] = useState<Screen>('main');
@@ -82,7 +118,7 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
   const screenTitle: Record<Screen, string> = {
     main: 'Settings', crew: 'The Crew', mode: 'How You Begin', sound: 'Sounds',
     safety: 'Safety & Crisis', cartridge: 'Practice Cartridge', data: 'Privacy & Data',
-    harbormaster: 'The Harbormaster',
+    harbormaster: 'The Harbormaster', aikey: 'AI Brain & Key',
   };
 
   return (
@@ -179,6 +215,7 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
                   <SectionHeader title="System" />
                   <SectionRow icon={Anchor}   label="The Harbormaster"   sub={getTherapistLink() ? `${getTherapistLink()?.practiceName || 'Your therapist'} · connected` : 'Connect your therapist’s Navigator'} onPress={() => setScreen('harbormaster')} color="#2E96B5" />
                   <SectionRow icon={Shield}   label="Safety & Crisis"    sub="Set up with your therapist" onPress={() => setScreen('safety')} color="#F87171" />
+                  <SectionRow icon={Zap}      label="AI Brain & Key"     sub={loadAiKey() ? 'Running on your practice’s key' : 'Run AI features on your own key'} onPress={() => setScreen('aikey')} color="#F2A65A" />
                   <SectionRow icon={BookOpen} label="Practice Cartridge" sub={cart.practiceName}          onPress={() => setScreen('cartridge')} color="#7FD98C" />
 
                   <SectionHeader title="Admin & Data" />
@@ -317,6 +354,9 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
 
               {/* ══ THE HARBORMASTER — the Navigator bridge (client #3) ═══════ */}
               {screen === 'harbormaster' && <HarbormasterCard />}
+
+              {/* ══ AI BRAIN & KEY — bring-your-own-key (the fleet law) ═══════ */}
+              {screen === 'aikey' && <AiKeyScreen />}
 
               {/* ══ SAFETY & CRISIS — therapist-configured, settings-only ═════ */}
               {screen === 'safety' && (
