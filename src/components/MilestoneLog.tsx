@@ -28,7 +28,9 @@ interface LogState {
   // moved AND every box is checked. Each first check strikes a match or
   // lands a ration (rewarded[] guards the double-tap; the tide keeps what
   // it pays).
-  investigating: { id: string; baseline: string; tasks?: boolean[]; rewarded?: boolean[] } | null;
+  // `aboard`: the slotIds who took the conch for THIS first (conjoint only) —
+  // the story remembers who was actually there, not just that "it happened."
+  investigating: { id: string; baseline: string; tasks?: boolean[]; rewarded?: boolean[]; aboard?: string[] } | null;
 }
 const STATE_KEY = 'driftwood_milestone_log_v1';
 
@@ -117,6 +119,8 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
   const [phase, setPhase] = useState<Phase>('log');
   const [beatIdx, setBeatIdx] = useState(0);
   const [conchConfirms, setConchConfirms] = useState<string[]>([]);
+  // the names who took the conch on the just-closed first (for the ceremony)
+  const [closedAboard, setClosedAboard] = useState<string[]>([]);
   const [curtain, setCurtain] = useState<{ season: number; name: string; arc: string } | null>(null);
 
   const firstOpen = useMemo(
@@ -203,10 +207,13 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
     // the task list boards with the work: one checkbox per CRAFT step
     const tasks = craft?.steps?.length ? craft.steps.map(() => false) : undefined;
     const rewarded = tasks ? tasks.map(() => false) : undefined;
+    // who took the conch (conjoint firsts only) — rides with the work so the
+    // closing can name them and the log can remember who was aboard
+    const aboard = m.instrument.conjoint && conchConfirms.length ? [...conchConfirms] : undefined;
     if (craft?.gameId) {
       // the instrument is a campfire game — baseline the real round count,
       // then send the crew to the fire with the right game queued
-      const next = { ...loadState(), investigating: { id: m.id, baseline: String(gameRounds(craft.gameId)), tasks, rewarded } };
+      const next = { ...loadState(), investigating: { id: m.id, baseline: String(gameRounds(craft.gameId)), tasks, rewarded, aboard } };
       setState(next); saveState(next);
       setPhase('working');
       try { sessionStorage.setItem('driftwood_pending_game', craft.gameId); } catch { /* menu still opens */ }
@@ -215,7 +222,7 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
     }
     const signal = (TOOL_COMPLETION as Record<string, { kind: string; keys?: string[] }>)[m.instrument.toolId];
     const baseline = signal?.kind === 'save' && signal.keys ? readSaveSignature(signal.keys) : '';
-    const next = { ...loadState(), investigating: { id: m.id, baseline, tasks, rewarded } };
+    const next = { ...loadState(), investigating: { id: m.id, baseline, tasks, rewarded, aboard } };
     setState(next); saveState(next);
     setPhase('working');
     onOpenTool(m.instrument.toolId);
@@ -258,6 +265,11 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
 
   const finishMilestone = (m: Milestone) => {
     const already = loadState().closed.includes(m.id);
+    // read who was aboard BEFORE the log clears the work
+    const inv = loadState().investigating;
+    const aboard = inv?.id === m.id ? inv.aboard ?? [] : [];
+    const aboardNames = readCrew().filter(c => aboard.includes(c.slotId)).map(c => c.name);
+    setClosedAboard(aboardNames);
     const next: LogState = {
       closed: already ? loadState().closed : [...loadState().closed, m.id],
       investigating: null,
@@ -277,7 +289,7 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
       appendEvent(me.id, 'milestone_closed', { milestoneId: m.id, n: m.n });
       for (let i = 0; i < m.planks; i++) appendEvent(me.id, 'plank_earned', { milestoneId: m.id });
       appendEvent(me.id, 'ember_earned', { milestoneId: m.id });
-      if (m.instrument?.conjoint) appendEvent(me.id, 'gathering_held', { milestoneId: m.id });
+      if (m.instrument?.conjoint) appendEvent(me.id, 'gathering_held', { milestoneId: m.id, aboard: aboardNames });
       if (isSeasonEnd(m)) {
         const s = SEASONS.find(x => x.n === m.season)!;
         setCurtain({ season: s.n, name: s.name, arc: s.arc });
@@ -522,8 +534,19 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
                 : 'bg-slate-100 text-slate-300'
             }`}
           >
-            Together: {active.instrument.toolName} <ChevronRight className="w-3.5 h-3.5" />
+            Together: {active.instrument.toolName}
+            {conchConfirms.length >= 2 && conchConfirms.length < readCrew().length &&
+              ` · ${conchConfirms.length} of ${readCrew().length} aboard`}
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
+          {/* the honest muster: a together-first with hands missing says so out
+              loud — no shame, just the truth of who held the shell tonight */}
+          {conchConfirms.length >= 2 && conchConfirms.length < readCrew().length && (
+            <p className="text-[9px] text-amber-600/90 font-bold text-center">
+              {readCrew().filter(c => !conchConfirms.includes(c.slotId)).map(c => c.name).join(' · ')} didn't
+              take the shell tonight — the island will remember who did.
+            </p>
+          )}
           <p className="text-[8px] text-slate-400 italic text-center">
             Solo tonight? That's honest too — set it aside and bring the crew at the next Gathering. Nothing is lost by waiting.
           </p>
@@ -594,6 +617,13 @@ export default function MilestoneLog({ onOpenTool, hideShelf }: { onOpenTool: (i
           </div>
           <span className="text-2xl">🪵</span>
           <p className="text-[13px] font-display font-black text-slate-800">{active.title} — done for real.</p>
+          {/* THE NAMES LAW, at the ceremony: a together-first belongs to the
+              hands that held the shell — the island says their names back */}
+          {active.instrument?.conjoint && closedAboard.length > 0 && (
+            <p className="text-[10px] font-black text-amber-700 tracking-wide">
+              🐚 This first belongs to {closedAboard.join(' · ')}.
+            </p>
+          )}
           <p className="text-[10px] text-slate-500">
             +{active.planks} plank{active.planks > 1 ? 's' : ''} on the raft · +1 ember for the fire.
             The camp never shrinks; this is yours forever.
