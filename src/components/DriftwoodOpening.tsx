@@ -14,7 +14,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 // audio before the first tap. Skippable everywhere: nothing blocks the work.
 // ============================================================================
 
-const OPENING_V = '?v=20260720c';   // c: THE NARRATOR — Bill (wise, old, made for stories) records all sixteen
+const OPENING_V = '?v=20260723a';   // a: THE NARRATOR II — Wolfgang (deep, resonant; the XAI trailer voice) retells all sixteen; Bill archived at asset-archive-story/narration-bill
 const A = '/opening/audio';
 const V = '/opening/video';
 const S = '/opening/still';
